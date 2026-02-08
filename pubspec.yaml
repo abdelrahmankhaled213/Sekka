@@ -13,6 +13,7 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   dio: ^5.9.1
+<<<<<<< HEAD
   flutter_native_splash: ^2.4.7
   geolocator: ^14.0.2
   flutter_screenutil: ^5.9.3
@@ -26,6 +27,9 @@ dependencies:
   supabase_flutter: ^2.10.3
   dartx: ^1.2.0
   dartz: ^0.10.1
+=======
+
+>>>>>>> 0eaaaec78cdaa0db603949b15dfae98c51dc51aa
 dev_dependencies:
   flutter_test:
     sdk: flutter
