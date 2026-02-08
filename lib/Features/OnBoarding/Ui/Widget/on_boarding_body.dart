@@ -8,7 +8,6 @@ class OnBoardingBody extends StatelessWidget {
     return CustomScrollView(
 
       slivers: [
-
 SliverToBoxAdapter(
   child: OnBoardingBody(),
 ),
