@@ -13,7 +13,7 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   dio: ^5.9.1
-<<<<<<< HEAD
+
   flutter_native_splash: ^2.4.7
   geolocator: ^14.0.2
   flutter_screenutil: ^5.9.3
@@ -27,9 +27,6 @@ dependencies:
   supabase_flutter: ^2.10.3
   dartx: ^1.2.0
   dartz: ^0.10.1
-=======
-
->>>>>>> 0eaaaec78cdaa0db603949b15dfae98c51dc51aa
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -39,8 +36,9 @@ flutter:
   uses-material-design: true
 
   assets:
-     - assets/images/
-     - assets/Icons/
+   - assets/Images/
+   - assets/Icons/
+
 
 
   # To add custom fonts to your application, add a fonts section here,
@@ -48,17 +46,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
+  fonts:
+     - family: Roboto
+       fonts:
+         - asset: assets/Fonts/Roboto-VariableFont_wdth,wght.ttf
+
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

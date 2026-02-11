@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 class OnBoardingBody extends StatelessWidget {
   const OnBoardingBody({super.key});
 
@@ -9,9 +8,6 @@ class OnBoardingBody extends StatelessWidget {
 
       slivers: [
 
-SliverToBoxAdapter(
-  child: OnBoardingBody(),
-),
 
       ],
 
