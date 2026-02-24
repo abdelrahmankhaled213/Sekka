@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../Widget/on_boarding_body.dart';
 
 class OnBoardingView extends StatelessWidget {
@@ -8,7 +9,7 @@ class OnBoardingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-       body: OnBoardingBody(),
+      body: OnBoardingBody(),
     );
   }
 }

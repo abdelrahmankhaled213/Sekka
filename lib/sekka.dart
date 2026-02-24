@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sekka/Core/App/env_variables.dart';
 import 'package:sekka/Core/Navigation/on_generate_route.dart';
 
 class Sekka extends StatelessWidget {
@@ -13,7 +14,7 @@ designSize: Size(394, 853),
      splitScreenMode: true,
     builder: (context, child) {
 return MaterialApp(
-debugShowCheckedModeBanner: false,
+debugShowCheckedModeBanner: EnvironmentVariable.instance.environmentVariable=='Dev',
   title: 'Sekka',
 
 onGenerateRoute: onGenerateRoute,
