@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_it/get_it.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
+import 'package:sekka/Core/Constants/app_route.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
+import 'package:sekka/Core/Constants/cached_keys.dart';
+import 'package:sekka/Core/DI/service_locator.dart';
+import 'package:sekka/Core/Database/cache_helper.dart';
 import 'package:sekka/Core/Widget/custom_button_core.dart';
 import 'package:sekka/Features/OnBoarding/Ui/Widget/next_or_skip.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -140,10 +145,13 @@ class _OnBoardingSwitchState extends State<OnBoardingSwitch> {
                 SmoothPageIndicator(
                 controller: _controller,
                   effect: WormEffect(
+radius: 12.r,
 
                     dotHeight: 8.h,
-                    dotWidth: 8.w,
+                    dotWidth: 32.w,
+
                     strokeWidth: 1,
+
                     activeDotColor:
                     data[index].firstColorGradient,
                    type: WormType.thinUnderground
@@ -174,22 +182,36 @@ class _OnBoardingSwitchState extends State<OnBoardingSwitch> {
       _controller.nextPage(duration: const Duration(
           seconds: 1
       ), curve: Curves.easeInToLinear);
+
+    }
+    else{
+      _navigateToRegister();
     }
   }
-
+Future<void> setCache() async{
+    await getIt<CacheHelper>()
+        .setCachedValue(key: CachedKeys.onBoardingKey,value: true);
+}
   void _onPressedSkip() {
+
     if (_controller.page! < data.length - 1) {
       _controller.animateToPage(data.length
           , duration: const Duration(
               seconds: 1
           ), curve: Curves.easeInToLinear);
     }
-    else {
-
+else{
+  _navigateToRegister();
     }
   }
 
+ Future<void> _navigateToRegister() async {
+   await setCache();
+   Navigator.pushReplacementNamed(context, AppRoute.register);
+
+ }
   void _onPageChanged(int value) {
+
     final isLastPage = value == data.length - 1;
 
     if (skipDisappear != isLastPage) {

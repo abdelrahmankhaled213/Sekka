@@ -3,6 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_route.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
+import 'package:sekka/Core/Constants/cached_keys.dart';
+import 'package:sekka/Core/DI/service_locator.dart';
+import 'package:sekka/Core/Database/cache_helper.dart';
 import 'package:sekka/Features/Splash/Widget/logo_container.dart';
 
 class SplashScreenBody extends StatefulWidget {
@@ -57,9 +60,18 @@ class _SplashScreenBodyState extends State<SplashScreenBody>
       ),
     );
 
-    Future.delayed(const Duration(seconds: 6), () {
+    Future.delayed(const Duration(seconds: 6), () async {
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, AppRoute.onBoarding);
+
+      final data=await getIt<CacheHelper>()
+          .getCachedValue(CachedKeys.onBoardingKey);
+      print(data);
+      if(data==true){
+        Navigator.pushReplacementNamed(context, AppRoute.register);
+      }else{
+        Navigator.pushReplacementNamed(context, AppRoute.onBoarding);
+      }
+
     });
   }
 
