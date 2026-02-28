@@ -10,18 +10,22 @@ const Sekka({super.key});
 @override
 Widget build(BuildContext context) {
   return ScreenUtilInit(
-designSize: Size(394, 853),
+     designSize: Size(394, 853),
      splitScreenMode: true,
-    builder: (context, child) {
-return MaterialApp(
-debugShowCheckedModeBanner: EnvironmentVariable.instance.environmentVariable=='Dev',
-  title: 'Sekka',
-
-onGenerateRoute: onGenerateRoute,
+     builder: (context, child) {
+return GestureDetector(
+  behavior:HitTestBehavior.translucent ,
+  onTap: _onTapMaterialApp,
+  child:MaterialApp(
+  debugShowCheckedModeBanner: EnvironmentVariable.instance.environmentVariable=='Dev',
+    title: 'Sekka',
+  onGenerateRoute: onGenerateRoute,
+  ),
 );
     },
-
-
   );
+}
+void _onTapMaterialApp(){
+  FocusManager.instance.primaryFocus?.unfocus();
 }
 }
