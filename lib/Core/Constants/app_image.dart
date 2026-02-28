@@ -9,5 +9,5 @@ abstract class AppImage{
    static const String realTimeCapacityIcon="assets/Icons/real_time_capacity_icon.png";
    static const String chatbotIcon="assets/Icons/chatbot_Icon.png";
    static const String smartAlertIcon="assets/Icons/smart_alert_icon.png";
-
+   static const String backgroundAuth="assets/Images/Image (Smart City) (1).png";
 }
