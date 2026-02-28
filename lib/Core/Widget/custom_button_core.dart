@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:sekka/Core/Constants/app_style.dart';
 
 class CustomButtonCore extends StatelessWidget{
 
@@ -9,16 +8,20 @@ class CustomButtonCore extends StatelessWidget{
   final String text;
   final double height;
   final double width;
+  final Widget child;
   final Color firstColor;
   final Color secondColor;
-  final Widget child;
-  const CustomButtonCore({super.key
-    ,required this.onPressed,required this.width 
+  final Color? thirdColor;
+  const CustomButtonCore({
+     super.key,
+     required this.child
+    ,required this.onPressed
+    ,required this.width
     ,required this.height,
-  required this.firstColor,
-  required this.secondColor,
-    required this.text,
-    required this.child
+     required this.firstColor,
+     required this.secondColor,
+      this.thirdColor,
+     required this.text,
   });
 
 @override
@@ -37,13 +40,12 @@ return GestureDetector(
           blurRadius: 4
 
         ),
-
       ],
        borderRadius: BorderRadius.circular(16.r),
        gradient: LinearGradient(colors: [
     firstColor.withOpacity(0.8),
-    firstColor.withOpacity(0.8),
-    secondColor.withOpacity(0.85)
+    thirdColor==null?firstColor.withOpacity(0.8):secondColor,
+    thirdColor==null?secondColor.withOpacity(0.85):thirdColor!
       ]
       ,stops: [0,0.5,1],begin: Alignment.topCenter
       ,end: Alignment.bottomCenter
