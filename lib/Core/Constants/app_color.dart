@@ -9,4 +9,8 @@ abstract class AppColor{
   static const Color orange=Color(0xffF59E0B);
   static const Color black=Color(0xff0F172A);
   static const Color grey=Color(0xff64748B);
+  static const Color customWhite=Color(0xffF8FAFC);
+  static const Color offWhite=Color(0xffF1F5F9);
+  static const Color borderColor=Color(0xff94A3B8);
+
 }

@@ -61,13 +61,13 @@ class _SplashScreenBodyState extends State<SplashScreenBody>
     );
 
     Future.delayed(const Duration(seconds: 6), () async {
+
       if (!mounted) return;
 
       final data=await getIt<CacheHelper>()
           .getCachedValue(CachedKeys.onBoardingKey);
-      print(data);
       if(data==true){
-        Navigator.pushReplacementNamed(context, AppRoute.register);
+        Navigator.pushReplacementNamed(context, AppRoute.onBoarding);
       }else{
         Navigator.pushReplacementNamed(context, AppRoute.onBoarding);
       }
@@ -110,6 +110,7 @@ class _SplashScreenBodyState extends State<SplashScreenBody>
                 child: LogoContainer(
                   height: 160.h,
                   width: 160.h,
+                  radius: 40.r,
                 ),
               ),
 
