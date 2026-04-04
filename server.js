@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(cors());
 
 
-const serviceAccount = require("./serviceAccountKey.json");
+const serviceAccount = JSON.parse(process.env.FirebaseServiceAccount);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -33,6 +33,7 @@ app.post("/addStation", async (req, res) => {
     });
 
     res.json({ success: true, id: doc.id });
+
   } catch (e) {
     res.status(500).json({ error: e.message });
     
