@@ -105,6 +105,19 @@ app.post("/save-token", async (req, res) => {
 });
 
 
+app.get("/test-db", async (req, res) => {
+  try {
+    const { data, error } = await supabase.from("user_devices").select("*");
+    if (error) throw error;
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+
+
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
