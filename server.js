@@ -78,14 +78,19 @@ app.post("/save-token", async (req, res) => {
 
    
     const { data, error } = await supabase
-      .from("user_devices")
+     
+        .from("user_devices")
       .upsert(
         {
+
           user_id: user_id ?? null,
-          fcm_token: token,
+          token: token,
           device_type: device_type ?? "android",
         },
-        { onConflict: "fcm_token" }
+         
+      { onConflict: "token" }
+ 
+
       );
 
     if (error) throw error;
@@ -98,12 +103,6 @@ app.post("/save-token", async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
-
-
-
-
-
-
 
 
 const PORT = process.env.PORT || 3000;
