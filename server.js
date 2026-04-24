@@ -1,3 +1,6 @@
+const fetch = (...args) =>
+  import('node-fetch').then(({default: fetch}) => fetch(...args));
+global.fetch = fetch;
 const express = require("express");
 const admin = require("firebase-admin");
 const cors = require("cors");
