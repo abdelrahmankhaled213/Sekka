@@ -49,25 +49,6 @@ app.post("/test-notification"
 });
 
 
-app.post("/addStation", async (req, res) => {
-  try {
-
-    const { name, lat, lng } = req.body;
-
-    const doc = await db.collection("stations").add({
-      name,
-      lat,
-      lng,
-      createdAt: new Date(),
-    });
-
-    res.json({ success: true, id: doc.id });
-
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-    
-  }
-});
 
 async function sendNotification(token,title, body) {
 
@@ -87,7 +68,36 @@ async function sendNotification(token,title, body) {
 
 }
 
+app.post("/save-token", async (req, res) => {
+  try {
+    const { user_id, token, device_type } = req.body;
 
+    if (!token) {
+      return res.status(400).json({ error: "Token is required" });
+    }
+
+   
+    const { data, error } = await supabase
+      .from("user_devices")
+      .upsert(
+        {
+          user_id: user_id ?? null,
+          fcm_token: token,
+          device_type: device_type ?? "android",
+        },
+        { onConflict: "fcm_token" }
+      );
+
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      message: "Token saved successfully 🚀",
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 
 
 
