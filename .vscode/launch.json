@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "sekka (Flutter SM T585)",
+            "request": "launch",
+            "type": "dart"
+        },
+
+        {
+            "name": "sekka",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "sekka (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "sekka (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

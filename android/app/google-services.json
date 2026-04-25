@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "383394777404",
+    "project_id": "islamy-2026",
+    "storage_bucket": "islamy-2026.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:383394777404:android:5a73ef5b4e742c852e7639",
+        "android_client_info": {
+          "package_name": "com.example.abdelrahmankhaled.sekka"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "383394777404-02b8t6lq3qr53k358iojfjrvio2vsdrl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.abdelrahmankhaled.sekka",
+            "certificate_hash": "97dc14858bd39139fa1a416849f694a90a29cc37"
+          }
+        },
+        {
+          "client_id": "383394777404-9nbap5qnercl1m09om7ovufisd839307.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCU1sBsG_41CyhzJsYe8pjcuerPbp-BDk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "383394777404-9nbap5qnercl1m09om7ovufisd839307.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "383394777404-i3jckso1e6hi1k12399n0r69mf2vdm35.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.abdelrahmankhaled.sekka"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
