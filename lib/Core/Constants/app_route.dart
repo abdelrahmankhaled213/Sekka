@@ -8,5 +8,6 @@ abstract class AppRoute{
   static const String setUpProfile='/setUpProfile';
   static const String authWrapper='/authWrapper';
   static const String bottomNavigation='/bottomNavigation';
+  static const String itemDetailAndChatScreen='/itemDetailAndChatScreen';
 
 }

@@ -5,6 +5,7 @@ import 'package:sekka/Core/Navigation/custom_route_builder.dart';
 import 'package:sekka/Core/Navigation/main_bottom_nav_view.dart';
 import 'package:sekka/Features/Auth/Logic/set_up_profile_cubit.dart';
 import 'package:sekka/Features/Auth/Ui/SetUpProfile/View/setup_profile_view.dart';
+import 'package:sekka/Features/LostAndFound/View/item_detail_and_chat_screen.dart';
 import 'package:sekka/Features/OnBoarding/Ui/Views/OnBoardingView.dart';
 import '../../Features/Auth/Ui/auth_wrapper_view.dart';
 import '../../Features/Splash/View/splash_screen_view.dart';
@@ -44,7 +45,10 @@ import '../DI/service_locator.dart';
         );
 
       case AppRoute.bottomNavigation:
-        return CustomPageRoute(page:MainBottomNavView() );
+        return CustomPageRoute(page:MainScreen() );
+
+case AppRoute.itemDetailAndChatScreen:
+        return CustomPageRoute(page:ItemDetailAndChatScreen(),);
 
       default:
         return MaterialPageRoute(
