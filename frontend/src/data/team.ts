@@ -12,7 +12,7 @@ export const teamMembers: TeamMember[] = [
   {
     name: "Abdelrahman Khaled",
     nameAr: "عبد الرحمن خالد",
-    role: "Flutter Developer",
+    role: "Team Leader & Flutter Developer",
     roleAr: "مطور تطبيقات فلاتر",
     description: "Leads the development of the Sekka mobile application, building a seamless experience across Android and iOS platforms.",
     descriptionAr: "يقود تطوير تطبيق سكة المحمول، ويبني تجربة سلسة عبر منصتي Android و iOS.",
