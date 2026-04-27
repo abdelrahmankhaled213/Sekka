@@ -18,7 +18,7 @@ import 'package:sekka/Features/Auth/Data/UseCase/upsert_user_usecase.dart';
 import 'package:sekka/Features/Auth/Logic/auth_cubit.dart';
 import 'package:sekka/Features/Auth/Logic/set_up_profile_cubit.dart';
 
-Future<void> initAuthDI() async {
+void initAuthDI()  {
 
   /// DataSources
   getIt.registerLazySingleton(() => SupabaseDataSource(getIt()));

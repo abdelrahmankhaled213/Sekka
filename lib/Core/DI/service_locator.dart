@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:sekka/Core/DI/auth_di.dart';
 import 'package:sekka/Core/DI/core_di.dart';
 import 'package:sekka/Core/DI/init_dio.dart';
+import 'package:sekka/Core/DI/lost_found_di.dart';
 import 'package:sekka/Core/DI/notification_di.dart';
 import 'package:sekka/Core/DI/profile_di.dart';
 import 'package:sekka/Core/DI/routes_di.dart';
@@ -11,12 +12,13 @@ final getIt=GetIt.instance;
 
 void setUpServiceLocator() async{
 
- await initCore();
- await initAuthDI();
- await initRoutesDI();
- await initProfileDI();
- await initDio();
- await initSecureStorage();
- await initNotificationDI();
+  await initCore();
+  initAuthDI();
+  initRoutesDI();
+  initProfileDI();
+  initDio();
+  initSecureStorage();
+  initNotificationDI();
+  initLostAndFound();
 
 }

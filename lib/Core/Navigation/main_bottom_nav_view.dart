@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/DI/service_locator.dart';
 import 'package:sekka/Core/Navigation/nav_entities.dart';
+import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
 import 'package:sekka/Features/LostAndFound/View/home_feed_screen_view.dart';
 import 'package:sekka/Features/Profile/Logic/profile_cubit.dart';
 import 'package:sekka/Features/Profile/UI/profile_screen_view.dart';
@@ -13,7 +14,6 @@ import 'package:sekka/Features/Routes/Ui/Widget/View/routes_screen_view.dart';
 import 'package:sekka/main.dart' as AppColor;
 
 class MainScreen extends StatefulWidget {
-
   const MainScreen({super.key});
 
   @override
@@ -24,23 +24,45 @@ class _MainScreenState extends State<MainScreen> {
   int index = 0;
 
   final items = const [
-    NavItemData(label: 'Home', icon: Icons.home_outlined, activeIcon: Icons.home),
-    NavItemData(label: 'Routes', icon: Icons.route_outlined, activeIcon: Icons.route),
-    NavItemData(label: 'Lost', icon: Icons.foundation_outlined, activeIcon: Icons.foundation),
-    NavItemData(label: 'Alerts', icon: Icons.notifications_none, activeIcon: Icons.notifications),
-    NavItemData(label: 'Profile', icon: Icons.person_outline, activeIcon: Icons.person),
+    NavItemData(
+      label: 'Home',
+      icon: Icons.home_outlined,
+      activeIcon: Icons.home,
+    ),
+    NavItemData(
+      label: 'Routes',
+      icon: Icons.route_outlined,
+      activeIcon: Icons.route,
+    ),
+    NavItemData(
+      label: 'Lost',
+      icon: Icons.foundation_outlined,
+      activeIcon: Icons.foundation,
+    ),
+    NavItemData(
+      label: 'Alerts',
+      icon: Icons.notifications_none,
+      activeIcon: Icons.notifications,
+    ),
+    NavItemData(
+      label: 'Profile',
+      icon: Icons.person_outline,
+      activeIcon: Icons.person,
+    ),
   ];
 
-  final pages =  [
-Text("Home"), 
-BlocProvider( create: (context) => getIt<RoutesCubit>()..fetchTransports()
-, child: const RoutesScreenView(), ) 
-, HomeFeedScreen() 
-, Text('Alerts') 
-, BlocProvider(create: (context) => getIt<ProfileCubit>()..getProfile() 
-,child: const ProfileScreenView()),
-
-
+  final pages = [
+    Text("Home"),
+    BlocProvider(
+      create: (context) => getIt<RoutesCubit>()..fetchTransports(),
+      child: const RoutesScreenView(),
+    ),
+    BlocProvider(create: (context) =>getIt<LostAndFoundCubit>(), child: HomeFeedScreen()),
+    Text('Alerts'),
+    BlocProvider(
+      create: (context) => getIt<ProfileCubit>()..getProfile(),
+      child: const ProfileScreenView(),
+    ),
   ];
 
   @override
@@ -57,9 +79,6 @@ BlocProvider( create: (context) => getIt<RoutesCubit>()..fetchTransports()
   }
 }
 
-
-
-
 class FloatingBottomNav extends StatelessWidget {
   const FloatingBottomNav({
     super.key,
@@ -75,14 +94,14 @@ class FloatingBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:  EdgeInsets.fromLTRB(16.h, 0.w, 16.h, 18.w),
+      padding: EdgeInsets.fromLTRB(16.h, 0.w, 16.h, 18.w),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28.r),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
           child: Container(
             height: 70.h,
-            padding:  EdgeInsets.all(8.sp),
+            padding: EdgeInsets.all(8.sp),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(.85),
               borderRadius: BorderRadius.circular(28),
@@ -92,7 +111,7 @@ class FloatingBottomNav extends StatelessWidget {
                   color: Color(0x33000000),
                   blurRadius: 25,
                   offset: Offset(0, 10),
-                )
+                ),
               ],
             ),
             child: LayoutBuilder(
@@ -118,7 +137,7 @@ class FloatingBottomNav extends StatelessWidget {
                           ),
                         );
                       }),
-                    )
+                    ),
                   ],
                 );
               },
@@ -128,8 +147,8 @@ class FloatingBottomNav extends StatelessWidget {
       ),
     );
   }
-  
 }
+
 class _AnimatedPill extends StatelessWidget {
   final double left;
   final double width;
@@ -146,7 +165,7 @@ class _AnimatedPill extends StatelessWidget {
       bottom: 0,
       width: width,
       child: Padding(
-        padding:  EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+        padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.blue.withOpacity(.15),
@@ -157,6 +176,7 @@ class _AnimatedPill extends StatelessWidget {
     );
   }
 }
+
 class _NavItem extends StatelessWidget {
   final NavItemData item;
   final bool selected;
@@ -186,7 +206,7 @@ class _NavItem extends StatelessWidget {
               child: Icon(
                 selected ? item.activeIcon : item.icon,
                 key: ValueKey(selected),
-                size: selected ? 27 : 22,
+                size: selected ? 27.sp : 22.sp,
                 color: selected ? Colors.blue : Colors.grey,
               ),
             ),
@@ -199,7 +219,7 @@ class _NavItem extends StatelessWidget {
                 color: selected ? Colors.blue : Colors.grey,
               ),
               child: Text(item.label),
-            )
+            ),
           ],
         ),
       ),

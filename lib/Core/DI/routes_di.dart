@@ -4,7 +4,7 @@ import 'package:sekka/Features/Routes/Data/Model/Repo/routes_repo.dart';
 import 'package:sekka/Features/Routes/Logic/routes_cubit.dart';
 
  
-Future<void> initRoutesDI() async {
+void initRoutesDI()  {
 
   /// DataSource
   getIt.registerLazySingleton(

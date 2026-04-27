@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_route.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Widget/empty_state_widget.dart';
+import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/create_post_model_widget.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/home_header_widget.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/home_search_filter_widget.dart';
@@ -195,18 +197,23 @@ class _HomeFeedScreenState extends State<HomeFeedScreen>
     super.dispose();
   }
 
-  void _openCreatePostModal() {
+  void _openCreatePostModal(BuildContext
+      context) {
+    final cubit = context.read<LostAndFoundCubit>();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => CreatePostModalWidget(
-        onPostCreated: (postData) {
-          setState(() {
-            _postMaps.insert(0, postData);
-          });
-          Navigator.pop(context);
-        },
+      builder: (_) => BlocProvider.value(
+        value: cubit,
+        child: CreatePostModalWidget(
+          onPostCreated: (postData) {
+            setState(() {
+              _postMaps.insert(0, postData);
+            });
+            Navigator.pop(context);
+          },
+        ),
       ),
     );
   }
@@ -223,7 +230,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen>
             controller: _scrollController,
             slivers: [
               SliverToBoxAdapter(
-                child: HomeHeaderWidget(onAddPressed: _openCreatePostModal),
+                child: HomeHeaderWidget(onAddPressed: () => _openCreatePostModal(context),),
               ),
               SliverToBoxAdapter(
                 child: HomeSearchFilterWidget(
@@ -249,7 +256,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen>
                         description:
                             'Try adjusting your filters or search terms, or post a new item.',
                         ctaLabel: 'Post an Item',
-                        onCta: _openCreatePostModal,
+                        onCta:() =>  _openCreatePostModal,
                       ),
                     )
                   : isTablet
@@ -290,7 +297,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen>
                 curve: Curves.easeOutBack,
               ),
               child: FloatingActionButton.extended(
-                onPressed: _openCreatePostModal,
+                onPressed: () => _openCreatePostModal(context),
                 backgroundColor: AppColor.secondary,
                 foregroundColor: Colors.white,
                 elevation: 4,

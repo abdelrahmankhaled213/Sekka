@@ -84,7 +84,7 @@ class PostCardWidget extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.access_time_rounded,
-                              size: 11,
+                              size: 11.sp,
                               color: AppColor.muted,
                             ),
                             const SizedBox(width: 3),

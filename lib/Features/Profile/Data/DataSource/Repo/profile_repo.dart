@@ -22,48 +22,29 @@ const ProfileRepo({required this.remoteDataSource,required this.localUserDataSou
     return remoteUser;
   }
 
-  Future<void> editUser(UpdateUserRequest request) async {
-     
-     await remoteDataSource.updateUser(request);
-     final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId == null) return;
-   final updatedUser = await remoteDataSource.getUser(userId);
-    await localUserDataSource.upsertUser(updatedUser);
-  }
+
+
+Future<void> editUser(UpdateUserRequest request) async {
+
+  final userId = FirebaseAuth.instance.currentUser!.uid;
+
+  await remoteDataSource.updateUser(request);
+
+  final cachedUser = await localUserDataSource.getUser(userId);
+
+  if (cachedUser == null) return;
+
+  final updatedUser = cachedUser.copyWith(
+    name: request.name ?? cachedUser.name,
+    phone: request.phone ?? cachedUser.phone,
+    image: request.image ?? cachedUser.image,
+    favTrasnportation:
+        request.favTrasnportation ?? cachedUser.favTrasnportation,
+    isGetStarted: request.isGetStarted ?? cachedUser.isGetStarted,
+  );
+
+  await localUserDataSource.upsertUser(updatedUser);
+
 }
-
-// Future<UserModel> getUser(String userId) async{
-
-//   final cachedUser = await localUserDataSource.getUser(userId);
-
-//   if (cachedUser != null) return cachedUser;
-
-// return await remoteDataSource.getUser(userId);
-
-// }
-
-
-// Future<void> editUser(UpdateUserRequest request) async {
-
-//   final userId = FirebaseAuth.instance.currentUser!.uid;
-
-//   await remoteDataSource.updateUser(request);
-
-//   final cachedUser = await localUserDataSource.getUser(userId);
-
-//   if (cachedUser == null) return;
-
-//   final updatedUser = cachedUser.copyWith(
-//     name: request.name ?? cachedUser.name,
-//     phone: request.phone ?? cachedUser.phone,
-//     image: request.image ?? cachedUser.image,
-//     favTrasnportation:
-//         request.favTrasnportation ?? cachedUser.favTrasnportation,
-//     isGetStarted: request.isGetStarted ?? cachedUser.isGetStarted,
-//   );
-
-//   await localUserDataSource.upsertUser(updatedUser);
-
-// }
 
 

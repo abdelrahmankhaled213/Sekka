@@ -55,9 +55,9 @@ return GestureDetector(
   
           title: 'Sekka',
 
-   onGenerateRoute: onGenerateRoute,
+  //  onGenerateRoute: onGenerateRoute,
           
-        //   home: MainBottomNavView(),
+           home: MainScreen(),
           );
       },
     ),

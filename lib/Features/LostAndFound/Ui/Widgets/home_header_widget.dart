@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
+  
   final VoidCallback onAddPressed;
 
   const HomeHeaderWidget({super.key, required this.onAddPressed});

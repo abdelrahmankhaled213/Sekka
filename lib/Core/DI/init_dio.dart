@@ -4,7 +4,7 @@ import 'package:sekka/Core/API/api_service.dart';
 import 'package:sekka/Core/API/dio_consumer.dart';
 import 'package:sekka/Core/DI/service_locator.dart';
 
-Future<void>initDio()async{
+void initDio(){
 
 final Dio dio = Dio(
   BaseOptions(
