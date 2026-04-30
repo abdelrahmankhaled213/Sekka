@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart'; // تأكد من المسار
+import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
+import 'package:sekka/Features/LostAndFound/Logic/lost_found_state.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/chat_bubble.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/chat_input_widget.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/item_info_card_widget.dart';
@@ -20,6 +23,7 @@ class ItemDetailAndChatScreen extends StatefulWidget {
 }
 
 class _ItemDetailAndChatScreenState extends State<ItemDetailAndChatScreen> {
+
   late ScrollController _scrollController;
 
     final List<Map<String, dynamic>> _messageMaps = [
@@ -37,9 +41,17 @@ class _ItemDetailAndChatScreenState extends State<ItemDetailAndChatScreen> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.item == null && widget.id != null) {
+        // context.read<LostAndFoundCubit>().getPostDetails(widget.id!);
+      } else if (widget.item != null) {
+      
+        context.read<LostAndFoundCubit>().getComments(widget.item!.id.toString());
+      }
+    });
   }
-
+    // WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   @override
   void dispose() {
     _scrollController.dispose();
@@ -80,31 +92,51 @@ class _ItemDetailAndChatScreenState extends State<ItemDetailAndChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // هنا استبدلنا الـ ModalRoute بـ widget.item الحقيقي
+
     final item = widget.item; 
     final isTablet = MediaQuery.of(context).size.width >= 600;
     final maxWidth = isTablet ? 600.0 : double.infinity;
 
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SizedBox(
-            width: maxWidth,
-            child: Column(
-              children: [
-                _buildGradientHeader(
-                  item?.title??'', 
-                  item?.type == ItemType.found, 
-                  _messageMaps.length
-                ),
-                ItemInfoCardWidget(
-                  station: item?.stationName??"", 
-                  description: item?.description??""
-                ),
-                _buildListView(),
-                ChatInputWidget(onSend: _sendMessage),
-                _buildBeRespectful(),
-              ],
+    return BlocConsumer<LostAndFoundCubit, LostFoundState>(
+      listenWhen: (previous, current) => current is CommentAdded 
+      || current is CommentDeleted ,
+      
+      listener: (context, state) {
+        if (state is CommentAdded) {
+          setState(() {
+            _messageMaps.add({
+              'id': DateTime.now().millisecondsSinceEpoch.toString(),
+              'senderName': 'You',
+              'message': state.comment.message,
+              'timestamp': _formatNow(),
+              'isMine': true,
+            });
+          });
+          WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+        }
+      },
+
+      builder: Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: SizedBox(
+              width: maxWidth,
+              child: Column(
+                children: [
+                  _buildGradientHeader(
+                    item?.title??'', 
+                    item?.type == ItemType.found, 
+                    _messageMaps.length
+                  ),
+                  ItemInfoCardWidget(
+                    station: item?.stationName??"", 
+                    description: item?.description??""
+                  ),
+                  _buildListView(),
+                  ChatInputWidget(onSend: _sendMessage),
+                  _buildBeRespectful(),
+                ],
+              ),
             ),
           ),
         ),
