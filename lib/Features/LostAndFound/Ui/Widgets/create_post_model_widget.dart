@@ -11,9 +11,8 @@ import 'package:sekka/Features/LostAndFound/Ui/Widgets/category_ui.dart';
 
 class CreatePostModalWidget extends StatefulWidget {
 
-  final Function(Map<String, dynamic>) onPostCreated;
 
-  const CreatePostModalWidget({super.key, required this.onPostCreated});
+  const CreatePostModalWidget({super.key});
 
   @override
   State<CreatePostModalWidget> createState() => _CreatePostModalWidgetState();
@@ -27,7 +26,6 @@ class _CreatePostModalWidgetState extends State<CreatePostModalWidget> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _stationController = TextEditingController();
-  // bool _isSubmitting = false;
 
 
   @override
@@ -57,7 +55,7 @@ void _buildScafoldMessenger(String text) {
     
 }
   Future<void> _submit() async {
-print("submitted aho");
+
   if (!_formKey.currentState!.validate()) return;
 
   if (_postType == null) {
@@ -84,32 +82,9 @@ print("submitted aho");
 
 await context.read<LostAndFoundCubit>().postLostAndFound(post);
 
-  // widget.onPostCreated(post.toJson());
-
-  // if (mounted) Navigator.pop(context);
 
 }
-    // // TODO: Replace with actual API call
-    // await Future.delayed(const Duration(milliseconds: 800));
-    // if (mounted) {
-    //   final catLabel = _selectedCategory.replaceAll('/', '');
-    //   widget.onPostCreated({
-    //     'id': DateTime.now().millisecondsSinceEpoch.toString(),
-    //     'posterName': 'You',
-    //     'posterAvatar':
-    //         'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?w=100',
-    //     'posterAvatarSemanticLabel': 'Your profile photo',
-    //     'postType': _postType,
-    //     'timeAgo': 'Just now',
-    //     'title': _titleController.text.trim(),
-    //     'description': _descriptionController.text.trim(),
-    //     'station': _stationController.text.trim(),
-    //     'messageCount': 0,
-    //     'status': 'active',
-    //     'category': catLabel,
-    //   });
-    
-  
+
 
   @override
   Widget build(BuildContext context) {

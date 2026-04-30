@@ -1,9 +1,11 @@
 import 'dart:ui';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/DI/service_locator.dart';
+import 'package:sekka/Core/Helper/notification_helper.dart';
 import 'package:sekka/Core/Navigation/nav_entities.dart';
 import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
 import 'package:sekka/Features/LostAndFound/View/home_feed_screen_view.dart';
@@ -21,6 +23,18 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  @override
+  void initState() {
+    initNotification();
+    super.initState();
+  }
+  void initNotification() async {
+
+     getIt<NotificationHelper>().init();
+     await FirebaseMessaging.instance.subscribeToTopic("posts");
+
+  }
+
   int index = 0;
 
   final items = const [

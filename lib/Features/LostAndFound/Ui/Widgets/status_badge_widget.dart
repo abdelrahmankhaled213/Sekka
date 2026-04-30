@@ -18,7 +18,9 @@ class StatusBadgeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final config = _getConfig(status);
+    
     return Container(
       padding:  EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
       decoration: BoxDecoration(

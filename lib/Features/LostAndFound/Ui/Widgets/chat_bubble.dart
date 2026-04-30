@@ -13,7 +13,7 @@ class ChatBubbleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final isMine = messageData['isMine'] as bool;
+    final isMine = messageData ['isMine'] as bool;
     final message = messageData['message'] as String;
     final timestamp = messageData['timestamp'] as String;
     final senderName = messageData['senderName'] as String;
@@ -108,12 +108,12 @@ class ChatBubbleWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const SizedBox(width: 40),
+                 SizedBox(width: 40.w),
                 Flexible(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 10,
+                    padding:  EdgeInsets.symmetric(
+                      horizontal: 14.w,
+                      vertical: 10.h,
                     ),
                     decoration: BoxDecoration(
                       gradient: AppStyle.brandGradient,
@@ -153,7 +153,8 @@ class ChatBubbleWidget extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 4),
+            
+             SizedBox(height: 4.h),
 
             Padding(
               padding:  EdgeInsets.only(right: 40.w),

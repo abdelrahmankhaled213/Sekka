@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sekka/Core/Error/error_handler.dart';
-import 'package:sekka/Features/Auth/Data/Model/user_model.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_update.dart';
 import 'package:sekka/Features/Auth/Logic/transport_model.dart';
 
@@ -88,31 +87,27 @@ void removeNetworkImage(){
 
 }
 
-Future<void> editProfile(UpdateUserRequest request) async {
 
+Future<void> editProfile(UpdateUserRequest request) async {
   emit(state.copyWith(
     profileStateEnum: ProfileStateEnum.editProfileLoading,
   ));
 
   try {
-
     final userId = FirebaseAuth.instance.currentUser!.uid;
 
     await repo.editUser(request);
 
-  
-    //  final updatedUser = await repo.getUser(userId);
+    final updatedUser = await repo.getUser(userId);
 
-    
     emit(state.copyWith(
       profileStateEnum: ProfileStateEnum.editProfileSuccess,
-      // userModel: updatedUser,
+      userModel: updatedUser, // Now it's actually getting the data!
     ));
-
+    
   } catch (e, stackTrace) {
-
-    print(e.toString());
-    print(stackTrace.toString());
+    debugPrint(e.toString());
+    debugPrint(stackTrace.toString());
 
     final failure = ErrorHandler.handleError(e);
 
@@ -122,7 +117,6 @@ Future<void> editProfile(UpdateUserRequest request) async {
     ));
   }
 }
-
 
 
 

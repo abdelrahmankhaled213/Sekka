@@ -4,7 +4,7 @@ import 'package:sekka/Features/Auth/Data/Model/user_model.dart';
 
 class HiveDataSource implements LocalUserDataSource {
 
-  static const String _userBoxName = 'sekka_users_box';
+  static const String _userBoxName = 'sekka_users_box2';
  
    Future<Box<UserModel>> get _userBox async {
     return await Hive.openBox<UserModel>(_userBoxName);

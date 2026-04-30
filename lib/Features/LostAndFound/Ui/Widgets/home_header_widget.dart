@@ -19,8 +19,8 @@ class HomeHeaderWidget extends StatelessWidget {
           children: [
 
             Positioned(
-              top: -20,
-              right: -20,
+              top: 0,
+              right: -5,
               child: _buildContainerShapes(height: 120.h, width:120.w)
             ),
 
@@ -97,7 +97,7 @@ return Container(
                         Text(
                           'Lost & Found',
                           style:AppStyle.regular18RobotoWhite.copyWith(
-                            fontSize: 18,
+                            fontSize: 18.sp,
                             fontWeight: FontWeight.w800,
                             color: Colors.white,
                             letterSpacing: -0.3,
@@ -106,7 +106,7 @@ return Container(
                         Text(
                           'Help each other find lost items',
                           style: AppStyle.regular18RobotoWhite.copyWith(
-                            fontSize: 12,
+                            fontSize: 12.sp,
                             fontWeight: FontWeight.w400,
                             color: Colors.white.withAlpha(217),
                           ),
@@ -130,10 +130,10 @@ return Container(
       width: 1.5,
                         ),
                         ),
-                        child: const Icon(
+                        child:  Icon(
                           Icons.add_rounded,
                           color: Colors.white,
-                          size: 22,
+                          size: 22.sp,
                         ),
                       ),
   ),

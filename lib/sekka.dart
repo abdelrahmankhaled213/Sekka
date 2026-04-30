@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:sekka/Core/Helper/notification_helper.dart';
 import 'package:sekka/Core/Localization/app_localizations.dart';
 import 'package:sekka/Core/Localization/locale_cubit.dart';
 import 'package:sekka/Core/Navigation/main_bottom_nav_view.dart';
@@ -55,9 +56,9 @@ return GestureDetector(
   
           title: 'Sekka',
 
-  //  onGenerateRoute: onGenerateRoute,
+   navigatorKey: navigatorKey,
+   onGenerateRoute: onGenerateRoute,
           
-           home: MainScreen(),
           );
       },
     ),

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
@@ -62,7 +63,11 @@ class _SplashScreenBodyState extends State<SplashScreenBody>
       );
 
       if (data == true) {
-        Navigator.pushReplacementNamed(context, AppRoute.onBoarding);
+        if(FirebaseAuth.instance.currentUser != null) {
+          Navigator.pushReplacementNamed(context, AppRoute.bottomNavigation);
+        } else {
+          Navigator.pushReplacementNamed(context, AppRoute.login);
+        }
       } else {
         Navigator.pushReplacementNamed(context, AppRoute.onBoarding);
       }
@@ -129,7 +134,7 @@ class _SplashScreenBodyState extends State<SplashScreenBody>
                 ),
               ),
 
-              const SizedBox(height: 15),
+               SizedBox(height: 15.h),
 
               Text(
                 "loading your journey..",

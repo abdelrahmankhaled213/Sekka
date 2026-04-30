@@ -7,10 +7,11 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-    /* Path alias (modern TS + Vite) */
-    "paths": {
-      "@/*": ["src/*"]
-    },
+  "baseUrl": ".",
+  
+"paths": {
+  "@/*": ["src/*"]
+                 },
 
     /* Bundler mode */
     "moduleResolution": "bundler",

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Widget/custom_image_widget.dart';
+import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/status_badge_widget.dart';
 import 'package:sekka/core/constants/app_color.dart';
 
 class PostCardWidget extends StatelessWidget {
-  final Map<String, dynamic> postData;
+
+  final ItemModel postData;
   final VoidCallback onTap;
 
   const PostCardWidget({
@@ -16,18 +18,19 @@ class PostCardWidget extends StatelessWidget {
   });
 
   @override
+
   Widget build(BuildContext context) {
-    final isFound = postData['postType'] == 'found';
-    final isResolved = postData['status'] == 'resolved';
+    final isFound = postData.type == ItemType.found;
+    final isResolved = postData.isActive;
     final accentColor = isFound ? AppColor.success : AppColor.error;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        margin:  EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
         decoration: BoxDecoration(
-          color: isResolved ? AppColor.surfaceVariant : AppColor.surface,
-          borderRadius: BorderRadius.circular(16),
+          color:  AppColor.surfaceVariant ,
+          borderRadius: BorderRadius.circular(16.r),
           border: Border(left: BorderSide(color: accentColor, width: 3)),
           boxShadow: [
             BoxShadow(
@@ -42,20 +45,22 @@ class PostCardWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header row: avatar, name, badge, time, phone action
+
               Row(
                 children: [
                   ClipOval(
                     child: CustomImageWidget(
-                      imageUrl: postData['posterAvatar'] as String,
-                      width: 40,
-                      height: 40,
+                      imageUrl: postData.userImage,
+                      width: 40.w,
+                      height: 40.h,
                       fit: BoxFit.cover,
-                      semanticLabel:
-                          postData['posterAvatarSemanticLabel'] as String,
+                      // semanticLabel:
+                      //     postData['posterAvatarSemanticLabel'] as String,
                     ),
                   ),
-                  const SizedBox(width: 10),
+
+                  SizedBox(width: 10.w),
+                  
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,23 +68,26 @@ class PostCardWidget extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              postData['posterName'] as String,
+                              postData.userName ?? '',
                               style: AppStyle.regular16RobotoBlack.copyWith(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: AppColor.textPrimary,
                               ),
                             ),
-                            const SizedBox(width: 8),
+
+                             SizedBox(width: 8.w),
+                            
                             StatusBadgeWidget(
                               status: isFound
                                   ? PostStatus.found
                                   : PostStatus.lost,
-                              fontSize: 10,
+                              fontSize: 10.sp,
                             ),
                           ],
                         ),
-                        const SizedBox(height: 2),
+
+                        SizedBox(height: 2.h),
                         Row(
                           children: [
                             Icon(
@@ -87,9 +95,9 @@ class PostCardWidget extends StatelessWidget {
                               size: 11.sp,
                               color: AppColor.muted,
                             ),
-                            const SizedBox(width: 3),
+                             SizedBox(width: 3.w),
                             Text(
-                              postData['timeAgo'] as String,
+                              postData.createdAt.toIso8601String(),
                               style: AppStyle.regular11RobotoGrey
                             ),
                           ],
@@ -112,20 +120,22 @@ class PostCardWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
-              // Title
+              
+              
+               SizedBox(height: 10.h),
+            
               Text(
-                postData['title'] as String,
+                postData.title,
                 style: AppStyle.regular16RobotoBlack.copyWith(
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w700,
                   color: AppColor.textPrimary,
                 ),
               ),
-              const SizedBox(height: 4),
-              // Description
+               SizedBox(height: 4.h),
+              
               Text(
-                postData['description'] as String,
+                postData.description ,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: AppStyle.regular16RobotoBlack.copyWith(
@@ -135,12 +145,13 @@ class PostCardWidget extends StatelessWidget {
                   height: 1.5,
                 ),
               ),
-              const SizedBox(height: 10),
-              // Station chip
+              
+               SizedBox(height: 10.h),
+              
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
+                padding:  EdgeInsets.symmetric(
+                  horizontal: 10.w,
+                  vertical: 5.h,
                 ),
                 decoration: BoxDecoration(
                   color: AppColor.background,
@@ -152,12 +163,12 @@ class PostCardWidget extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.location_on_outlined,
-                      size: 13,
+                      size: 13.sp,
                       color: AppColor.secondary,
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      postData['station'] as String,
+                      postData.stationName,
                       style: AppStyle.regular16RobotoGrey.copyWith(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
@@ -167,18 +178,20 @@ class PostCardWidget extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 10),
-              // Footer: messages + status
+
+               SizedBox(height: 10.h),
+              
               Row(
                 children: [
                   Icon(
                     Icons.chat_bubble_outline_rounded,
-                    size: 14,
+                    size: 14.sp,
                     color: AppColor.secondary,
                   ),
-                  const SizedBox(width: 4),
+
+                   SizedBox(width: 4.w),
                   Text(
-                    '${postData['messageCount']} messages',
+                    '${postData.commentCount} messages',
                     style: AppStyle.regular16RobotoGrey.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
@@ -190,7 +203,7 @@ class PostCardWidget extends StatelessWidget {
                     status: isResolved
                         ? PostStatus.resolved
                         : PostStatus.active,
-                    fontSize: 10,
+                    fontSize: 10.sp,
                   ),
                 ],
               ),

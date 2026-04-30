@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_model.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_update.dart';
 import 'package:sekka/Features/Auth/Logic/transport_model.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 enum ProfileStateEnum{
   initial,

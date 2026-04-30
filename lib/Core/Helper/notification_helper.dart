@@ -2,12 +2,15 @@ import 'dart:async';
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sekka/Core/API/api_service.dart';
+import 'package:sekka/Core/Constants/app_route.dart';
 import 'package:sekka/Core/Database/secure_storage.dart';
 import 'package:sekka/Core/Error/error_handler.dart';
 import 'package:sekka/Core/Helper/toast_helper.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("📩 Background Message");
@@ -16,6 +19,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class NotificationHelper {
+
   final SecureStorageService secureStoargeService;
   final ApiConsumer apiConsumer;
 
@@ -46,6 +50,35 @@ class NotificationHelper {
     );
   }
 
+Future<void>handleClickNotification()async{
+
+RemoteMessage? message = await _messaging.getInitialMessage();
+
+if(message!=null){
+   _navigateToDetails(message);
+}
+FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      _navigateToDetails(message);
+    });
+    
+}
+
+void _navigateToDetails(RemoteMessage message) {
+    if (message.data['postId'] != null) {
+      
+      String postId = message.data['postId'];
+      
+
+      navigatorKey.currentState?.pushNamed(AppRoute.itemDetailAndChatScreen, arguments: postId);
+
+      
+      
+      print("🚀 Go to Post ID: $postId");
+    }
+  }
+
+
+
   Future<void> _getFcmToken() async {
     
     final newToken = await _messaging.getToken();
@@ -69,7 +102,7 @@ class NotificationHelper {
     await secureStoargeService.saveFcmToken(token);
 
     await apiConsumer.post(
-      "/save-token",
+      "save-token",
       data: {
         "user_id": FirebaseAuth.instance.currentUser!.uid,
         "token": token,
@@ -146,10 +179,11 @@ class NotificationHelper {
     await _requestNotificationPermission();
     await _getFcmToken();
     listenToRefreshToken();
-
+    await handleForegroundNotification();
+    await handleClickNotification();
+    
     FirebaseMessaging.onBackgroundMessage(
         firebaseMessagingBackgroundHandler);
 
-    await handleForegroundNotification();
   }
 }

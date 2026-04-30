@@ -162,8 +162,8 @@ Widget _buildAnimatedContainer(bool isActive, String filter) {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOutCubic,
-          margin: const EdgeInsets.only(right: 8),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          margin:  EdgeInsets.only(right: 8.w),
+          padding:  EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
           decoration: BoxDecoration(
             gradient: isActive ? AppStyle.brandGradient : null,
             color: isActive ? null : AppColor.surface,
@@ -179,14 +179,14 @@ Widget _buildAnimatedContainer(bool isActive, String filter) {
             children: [
               Icon(
                 cat.icon,
-                size: 15,
+                size: 15.sp,
                 color: isActive ? Colors.white : AppColor.textSecondary,
               ),
-              const SizedBox(width: 5),
+               SizedBox(width: 5.w),
               Text(
                 cat.label,
                 style: AppStyle.w60012RobotoGrey.copyWith(
-                  fontSize: 13,
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.w600,
                   color: isActive ? Colors.white : AppColor.textSecondary,
                 ),

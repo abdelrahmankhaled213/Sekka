@@ -4,47 +4,39 @@ import 'package:sekka/Core/Database/local_data_source.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_model.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_update.dart';
 import 'package:sekka/Features/Profile/Data/DataSource/remote_data_source.dart';
+class ProfileRepo {
+  final RemoteDataSource remoteDataSource;
+  final LocalUserDataSource localUserDataSource;
 
-class ProfileRepo{
-
-final RemoteDataSource remoteDataSource;
-final LocalUserDataSource localUserDataSource;
-
-const ProfileRepo({required this.remoteDataSource,required this.localUserDataSource});
+  const ProfileRepo({required this.remoteDataSource, required this.localUserDataSource});
 
   Future<UserModel> getUser(String userId) async {
-    
-    final cachedUser = await localUserDataSource.getUser(userId);
-    if (cachedUser != null) return cachedUser;
-
-    final remoteUser = await remoteDataSource.getUser(userId);
-    await localUserDataSource.upsertUser(remoteUser);
-    return remoteUser;
+    try {
+      
+      final remoteUser = await remoteDataSource.getUser(userId);
+      
+      await localUserDataSource.upsertUser(remoteUser);
+      
+      return remoteUser;
+    } catch (e) {
+      
+      final cachedUser = await localUserDataSource.getUser(userId);
+      if (cachedUser != null) return cachedUser;
+      rethrow; 
+    }
   }
 
+  Future<void> editUser(UpdateUserRequest request) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
 
+    // 1. نحدث السيرفر الأول
+    await remoteDataSource.updateUser(request);
 
-Future<void> editUser(UpdateUserRequest request) async {
+    // 2. بدل ما نعتمد على الكاش القديم ونعمل copyWith
+    // الأحسن نجيب اليوزر كامل من السيرفر تاني بعد التعديل عشان نضمن الدقة
+    final updatedRemoteUser = await remoteDataSource.getUser(userId);
 
-  final userId = FirebaseAuth.instance.currentUser!.uid;
-
-  await remoteDataSource.updateUser(request);
-
-  final cachedUser = await localUserDataSource.getUser(userId);
-
-  if (cachedUser == null) return;
-
-  final updatedUser = cachedUser.copyWith(
-    name: request.name ?? cachedUser.name,
-    phone: request.phone ?? cachedUser.phone,
-    image: request.image ?? cachedUser.image,
-    favTrasnportation:
-        request.favTrasnportation ?? cachedUser.favTrasnportation,
-    isGetStarted: request.isGetStarted ?? cachedUser.isGetStarted,
-  );
-
-  await localUserDataSource.upsertUser(updatedUser);
-
+    // 3. نحدث الكاش باللي جه من السيرفر
+    await localUserDataSource.upsertUser(updatedRemoteUser);
+  }
 }
-
-
