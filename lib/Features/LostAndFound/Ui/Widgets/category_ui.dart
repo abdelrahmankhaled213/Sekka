@@ -10,9 +10,11 @@ class CategoryUI {
 }
 
 final List<CategoryUI> categories = const [
+
   CategoryUI(Category.phone, 'Phone', Icons.phone_android_rounded),
   CategoryUI(Category.wallet, 'Wallet', Icons.account_balance_wallet_outlined),
   CategoryUI(Category.bag, 'Bag/Backpack', Icons.work_outline_rounded),
   CategoryUI(Category.keys, 'Keys', Icons.key_outlined),
   CategoryUI(Category.other, 'Other', Icons.inventory_2_outlined),
+
 ];

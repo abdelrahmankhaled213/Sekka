@@ -25,7 +25,7 @@ required this.directionName,
    return Transport(
     
         directionName: json['direction_name'],
-        id:json['id']==null?null:json['id'],
+        id:json['id'],
          type: json['edge_type']==null?null:TransportTypeMapper.fromJson(json['edge_type']),
         name: json['stop_name'],
         location: GeoPoint.fromJson(json['location']),

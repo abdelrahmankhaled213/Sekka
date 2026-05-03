@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
-import 'package:sekka/Core/Localization/app_localizations.dart';
+import 'package:sekka/Core/Constants/app_text.dart';
 import 'package:sekka/Core/Helper/animation_helper.dart';
 import 'package:sekka/Core/Helper/toast_helper.dart';
 import 'package:sekka/Core/Helper/validator_helper.dart';
@@ -187,8 +187,8 @@ class _SignupFormState extends State<SignupForm>
                       },
                       validator: _validateEmail,
                         titleName:
-                    isEmail?context.l10n.emailAddress:context.l10n.phoneNumber
-                        , hint: isEmail?context.l10n.enterYourEmail:context.l10n.phoneNumber
+                    isEmail?AppText.emailAddress:AppText.phoneNumber
+                        , hint: isEmail?AppText.enterYourEmail:AppText.phoneNumber
                         , controller: isEmail?emailController:phoneController
                         ,prefixIcon:
                         Icon(isEmail?Icons.mail:Icons.phone
@@ -203,8 +203,8 @@ context.read<AuthCubit>().signUpPassword=value;
 },
                   validator: _validatePassword
                   ,titleName:
-                  context.l10n.password
-                      , hint: context.l10n.enterYourPassword
+                  AppText.password
+                      , hint: AppText.enterYourPassword
                       , controller: passwordController,prefixIcon:
                       Icon(Icons.lock,size: 20.sp,color: AppColor.grey,),
                   suffixIcon: IconButton(onPressed: (){
@@ -228,8 +228,8 @@ context.read<AuthCubit>().signUpPassword=value;
                     },
                     validator: _validateConfirmPassword,
                         titleName:
-                        context.l10n.confirmPassword
-                      , hint: context.l10n.enterYourConfirmPassword
+                        AppText.confirmPassword
+                      , hint: AppText.enterYourConfirmPassword
                       , controller: confirmPasswordController
                       ,prefixIcon:
                       Icon(Icons.lock,size: 20.sp,color: AppColor.grey,),
@@ -248,7 +248,7 @@ context.read<AuthCubit>().signUpPassword=value;
                   height: 16.h,
                 ),
 
-                Text(context.l10n.passwordMustContain
+                Text(AppText.passwordMustContain
                   ,style: AppStyle.regular16RobotoGrey.copyWith(
                   fontSize: 14.sp
                 ),),
@@ -293,9 +293,9 @@ _agreeToPolicy(),
                       ,
                       thirdColor: AppColor.pink
                       ,
-                      text: context.l10n.createAccount,
+                      text: AppText.createAccount,
                       child: Center(
-                        child: Text(context.l10n.createAccount,
+                        child: Text(AppText.createAccount,
                           style: AppStyle.regular18RobotoWhite.copyWith(
                             fontSize: 16.sp,
 
@@ -314,7 +314,7 @@ _agreeToPolicy(),
           },
           listener: (context, state) async {
             if(state is SignUpError){
-              FlutterToastHelper.showToast(text: state.errorMsg);
+              FlutterToastHelper.showToast(text: state.errorMsg,color: AppColor.error);
             }
             if(state is SignUpLoaded){
 
@@ -335,9 +335,9 @@ cubit.navigateToVerifyEmail(email: emailController.text,isBackToLogin: false);
                 ),
 
                 Center(
-                  child: CustomTextSpan(text: context.l10n
+                  child: CustomTextSpan(text: AppText
                       .alreadyHaveAnAccount
-                    , text2: context.l10n.signIn,onTapGesture: () {
+                    , text2: AppText.signIn,onTapGesture: () {
                     cubit.clearData();
                       cubit.navigateToSignIn();
                     },
@@ -362,11 +362,11 @@ Widget _agreeToPolicy(){
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CustomTextSpan(text: context.l10n.iAgreeToThe
-              , text2: context.l10n.termsOfService,),
+            CustomTextSpan(text: AppText.iAgreeToThe
+              , text2: AppText.termsOfService,),
 
-            CustomTextSpan(text: context.l10n.and
-              , text2: context.l10n.privacyPolicy,),
+            CustomTextSpan(text: AppText.and
+              , text2: AppText.privacyPolicy,),
           ],
         ),
 
@@ -427,7 +427,7 @@ String? _validateConfirmPassword(String? value){
     if(globalKey.currentState!.validate()){
 
 if(passwordController.text!=confirmPasswordController.text){
-  FlutterToastHelper.showToast(text: 'Password doesn\'t match confrim password');
+  FlutterToastHelper.showToast(text: 'Password doesn\'t match confrim password',color: AppColor.error);
   return;
 }
 

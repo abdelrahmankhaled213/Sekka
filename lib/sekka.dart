@@ -7,6 +7,7 @@ import 'package:sekka/Core/Localization/app_localizations.dart';
 import 'package:sekka/Core/Localization/locale_cubit.dart';
 import 'package:sekka/Core/Navigation/main_bottom_nav_view.dart';
 import 'package:sekka/Core/Navigation/on_generate_route.dart';
+import 'package:sekka/Features/Auth/Ui/Login/View/login_view.dart';
 import 'Core/Constants/app_color.dart';
 
 class Sekka extends StatelessWidget {

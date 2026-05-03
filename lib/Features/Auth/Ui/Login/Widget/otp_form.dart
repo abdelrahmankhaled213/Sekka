@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:sekka/Core/Constants/app_route.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
+import 'package:sekka/Core/Constants/app_text.dart';
 import '../../../../../Core/Constants/app_color.dart';
-import '../../../../../Core/Localization/app_localizations.dart';
 import '../../../../../Core/Helper/toast_helper.dart';
 import '../../../../../Core/Widget/custom_button_core.dart';
 import '../../../Logic/auth_cubit.dart';
@@ -76,7 +76,7 @@ class _OtpFormState extends State<OtpForm> with SingleTickerProviderStateMixin{
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
 
-      Align(child: Text(context.l10n.enterVerificationCode,style: AppStyle.regular16RobotoBlack,)),
+      Align(child: Text(AppText.enterVerificationCode,style: AppStyle.regular16RobotoBlack,)),
 
       SizedBox(
         height: 12.h,
@@ -140,7 +140,8 @@ errorBorderColor: Colors.red,
          if (state is OtpFailure) {
            shakeController.forward(from: 0);
            FlutterToastHelper.showToast(
-               text: state.errorMsg
+               text: state.errorMsg,
+               color: AppColor.error
            );
          }
 
@@ -148,7 +149,7 @@ errorBorderColor: Colors.red,
            showGeneralDialog(
              context: context,
              barrierDismissible: true,
-             barrierLabel: "Success",
+             barrierLabel: AppText.verificationSuccess,
              barrierColor: Colors.black54,
              transitionDuration: const Duration(milliseconds: 300),
 
@@ -196,14 +197,14 @@ errorBorderColor: Colors.red,
             ),
             child: CustomButtonCore(
                    text:
-               "Verify Code",
+               AppText.verifyCode,
               height: 56.h,
               width: 274.w,
               onPressed: isCompleted?_otpPressed:null,
               firstColor: AppColor.main,
               secondColor: AppColor.secondary,
               thirdColor: AppColor.pink,
-              child: Center(child: Text("Verify Code",style: AppStyle.regular18RobotoWhite,)),
+              child: Center(child: Text(AppText.verifyCode,style: AppStyle.regular18RobotoWhite,)),
             ),
           ),
         ),
@@ -250,14 +251,14 @@ await  BlocProvider.of<AuthCubit>(context)
                        SizedBox(height: 16.h),
 
                        Text(
-                         "Verification Success",
+                         AppText.verificationSuccess,
                          style: AppStyle.regular16RobotoBlack,
                        ),
 
                        SizedBox(height: 8.h),
 
                        Text(
-                         "Your phone number has been verified successfully",
+                         AppText.phoneVerifiedSuccessfully,
                          textAlign: TextAlign.center,
                          style: AppStyle.regular16RobotoGrey.copyWith(
                            fontSize: 14.sp
@@ -284,8 +285,8 @@ await  BlocProvider.of<AuthCubit>(context)
                               },
 
                            child:  GestureDetector(onTap: () =>
-                               Navigator.pushReplacementNamed(context, AppRoute.setUpProfile)
-                               ,child: Text("Continue",style: AppStyle.regular18RobotoWhite,)),
+                              Navigator.pushReplacementNamed(context, AppRoute.setUpProfile)
+                               ,child: Text(AppText.continuee,style: AppStyle.regular18RobotoWhite,)),
                          ),
                        )
                      ],

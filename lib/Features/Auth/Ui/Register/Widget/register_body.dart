@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sekka/Core/Constants/app_text.dart';
 import 'package:sekka/Core/Helper/animation_helper.dart';
 import 'package:sekka/Features/Auth/Logic/auth_cubit.dart';
 import 'package:sekka/Features/Auth/Ui/Register/Widget/signup_form.dart';
 import 'package:sekka/Features/Splash/Widget/logo_container.dart';
 import '../../../../../Core/Constants/app_style.dart';
-import '../../../../../Core/Localization/app_localizations.dart';
 import 'back_to_login.dart';
 import 'image_background.dart';
 
@@ -22,6 +22,8 @@ class _RegisterBodyState extends State<RegisterBody> with SingleTickerProviderSt
 
   late AnimationController _controller;
   late Animation<double> _logoAnimation;
+  late Animation<Offset> _headerSlide;
+  bool _localizedAnimationsReady = false;
 
   @override
   void initState() {
@@ -36,6 +38,19 @@ _logoAnimation=AnimationHelper.buildAnimation(start: 0.0, end: 0.5
 
 _controller.forward();
 
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_localizedAnimationsReady) return;
+    _localizedAnimationsReady = true;
+    _headerSlide = AnimationHelper.buildLocalizedSlideAnimation(
+      start: 0.2,
+      end: 0.75,
+      animationController: _controller,
+      languageCode: Localizations.localeOf(context).languageCode,
+      distance: 0.45,
+    );
   }
   @override
   void dispose() {
@@ -70,11 +85,14 @@ _controller.forward();
                SizedBox(
                  height: 13.h,
                ),
-               Text(context.l10n.createAccount,style: AppStyle.regular24RobotoBlack,),
+               SlideTransition(
+                 position: _headerSlide,
+                 child: Text(AppText.createAccount,style: AppStyle.regular24RobotoBlack,),
+               ),
                SizedBox(
                  height: 6.h,
                ),
-               Text(context.l10n.joinSekkaAndTravelSmart
+               Text(AppText.joinSekkaAndTravelSmart
                  ,style: AppStyle.regular16RobotoGrey,),
 
                SizedBox(

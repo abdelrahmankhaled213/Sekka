@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,7 +11,6 @@ import 'package:sekka/Features/Auth/Logic/auth_cubit.dart';
 import 'package:sekka/Features/Auth/Logic/auth_state.dart';
 import 'package:sekka/Features/Auth/Ui/VerifyEmail/Widget/email_container.dart';
 import 'package:sekka/Features/Auth/Ui/VerifyEmail/Widget/verify_email_instructions.dart';
-
 import '../../../../../Core/Localization/app_localizations.dart';
 
 class VerificationForm extends StatefulWidget {
@@ -116,13 +114,13 @@ class _VerificationFormState extends State<VerificationForm> {
            listener: (context, state) {
 
              if(state is ResendEmailSuccess){
-FlutterToastHelper.showToast(text: "Email sent",color: AppColor.main);
+FlutterToastHelper.showToast(text: "Email sent",color: AppColor.error);
 startTimer();
 
              }
 
              if(state is ResendEmailFailiure){
-               FlutterToastHelper.showToast(text: state.errorMsg,color: AppColor.main);
+               FlutterToastHelper.showToast(text: state.errorMsg,color: AppColor.error);
              }
            },
 
@@ -137,7 +135,7 @@ startTimer();
                onPressed: () async {
 
                  if(maxAttempts>=3){
-                   FlutterToastHelper.showToast(text: context.l10n.maxAttemptsForVerf,color: AppColor.main);
+                   FlutterToastHelper.showToast(text: context.l10n.maxAttemptsForVerf,color: AppColor.error);
                    return;
                  }
 
@@ -180,19 +178,25 @@ startTimer();
                     if(state is VerifyUserSuccess){
                       if(state.isVerified) {
                         FlutterToastHelper.showToast(
-                            text: "Email is verified ");
+                            text: "Email is verified",
+                            color: AppColor.success
+                            );
                       Navigator.pushReplacementNamed(context,AppRoute.setUpProfile);
                       }
                       else{
 
                         FlutterToastHelper.showToast(
-                            text: "Email is not verified ");
+                            text: "Email is not verified",
+                            color: AppColor.error
+                            
+                            );
                       }
                     }
 
                     if(state is VerifyUserFailed){
                       FlutterToastHelper.showToast(
-                          text: state.errorMsg);
+                        color:AppColor.error,
+                          text: state.errorMsg);  
                     }
 
                     },
@@ -231,15 +235,7 @@ startTimer();
                       current is VerifyUserFailed;
 
                     },
-
  ),
-
-
-
-
-
-
-
     ]),
                   )
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
+import 'package:sekka/Core/Constants/app_text.dart';
 
 class ContinueWithDivider extends StatelessWidget {
 
@@ -26,7 +27,7 @@ class ContinueWithDivider extends StatelessWidget {
           Padding(
             padding:  EdgeInsets.symmetric(horizontal: 12.w),
             child: Text(
-              "Or Continue With",
+              AppText.orContinueWith,
               style: AppStyle.bold14RobotoBlue.copyWith(
                 fontWeight: FontWeight.w400,
                 color: AppColor.black

@@ -150,7 +150,7 @@ SizedBox(
 
                 if(state.pickImageEnum==PickImageEnum.uploadImageLoading){
 
-                await  FlutterToastHelper.showToast(text: AppText.loading);
+                await  FlutterToastHelper.showToast(text: AppText.loading,color: AppColor.main);
 
                 }
               if(state.pickImageEnum==PickImageEnum.uploadImageLoaded){
@@ -163,7 +163,7 @@ SizedBox(
               }
               else if(state.pickImageEnum==PickImageEnum.uploadImageError){
 
-               FlutterToastHelper.showToast(text: state.errorMsg??'');
+               FlutterToastHelper.showToast(text: state.errorMsg??"",color: AppColor.error);
 
               }
 
@@ -174,6 +174,7 @@ SizedBox(
                 builder: (context, state) {
 
               if(state.setUpProfileEnum==SetUpProfileEnum.upsertUserLoading){
+                
                 return Center(
                   child: const CircularProgressIndicator(
                     color: AppColor.main,
@@ -258,7 +259,7 @@ uploadRestOfData(context);
       
     }
     else{
-      FlutterToastHelper.showToast(text: "Please Choose Your Fav");
+      FlutterToastHelper.showToast(text: "Please Choose Your Fav",color: AppColor.error);
     }
   }
       

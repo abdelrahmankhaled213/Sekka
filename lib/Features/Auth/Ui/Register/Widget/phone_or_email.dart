@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../Core/Constants/app_color.dart';
 import '../../../../../Core/Constants/app_style.dart';
-import '../../../../../Core/Localization/app_localizations.dart';
+import '../../../../../Core/Constants/app_text.dart';
 import 'signup_form.dart';
 
 class PhoneOrEmail extends StatelessWidget {
@@ -42,8 +42,8 @@ class PhoneOrEmail extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildOption(SignUpMethod.email, context.l10n.email, Icons.mail),
-          _buildOption(SignUpMethod.phone, context.l10n.phone, Icons.phone),
+          _buildOption(SignUpMethod.email, AppText.email, Icons.mail),
+          _buildOption(SignUpMethod.phone, AppText.phone, Icons.phone),
         ],
       ),
     );

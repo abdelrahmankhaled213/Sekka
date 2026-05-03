@@ -1,8 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sekka/Core/Constants/app_color.dart';
+import 'package:sekka/Core/Constants/app_text.dart';
 import 'package:sekka/Core/Error/error_handler.dart';
 import 'package:sekka/Core/Error/failure.dart';
 import 'package:sekka/Core/Helper/segment_helper.dart';
+import 'package:sekka/Core/Helper/toast_helper.dart';
 import 'package:sekka/Features/Auth/Logic/transport_model.dart';
 import 'package:sekka/Features/Routes/Data/Model/Repo/routes_repo.dart';
 import 'package:sekka/Features/Routes/Data/Model/Transport.dart';
@@ -58,18 +61,29 @@ void resetSearch() {
 
 
 void replaceMetroStations() {
-final currentStart = state.selectedTransportStart;
-final currentEnd = state.selectedTransportEnd;
-if (currentStart == null || currentEnd == null) return;
-emit(state.copyWith(
-  selectedTransportStart: currentEnd,
-  selectedTransportEnd: currentStart,
-  routesStateEnum: RoutesStateEnum.replacingStations
+
+if (selectedStartController.text.isEmpty || selectedEndController.text.isEmpty){
+  FlutterToastHelper.showToast(text: AppText.pleaseSelectStation,color: AppColor.error); 
+  return;
+}
+
+var temp2=selectedStartController.text;
+selectedStartController.text=selectedEndController.text;
+selectedEndController.text=temp2;
+
+emit( 
+state.copyWith(
+  selectedTransportStart: state.selectedTransportEnd,
+  selectedTransportEnd: state.selectedTransportStart,
+  routesStateEnum: RoutesStateEnum.resetStartEnd
 ));
+
 }
 
 void selectMetroStart(Transport transport) {
+
 selectedStartController.text=transport.name;
+
 emit(
   state.copyWith(
     selectedTransportStart: transport,
@@ -118,14 +132,16 @@ Future<void> getRoutePath() async {
 List<StepModel> _buildStepsFromApi(List<Transport> data) {
   return data.map((e) {
     return StepModel(
+      direction: e.directionName??'',
       stopName: e.name,
       type:e.type??TransportType.metro, 
       routeName: e.routeName!,
+      
     );
   }).toList();
 }
 
-Future<void> changeTransportType(TransportSwitiching type) async {
+void changeTransportType(TransportSwitiching type)  {
 
 selectedStartController.clear();
 selectedEndController.clear();
@@ -165,7 +181,7 @@ if(isClosed) return;
     final params = ParamsOfFetchRoutes(
       limit: limit,
       offset: offset,
-      type: state.selectedTransportSwitching?.title
+      type: state.selectedTransportSwitching?.title??TransportType.metro,
     );
 
 

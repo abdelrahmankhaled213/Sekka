@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sekka/Core/Constants/app_text.dart';
 import 'package:sekka/Features/Auth/Logic/auth_cubit.dart';
 import '../../../../../Core/Constants/app_style.dart';
-import '../../../../../Core/Localization/app_localizations.dart';
 import '../../../../../Core/Helper/animation_helper.dart';
 import '../../../../Splash/Widget/logo_container.dart';
 import '../../Register/Widget/back_to_login.dart';
@@ -25,6 +25,8 @@ class _OtpBodyState extends State<OtpBody> with SingleTickerProviderStateMixin{
 
   late AnimationController _controller;
   late Animation<double> _logoAnimation;
+  late Animation<Offset> _titleSlide;
+  bool _localizedAnimationsReady = false;
 
   @override
   void initState() {
@@ -39,6 +41,19 @@ class _OtpBodyState extends State<OtpBody> with SingleTickerProviderStateMixin{
 
     _controller.forward();
 
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_localizedAnimationsReady) return;
+    _localizedAnimationsReady = true;
+    _titleSlide = AnimationHelper.buildLocalizedSlideAnimation(
+      start: 0.2,
+      end: 0.75,
+      animationController: _controller,
+      languageCode: Localizations.localeOf(context).languageCode,
+      distance: 0.45,
+    );
   }
   @override
   void dispose() {
@@ -70,12 +85,15 @@ class _OtpBodyState extends State<OtpBody> with SingleTickerProviderStateMixin{
                   SizedBox(
                     height: 13.h,
                   ),
-                  Text(context.l10n.verifyPhoneNumber
-                    ,style: AppStyle.regular24RobotoBlack,),
+                  SlideTransition(
+                    position: _titleSlide,
+                    child: Text(AppText.verifyPhoneNumber
+                      ,style: AppStyle.regular24RobotoBlack,),
+                  ),
                   SizedBox(
                     height: 6.h,
                   ),
-                  Text(context.l10n.send6DigitCode
+                  Text(AppText.send6DigitCode
                     ,style: AppStyle.regular16RobotoGrey,),
 
                   SizedBox(

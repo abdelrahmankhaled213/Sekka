@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Helper/segment_helper.dart';
 
 class TransferWidget extends StatelessWidget {
+
   final SegmentModel fromSegment;
   final SegmentModel toSegment;
-
+  final String stationName;
   const TransferWidget({
+
     super.key,
     required this.fromSegment,
     required this.toSegment,
+   required this.stationName
   });
 
   @override
@@ -25,16 +29,30 @@ class TransferWidget extends StatelessWidget {
         children: [
           Icon(Icons.swap_horiz, color: Colors.orange),
 
-          SizedBox(width: 10),
+          SizedBox(width: 10.w),
 
           Expanded(
-            child: Text(
-              "Transfer from ${fromSegment.lineName ?? fromSegment.type.name}"
-              " → ${toSegment.lineName ?? toSegment.type.name}",
-              style: TextStyle(
-                color: Colors.orange,
-                fontWeight: FontWeight.w500,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Transfer from ${fromSegment.lineName ?? fromSegment.type.name}"
+                  " → ${toSegment.lineName ?? toSegment.type.name}",
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.orange,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  "Transfer at $stationName ",
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.orange,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sekka/Core/Constants/app_text.dart';
 import 'package:sekka/Core/Helper/app_regex_helper.dart';
 import 'package:sekka/Features/Auth/Ui/Register/Widget/password_restriction.dart';
-
-import '../../../../../Core/Localization/app_localizations.dart';
 
 class AllPasswordRestrictions extends StatelessWidget {
 
@@ -17,28 +16,28 @@ class AllPasswordRestrictions extends StatelessWidget {
 
       children: [
 
-        PasswordRestriction(text: context.l10n.validationTextLength
+        PasswordRestriction(text: AppText.validationTextLength
           , hasValidated: appRegexUpdates.minLength,),
 
         SizedBox(
           height: 3.h,
         ),
 
-        PasswordRestriction(text: context.l10n.validationLowerCase
+        PasswordRestriction(text: AppText.validationLowerCase
           , hasValidated: appRegexUpdates.isLowerCase,),
 
         SizedBox(
           height: 3.h,
         ),
 
-        PasswordRestriction(text: context.l10n.validationUpperCase
+        PasswordRestriction(text: AppText.validationUpperCase
           , hasValidated: appRegexUpdates.isUpperCase,),
 
         SizedBox(
           height: 3.h,
         ),
 
-        PasswordRestriction(text: context.l10n.validationNumber
+        PasswordRestriction(text: AppText.validationNumber
           , hasValidated: appRegexUpdates.hasNumber,),
 
 
@@ -46,7 +45,7 @@ class AllPasswordRestrictions extends StatelessWidget {
           height: 3.h,
         ),
 
-        PasswordRestriction(text: context.l10n.validationSpecialCharacter
+        PasswordRestriction(text: AppText.validationSpecialCharacter
           , hasValidated: appRegexUpdates.isSpecialCharacter,),
 
       ],

@@ -9,7 +9,7 @@ import 'package:sekka/core/constants/app_color.dart';
 class PostCardWidget extends StatelessWidget {
 
   final ItemModel postData;
-  final VoidCallback onTap;
+  final void Function()? onTap;
 
   const PostCardWidget({
     super.key,
@@ -20,6 +20,7 @@ class PostCardWidget extends StatelessWidget {
   @override
 
   Widget build(BuildContext context) {
+
     final isFound = postData.type == ItemType.found;
     final isResolved = postData.isActive;
     final accentColor = isFound ? AppColor.success : AppColor.error;
@@ -97,7 +98,7 @@ class PostCardWidget extends StatelessWidget {
                             ),
                              SizedBox(width: 3.w),
                             Text(
-                              postData.createdAt.toIso8601String(),
+                              postData.createdAt,
                               style: AppStyle.regular11RobotoGrey
                             ),
                           ],
@@ -193,7 +194,7 @@ class PostCardWidget extends StatelessWidget {
                   Text(
                     '${postData.commentCount} messages',
                     style: AppStyle.regular16RobotoGrey.copyWith(
-                      fontSize: 12,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w500,
                       color: AppColor.secondary,
                     ),

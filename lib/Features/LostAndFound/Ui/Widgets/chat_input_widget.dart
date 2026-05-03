@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
+import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
+import 'package:sekka/Features/LostAndFound/Logic/lost_found_state.dart';
 
 class ChatInputWidget extends StatefulWidget {
+  
   final Function(String) onSend;
 
   const ChatInputWidget({super.key, required this.onSend});
@@ -14,9 +18,6 @@ class ChatInputWidget extends StatefulWidget {
 
 class _ChatInputWidgetState extends State<ChatInputWidget> {
 
-  final _controller = TextEditingController();
-
-  bool _hasText = false;
 
 static final List<BoxShadow> _boxShadow = [
    BoxShadow(
@@ -27,19 +28,25 @@ static final List<BoxShadow> _boxShadow = [
                         
 
 ];
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
-  void _handleSend() {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
+Future<void> _handleSend() async {
+  final cubit = context.read<LostAndFoundCubit>();
+  final text = cubit.controller.text.trim();
+  
+  if (text.isEmpty) return;
+
+   if (cubit.state.isUpdatePressed) {
+    
+    await cubit.updateComment(text); 
+  } else {
+ 
     widget.onSend(text);
-    _controller.clear();
-    setState(() => _hasText = false);
   }
+  
+  cubit.closeTextField(); 
+
+  FocusScope.of(context).unfocus();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -75,14 +82,17 @@ static final List<BoxShadow> _boxShadow = [
   }
 
   Widget _buildAnimatedContainer(){
-    return    AnimatedContainer(
+
+    final _hasText = context.read<LostAndFoundCubit>().controller.text.trim().isNotEmpty;
+
+    return  AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeOutCubic,
             child: GestureDetector(
               onTap: _hasText ? _handleSend : null,
               child: Container(
-                width: 44,
-                height: 44,
+                width: 44.w,
+                height: 44.h,
                 decoration: BoxDecoration(
                   gradient: _hasText ? AppStyle.brandGradient : null,
                   color: _hasText ? null : AppColor.outline,
@@ -93,7 +103,7 @@ static final List<BoxShadow> _boxShadow = [
                 ),
                 child: Icon(
                   Icons.send_rounded,
-                  size: 18,
+                  size: 18.sp,
                   color: _hasText ? Colors.white : AppColor.muted,
                 ),
               ),
@@ -101,33 +111,40 @@ static final List<BoxShadow> _boxShadow = [
           );
              
   }
+  
+  
+  
+  
   Widget _buildTextField() {
 
-               return TextField(
-                controller: _controller,
-                onChanged: (v) =>
-                    setState(() => _hasText = v.trim().isNotEmpty),
-                style: AppStyle.regular16RobotoBlack.copyWith(
-                  fontSize: 14.sp,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Type your message...',
-                  hintStyle: AppStyle.regular16RobotoBlack.copyWith(
-                    fontSize: 14,
-                    color: AppColor.muted,
+               return BlocBuilder<LostAndFoundCubit,LostFoundState>(
+                builder:(context, state) =>  
+                  TextField(
+                  controller: context.read<LostAndFoundCubit>().controller,
+                  onChanged: (v) =>
+                      context.read<LostAndFoundCubit>().checkingTextFiledIsNotEmpty(v.isNotEmpty),  
+                  style: AppStyle.regular16RobotoBlack.copyWith(
+                    fontSize: 14.sp,
                   ),
-
-                  contentPadding:  EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 10.h,
+                  decoration: InputDecoration(
+                    hintText: 'Type your message...',
+                    hintStyle: AppStyle.regular16RobotoBlack.copyWith(
+                      fontSize: 14.sp,
+                      color: AppColor.muted,
+                    ),
+                 
+                    contentPadding:  EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 10.h,
+                    ),
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
                   ),
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                ),
-                maxLines: null,
-                textInputAction: TextInputAction.send,
-                onSubmitted: (_) => _handleSend(),
-              );
+                  maxLines: null,
+                  textInputAction: TextInputAction.send,
+                  onSubmitted: (_) => _handleSend(),
+                               ),
+               );
   }
 }

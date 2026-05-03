@@ -109,7 +109,7 @@ class EditProfilePhoto extends StatelessWidget {
               title: const Text("Camera"),
               onTap: () {
                 Navigator.pop(context);
-                _pickImage(ImageSource.camera, cubit);
+                _pickImage(context, ImageSource.camera, cubit);
               },
             ),
 
@@ -118,7 +118,7 @@ class EditProfilePhoto extends StatelessWidget {
               title: const Text("Gallery"),
               onTap: () {
                 Navigator.pop(context);
-                _pickImage(ImageSource.gallery, cubit);
+                _pickImage(context, ImageSource.gallery, cubit);
               },
             ),
           ],
@@ -128,11 +128,14 @@ class EditProfilePhoto extends StatelessWidget {
   }
 
   Future<void> _pickImage(
-      ImageSource source, PickImageCubit cubit) async {
+      BuildContext context, ImageSource source, PickImageCubit cubit) async {
+    final profileCubit = context.read<ProfileCubit>();
     final picker = ImagePicker();
     final image = await picker.pickImage(source: source);
 
     if (image != null && image.path.isNotEmpty) {
+      // Any newly selected image means we should not keep "remove network image" intent.
+      profileCubit.clearRemovedImageFlag();
       cubit.pickImage(image);
     }
   }

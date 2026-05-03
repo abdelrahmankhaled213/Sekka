@@ -11,6 +11,7 @@ import 'package:sekka/Core/DI/service_locator.dart';
 import 'package:sekka/Features/Profile/Logic/profile_cubit.dart';
 import 'package:sekka/Features/Profile/Logic/profile_state.dart';
 import 'package:sekka/Features/Profile/UI/Widgets/edit_profile_sheet.dart';
+import 'package:sekka/Features/Profile/UI/Widgets/stats_section.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class ProfileStack extends StatefulWidget {
@@ -24,7 +25,7 @@ class ProfileStack extends StatefulWidget {
 class _ProfileStackState extends State<ProfileStack> {
   
   static final List<Color> _gradientColors = [
-        Colors.white.withOpacity(0.4),
+        Colors.white.withOpacity(0.3),
         Colors.white.withOpacity(0.3),
         Colors.white.withOpacity(0.2),
        ];
@@ -63,7 +64,8 @@ static final List<BoxShadow> _boxShadows =
           child: _buildEditProfile(),
         ),
 
-
+          Positioned(top: 180.h,left: 16.w,right: 16.w,child: StatsSection(preferredCount: 3,),),
+                
       ],
     );
   }
@@ -81,7 +83,8 @@ static final List<BoxShadow> _boxShadows =
             ),
             ),
             SizedBox(height: 16.h,),
-            buildProfileDataContent()
+            buildProfileDataContent(),
+    
           ],
         ),
       ),
@@ -89,6 +92,11 @@ static final List<BoxShadow> _boxShadows =
 
     
   }
+
+  
+
+
+
 
   Widget buildProfileDataContent(){
 
@@ -108,8 +116,11 @@ static final List<BoxShadow> _boxShadows =
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-      Text(state.userModel?.name??AppText.sekkaMember,style: AppStyle.regular16RobotoBlack.copyWith(color: Colors.white),),
-      Text(state.userModel?.email??state.userModel?.phone??'',style: AppStyle.regular16RobotoBlack.copyWith(color: Colors.white),),
+      Text(state.userModel?.name??AppText.guestUser,style: AppStyle.regular16RobotoBlack.copyWith(color: Colors.white),),
+      Text(
+        state.userModel?.email ?? state.userModel?.phone ?? AppText.sekkaMember,
+        style: AppStyle.regular16RobotoBlack.copyWith(color: Colors.white),
+      ),
        
         ]
         ,

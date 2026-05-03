@@ -13,6 +13,7 @@ class BestPathDestination extends StatelessWidget {
     return Column(
       children: [
         Icon(icon,size: 40.sp,color: Colors.white,),
+        
         SizedBox(height: 4.h,),
         Text(AppText.planYourRoute, style:AppStyle.regular16RobotoGrey.copyWith(
           color: Colors.white

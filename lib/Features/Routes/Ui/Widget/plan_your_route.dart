@@ -10,6 +10,7 @@ import 'package:sekka/Features/Routes/Logic/routes_cubit.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/best_path_destination.dart';
 
 class PlanYourRoute extends StatefulWidget {
+
   const PlanYourRoute({super.key});
 
   @override
@@ -43,6 +44,7 @@ class _PlanYourRouteState extends State<PlanYourRoute> {
       color2: AppColor.lightGreen,
       title: TransportType.bus,
     ),
+  
   ];
 
   static LinearGradient _buildGradient(Color color1, Color color2) {
@@ -50,9 +52,10 @@ class _PlanYourRouteState extends State<PlanYourRoute> {
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [
-        color1.withOpacity(0.8),
-        color2.withOpacity(0.2),
+        color1.withOpacity(0.7),
+        color2.withOpacity(0.3),
       ],
+      stops: const [1,0],
     );
   }
 
@@ -72,7 +75,7 @@ class _PlanYourRouteState extends State<PlanYourRoute> {
           Image.asset(
             selectedTransport.image,
             height: 220.h,
-            fit: BoxFit.cover,
+            fit: BoxFit.fill,
             width: double.infinity,
           ),
 
@@ -106,49 +109,45 @@ class _PlanYourRouteState extends State<PlanYourRoute> {
     );
   }
 
-  Widget _buildChooseTransport(TransportSwitiching selectedTransport) {
-  
-    return Container(
-  
-      height: 200.h,
-  
-      padding: EdgeInsets.all(25.sp),
-  
-      decoration: BoxDecoration(
-  
-        color: Colors.white,
-  
-        borderRadius: BorderRadius.circular(20.r),
-  
-      ),
-  
+Widget _buildChooseTransport(TransportSwitiching selectedTransport) {
+
+  return Container(
+   
+    padding: EdgeInsets.all(25.sp),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20.r),
+    ),
+    child: IntrinsicHeight( 
+
       child: Column(
-  
+        mainAxisSize: MainAxisSize.min,
         children: [
 
           _buildSelectTransportTextAndIcon(),
 
           SizedBox(height: 16.h),
-
-          SizedBox(
-            height: 110.h,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: transportSwitchingList.length,
-              itemBuilder: (context, index) {
-                final transport = transportSwitchingList[index];
+          
+           SingleChildScrollView( 
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: transportSwitchingList.map((transport) {
                 return _buildTransportSwitchingItem(
                   context,
                   transport,
                   selectedTransport,
                 );
-              },
+              }).toList(),
             ),
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
+
+
+
 
   Widget _buildTransportSwitchingItem(
     BuildContext context,
@@ -157,12 +156,11 @@ class _PlanYourRouteState extends State<PlanYourRoute> {
   ) {
     final isSelected = selected == transport;
 
-    return GestureDetector(
-      onTap: () async {
         final cubit = context.read<RoutesCubit>();
 
-        await cubit.changeTransportType(transport);
-      },
+    return GestureDetector(
+      onTap: ()=>
+         cubit.changeTransportType(transport),
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 12.w),
         padding: EdgeInsets.all(17.sp),
@@ -217,7 +215,8 @@ class _PlanYourRouteState extends State<PlanYourRoute> {
   Widget _buildSelectTransportTextAndIcon() {
     return Row(
       children: [
-        Icon(Icons.train, size: 24.sp, color: AppColor.main),
+        Icon(context.read<RoutesCubit>().state.selectedTransportSwitching?.icon??Icons.train
+        , size: 24.sp, color: context.read<RoutesCubit>().state.selectedTransportSwitching?.color2?? AppColor.darkBlue ),
         SizedBox(width: 8.w),
         Text(
           AppText.selectTransport,

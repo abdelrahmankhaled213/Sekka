@@ -9,9 +9,9 @@ import 'package:sekka/Features/Auth/Logic/set_up_profile_cubit.dart';
 import 'package:sekka/Features/Auth/Ui/SetUpProfile/View/setup_profile_view.dart';
 import 'package:sekka/Features/Auth/Ui/auth_wrapper_view.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart';
+import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
 import 'package:sekka/Features/LostAndFound/View/item_detail_and_chat_screen.dart';
 import 'package:sekka/Features/OnBoarding/Ui/Views/OnBoardingView.dart';
-
 import '../../Features/Splash/View/splash_screen_view.dart';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -39,17 +39,31 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
         );
 
       case AppRoute.bottomNavigation:
-        return CustomPageRoute(page: const MainScreen());
+        return CustomPageRoute(page: const MainBottomNavView());
 
       case AppRoute.itemDetailAndChatScreen:
-        if (arguments is ItemModel) {
+      
+if (arguments is Map<String, dynamic>) {
+    return CustomPageRoute(
+      page: BlocProvider(
+create: (context) {
+  return getIt<LostAndFoundCubit>();
+},    
+        child: ItemDetailAndChatScreen(
+          item: arguments['item'] as ItemModel?,
+          id: arguments['id'] as int?,
+        ),
+      ),
+    );
+  }      
+       else if (arguments is int) {
           return CustomPageRoute(
-            page: ItemDetailAndChatScreen(item: arguments, id: null),
+            page: BlocProvider(
+              create: (context) => getIt<LostAndFoundCubit>(),
+              child: ItemDetailAndChatScreen(id: arguments , item: null),
+            ),
           );
-        } else if (arguments is String) {
-          return CustomPageRoute(
-            page: ItemDetailAndChatScreen(id: arguments, item: null),
-          );
+        
         }
         
         return MaterialPageRoute(builder: (_) => const SplashScreenView());

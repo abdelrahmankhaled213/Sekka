@@ -12,6 +12,7 @@ import 'package:sekka/Features/Auth/Data/Model/user_update.dart';
 import 'package:sekka/Features/Profile/Logic/profile_cubit.dart';
 import 'package:sekka/Features/Profile/Logic/profile_state.dart';
 
+
 class EditProfileFooter extends StatelessWidget {
   
   const EditProfileFooter({super.key});
@@ -128,7 +129,7 @@ void _listenForProfile(BuildContext context,ProfileState state)async{
                   }
                   
    if(state.profileStateEnum == ProfileStateEnum.editProfileError){
-        FlutterToastHelper.showToast(text: state.errorMsg!,);
+        FlutterToastHelper.showToast(text: state.errorMsg!,color: AppColor.error);
              }               
   }
 
@@ -141,6 +142,7 @@ if(state.pickImageEnum==PickImageEnum.uploadImageLoaded){
 final model=UpdateUserRequest(
 
   image: state.imagePathFromSupa,
+  clearImage: false,
   name: context.read<ProfileCubit>().nameController.text,
   favTrasnportation: context.read<ProfileCubit>().state.selectedTransports,
   isGetStarted: true
@@ -154,7 +156,7 @@ final model=UpdateUserRequest(
   
   if(state.pickImageEnum==PickImageEnum.uploadImageError){
 
-    FlutterToastHelper.showToast(text: state.errorMsg!);
+    FlutterToastHelper.showToast(text: state.errorMsg!,color: AppColor.error);
   }
 }
 }
@@ -178,7 +180,8 @@ void _onPressed(BuildContext context)async{
     final UpdateUserRequest model = UpdateUserRequest(
       favTrasnportation: context.read<ProfileCubit>().state.selectedTransports,
       name: context.read<ProfileCubit>().nameController.text,
-      isGetStarted: true
+      isGetStarted: true,
+      clearImage: context.read<ProfileCubit>().state.isImageRemoved,
     );
 
     await context.read<ProfileCubit>().editProfile(

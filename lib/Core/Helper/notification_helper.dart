@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sekka/Core/API/api_service.dart';
+import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_route.dart';
 import 'package:sekka/Core/Database/secure_storage.dart';
 import 'package:sekka/Core/Error/error_handler.dart';
@@ -93,7 +94,7 @@ void _navigateToDetails(RemoteMessage message) {
       await _savingTokenLocalAndServer(newToken);
     } catch (e) {
         final failure = ErrorHandler.handleError(e);
-        FlutterToastHelper.showToast(text: failure.message);
+        FlutterToastHelper.showToast(text: failure.message,color: AppColor.error);
     }
   }
 

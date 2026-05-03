@@ -70,7 +70,7 @@ class _RoutesBodyState extends State<RoutesBody> {
 
           children: [
             
-            Image.asset(AppImage.locationIcon,height: 24.h,width: 24.w,),
+            Image.asset(AppImage.locationIcon,height: 24.h,width: 24.w,color: context.read<RoutesCubit>().state.selectedTransportSwitching?.color1??AppColor.darkBlue,),
             SizedBox(width: 8.w,),
             Text(AppText.journeyDetails,style:AppStyle.regular16RobotoBlack ,),
           
@@ -116,23 +116,23 @@ BlocListener<RoutesCubit, RoutesState>(
         builder: (context, state) {
   
       final routesCubit = context.read<RoutesCubit>();
-  
+
+    final isSelectedStartOrEnd=routesCubit.selectedStartController.text.isNotEmpty&&routesCubit
+    .selectedEndController.text.isNotEmpty;
+    
       return Column(
 
         children: [
 
           AnimatedOpacity(
-            opacity: state.selectedTransportStart != null &&
-                    state.selectedTransportEnd != null
-                ? 1
+            opacity: isSelectedStartOrEnd? 1
                 : 0.4,
             duration: const Duration(milliseconds: 500),
             child: RoutesButton(
               label: AppText.search,
-              onPressed: () => _onPressed(context),
+              onPressed: () => isSelectedStartOrEnd? _onPressed(context):null,
               gradient: LinearGradient(
                 colors: [
-                  
                   routesCubit.state.selectedTransportSwitching?.color2 ?? AppColor.lightBlue,
                   routesCubit.state.selectedTransportSwitching?.color1 ?? AppColor.darkBlue,
                 ],
@@ -141,7 +141,7 @@ BlocListener<RoutesCubit, RoutesState>(
           ),
   
 
-           SizedBox(height: 20.h),
+           SizedBox(height: 10.h),
   
        AnimatedSwitcher(
   duration: const Duration(milliseconds: 500),
@@ -155,7 +155,7 @@ BlocListener<RoutesCubit, RoutesState>(
                   .read<RoutesCubit>().state
                   .selectedTransportSwitching
                   ?.color1 ??
-              Colors.blue,
+              AppColor.darkBlue,
         );
 
       case RoutesStateEnum.gettingRoutePathLoaded:
@@ -170,9 +170,11 @@ BlocListener<RoutesCubit, RoutesState>(
             switch (segment.type) {
               case TransportType.transfer:
                 return TransferWidget(
-  fromSegment: state.segments[i - 1],
-  toSegment: state.segments[i + 1],
-);
+                  stationName: state.segments[i].transferAtStop??'',
+                  fromSegment: state.segments[i - 1],
+                  toSegment: state.segments[i + 1],
+
+                                                     );
 
               default:
                 return RouteWidget(segment: segment);
@@ -207,7 +209,7 @@ void _onstateListener(BuildContext context,RoutesState state) {
   
   if(state.routesStateEnum==RoutesStateEnum.gettingRoutePathError){
 
-    FlutterToastHelper.showToast(text: state.errorMessage!);
+    FlutterToastHelper.showToast(text: state.errorMessage!,color: AppColor.error);
   }
 }
 
@@ -216,14 +218,6 @@ bool _listenWhen(RoutesState previous, RoutesState current) {
   current.routesStateEnum==RoutesStateEnum.gettingRoutePathError;
 }
 Future<void> _onPressed(BuildContext context) async {
-  
-  final state=context.read<RoutesCubit>().state;
-
-if(state.selectedTransportStart== state.selectedTransportEnd){
-  FlutterToastHelper.showToast(text: AppText.pleaseSelectStation);
-  return;
-}
-
   await context.read<RoutesCubit>().getRoutePath();
 }
   Widget _buildDropDown(

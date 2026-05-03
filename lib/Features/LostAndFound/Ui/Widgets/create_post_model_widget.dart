@@ -36,16 +36,18 @@ class _CreatePostModalWidgetState extends State<CreatePostModalWidget> {
     super.dispose();
   }
 
-void _buildScafoldMessenger(String text) {
+void _buildScafoldMessenger(String text,Color color) {
+  
   ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             text,
             style: AppStyle.regular16RobotoBlack.copyWith(
-              fontSize: 14.sp
+              fontSize: 14.sp,
+              color: Colors.white,
             ),
           ),
-          backgroundColor: AppColor.error,
+          backgroundColor: color,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.r),
@@ -59,19 +61,19 @@ void _buildScafoldMessenger(String text) {
   if (!_formKey.currentState!.validate()) return;
 
   if (_postType == null) {
-    _buildScafoldMessenger("Please choose post type");
+    _buildScafoldMessenger("Please choose post type",AppColor.error);
     return;
   }
 
   if (_selectedCategory == null) {
-    _buildScafoldMessenger("Please select a category");
+    _buildScafoldMessenger("Please select a category",AppColor.error);
     return;
   }
 
 
   final post = ItemModel(
     isActive: true , 
-    createdAt: DateTime.now(),
+    createdAt: DateTime.now().toIso8601String(),
     userId: FirebaseAuth.instance.currentUser!.uid,
     category: _selectedCategory!,
     title: _titleController.text.trim(),
@@ -85,121 +87,107 @@ await context.read<LostAndFoundCubit>().postLostAndFound(post);
 
 }
 
+@override
+Widget build(BuildContext context) {
+  final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-  @override
-  Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-
-    return Container(
-      decoration: const BoxDecoration(color: Colors.transparent),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-
-          Container(
-            width: double.infinity,
-            decoration:  BoxDecoration(
-              gradient: AppStyle.brandGradient,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-            ),
-            padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 24.h),
-            child: Row(
-              children: [
-                Container(
-                  width: 40.w,
-                  height: 40.h,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(51),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child:  Icon(
-                    Icons.inventory_2_rounded,
-                    color: Colors.white,
-                    size: 20.sp,
-                  ),
-                ),
-                 SizedBox(width: 12.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Create Post',
-                        style: AppStyle.regular18RobotoWhite.copyWith(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        'Report lost or found item',
-                        style: AppStyle.regular18RobotoWhite.copyWith(
-                          fontSize: 12,
-                          color: Colors.white.withAlpha(217),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    width: 36.w,
-                    height: 36.h,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(51),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.close_rounded,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Form body
-          Container(
-            color: AppColor.surface,
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(16, 20, 16, 20 + bottomInset),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildSectionLabel('Post Type *'),
-                    const SizedBox(height: 10),
-                    _buildPostTypeSelector(),
-                    const SizedBox(height: 18),
-                    _buildSectionLabel('Title *'),
-                    const SizedBox(height: 8),
-                    _buildTitleField(),
-                    const SizedBox(height: 18),
-                    _buildSectionLabel('Description'),
-                    const SizedBox(height: 8),
-                    _buildDescriptionField(),
-                    const SizedBox(height: 18),
-                    _buildSectionLabel('Category *'),
-                    const SizedBox(height: 10),
-                    _buildCategoryGrid(),
-                    const SizedBox(height: 18),
-                    _buildSectionLabel('Station *'),
-                    const SizedBox(height: 8),
-                    _buildStationField(),
-                    const SizedBox(height: 24),
-                    _buildSubmitButton(),
-                  ],
-                ),
+  return Container(
+    
+    constraints: BoxConstraints(
+      maxHeight: MediaQuery.of(context).size.height * 0.9,
+    ),
+    decoration: BoxDecoration(
+      color: AppColor.surface, 
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+    ),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+    
+        _buildHeader(),
+        
+    
+        Flexible( 
+          child: SingleChildScrollView(
+            
+            padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 20.h + bottomInset),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionLabel('Post Type *'),
+                  SizedBox(height: 10.h),
+                  _buildPostTypeSelector(),
+                  SizedBox(height: 18.h),
+                  _buildSectionLabel('Title *'),
+                  SizedBox(height: 8.h),
+                  _buildTitleField(),
+                  SizedBox(height: 18.h),
+                  _buildSectionLabel('Description'),
+                  SizedBox(height: 8.h),
+                  _buildDescriptionField(),
+                  SizedBox(height: 18.h),
+                  _buildSectionLabel('Category *'),
+                  SizedBox(height: 10.h),
+                  _buildCategoryGrid(),
+                  SizedBox(height: 18.h),
+                  _buildSectionLabel('Station *'),
+                  SizedBox(height: 8.h),
+                  _buildStationField(),
+                  SizedBox(height: 24.h),
+                  _buildSubmitButton(),
+                ],
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
+
+Widget _buildHeader() {
+  return Container(
+    width: double.infinity,
+    decoration: BoxDecoration(
+      gradient: AppStyle.brandGradient,
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+    ),
+    padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 24.h),
+    child: Row(
+      children: [
+        Container(
+          width: 40.w, height: 40.h,
+          decoration: BoxDecoration(
+            color: Colors.white.withAlpha(51),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(Icons.inventory_2_rounded, color: Colors.white, size: 20.sp),
+        ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Create Post', style: AppStyle.regular18RobotoWhite.copyWith(fontSize: 17, fontWeight: FontWeight.w800)),
+              Text('Report lost or found item', style: AppStyle.regular18RobotoWhite.copyWith(fontSize: 12, color: Colors.white.withAlpha(217))),
+            ],
+          ),
+        ),
+        GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Container(
+            width: 36.w, height: 36.h,
+            decoration: BoxDecoration(color: Colors.white.withAlpha(51), shape: BoxShape.circle),
+            child: const Icon(Icons.close_rounded, color: Colors.white, size: 18),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildSectionLabel(String label) {
     return Text(
@@ -489,22 +477,27 @@ await context.read<LostAndFoundCubit>().postLostAndFound(post);
       height: 50.h,
       child: BlocConsumer<LostAndFoundCubit, LostFoundState>(
         
-        listener: (context, state) {
-          if(state.status == LostFoundStatus.addPostsuccess) Navigator.pop(context);
+        listener: (context, state)  {
+          if(state.status == LostFoundStatus.addPostsuccess){
+  context.read<LostAndFoundCubit>().getPosts();
+          _buildScafoldMessenger("Item posted successfully", AppColor.success);
+          Navigator.pop(context);
+          } 
         if(state.status == LostFoundStatus.addPostfailure){
-          _buildScafoldMessenger(state.errorMsg!); 
+          _buildScafoldMessenger(state.errorMsg!,AppColor.error); 
         }
         },
         
-        listenWhen: (previous, current) {
-          return current.status==LostFoundStatus.addPostsuccess 
-          || current.status == LostFoundStatus.addPostfailure;
-        },
         
         builder: (BuildContext context, LostFoundState state) {
-print(state.status);  
+
        return 
-       ElevatedButton(
+      state.status == LostFoundStatus.addPostloading ? Center(
+        child: const CircularProgressIndicator(
+        color: AppColor.secondary,
+      )) 
+      : ElevatedButton(
+
           onPressed:  _submit,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
@@ -540,10 +533,13 @@ buildWhen:(previous, current) {
 
       return current.status == LostFoundStatus.addPostloading
           || current.status == LostFoundStatus.addPostsuccess 
-          || current.status == LostFoundStatus.addPostfailure;  
+          || current.status == LostFoundStatus.addPostfailure;
+          
 } ,
 
       ),
     );
   }
+
+
 }

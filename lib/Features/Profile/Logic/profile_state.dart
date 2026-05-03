@@ -20,12 +20,13 @@ final UpdateUserRequest?updateUserRequest;
 
 final String? errorMsg;
 final List<TransportType> selectedTransports;
+final bool isImageRemoved;
 
 
   const ProfileState({
     this.userModel,
     required this.profileStateEnum
-  , this.updateUserRequest,this.errorMsg, this.selectedTransports = const [],});
+  , this.updateUserRequest,this.errorMsg, this.selectedTransports = const [], this.isImageRemoved = false,});
 
   ProfileState copyWith({
     ProfileStateEnum? profileStateEnum,
@@ -34,18 +35,20 @@ final List<TransportType> selectedTransports;
     String? errorMsg,
    TransportType? selectedTransport,
   List<TransportType>? selectedTransports,
+  bool? isImageRemoved,
   }) {
     return ProfileState(
       profileStateEnum: profileStateEnum ?? this.profileStateEnum,
       updateUserRequest: updateUserRequest ?? this.updateUserRequest,
       errorMsg: errorMsg ?? this.errorMsg,
       userModel: userModel ?? this.userModel,
-      selectedTransports:  selectedTransports ?? this.selectedTransports
+      selectedTransports:  selectedTransports ?? this.selectedTransports,
+      isImageRemoved: isImageRemoved ?? this.isImageRemoved,
 
     );
   }
   
   @override
-  List<Object?> get props => [profileStateEnum,updateUserRequest,errorMsg,selectedTransports,userModel];
+  List<Object?> get props => [profileStateEnum,updateUserRequest,errorMsg,selectedTransports,userModel,isImageRemoved];
   
 }

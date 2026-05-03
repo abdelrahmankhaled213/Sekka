@@ -59,10 +59,11 @@ void toggleTransport(TransportType type) {
        
         userModel: profile,
        selectedTransports: profile.favTrasnportation??[],
+       isImageRemoved: false,
      
       ));
 
-    }catch(e,stackTrace){
+    }catch(e){
 
 
       final failure=ErrorHandler.handleError(e);
@@ -82,11 +83,17 @@ void removeNetworkImage(){
     
     emit(state.copyWith(
     userModel: currentUser.copyWith(image: null),
+    isImageRemoved: true,
   ));
 
 
 }
 
+void clearRemovedImageFlag() {
+  if (state.isImageRemoved) {
+    emit(state.copyWith(isImageRemoved: false));
+  }
+}
 
 Future<void> editProfile(UpdateUserRequest request) async {
   emit(state.copyWith(
@@ -102,7 +109,8 @@ Future<void> editProfile(UpdateUserRequest request) async {
 
     emit(state.copyWith(
       profileStateEnum: ProfileStateEnum.editProfileSuccess,
-      userModel: updatedUser, // Now it's actually getting the data!
+      userModel: updatedUser, 
+      isImageRemoved: false,
     ));
     
   } catch (e, stackTrace) {

@@ -3,6 +3,7 @@ import 'package:sekka/Features/Auth/Logic/transport_model.dart';
 class UpdateUserRequest {
   final String? name;
   final String? image;
+  final bool clearImage;
   final List<TransportType>? favTrasnportation;
   final bool? isGetStarted;
   final String? phone;
@@ -10,6 +11,7 @@ class UpdateUserRequest {
     this.phone,
     this.name,
     this.image,
+    this.clearImage = false,
     this.favTrasnportation,
     this.isGetStarted,
   });
@@ -21,7 +23,11 @@ class UpdateUserRequest {
 
     if (name != null) map['name'] = name;
     if(phone!=null) map['phone'] = phone;
-    if (image != null) map['image'] = image;
+    if (clearImage) {
+      map['image'] = null;
+    } else if (image != null) {
+      map['image'] = image;
+    }
     if (favTrasnportation != null) {
       map['Favourite_Transport'] =
           favTrasnportation!.map((e) => e.name).toList();

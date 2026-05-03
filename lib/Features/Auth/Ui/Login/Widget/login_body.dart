@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_route.dart';
+import 'package:sekka/Core/Constants/app_text.dart';
 import 'package:sekka/Core/Helper/animation_helper.dart';
 import 'package:sekka/Core/Helper/toast_helper.dart';
 import 'package:sekka/Features/Auth/Logic/auth_cubit.dart';
@@ -9,8 +10,6 @@ import 'package:sekka/Features/Auth/Logic/auth_state.dart';
 import 'package:sekka/Features/Auth/Ui/Login/Widget/or_continue_with.dart';
 import 'package:sekka/Features/Splash/Widget/logo_container.dart';
 import '../../../../../../Core/Constants/app_style.dart';
-import '../../../../../../Core/Localization/app_localizations.dart';
-
 import '../../../../../Core/Constants/app_color.dart';
 import '../../../../../Core/Constants/app_image.dart';
 import '../../Register/Widget/image_background.dart';
@@ -28,6 +27,8 @@ class _LoginBodyState extends State<LoginBody> with SingleTickerProviderStateMix
 
   late AnimationController _controller;
   late Animation<double> _logoAnimation;
+  late Animation<Offset> _headlineSlide;
+  bool _localizedAnimationsReady = false;
 
   @override
   void initState() {
@@ -42,6 +43,21 @@ class _LoginBodyState extends State<LoginBody> with SingleTickerProviderStateMix
 
     _controller.forward();
 
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_localizedAnimationsReady) return;
+    _localizedAnimationsReady = true;
+
+    _headlineSlide = AnimationHelper.buildLocalizedSlideAnimation(
+      start: 0.2,
+      end: 0.7,
+      animationController: _controller,
+      languageCode: Localizations.localeOf(context).languageCode,
+      distance: 0.45,
+    );
   }
 
   @override
@@ -70,11 +86,14 @@ class _LoginBodyState extends State<LoginBody> with SingleTickerProviderStateMix
               SizedBox(
                 height: 13.h,
               ),
-              Text(context.l10n.welcomeToSekka,style: AppStyle.regular24RobotoBlack,),
+              SlideTransition(
+                position: _headlineSlide,
+                child: Text(AppText.welcomeToSekka,style: AppStyle.regular24RobotoBlack,),
+              ),
               SizedBox(
                 height: 6.h,
               ),
-              Text(context.l10n.smartTransportation
+              Text(AppText.smartTransportation
                 ,style: AppStyle.regular16RobotoGrey,),
 
               SizedBox(
@@ -112,7 +131,7 @@ class _LoginBodyState extends State<LoginBody> with SingleTickerProviderStateMix
                       
                     }
                     if(state is GoogleError){
-                      FlutterToastHelper.showToast(text: state.errorMsg);
+                      FlutterToastHelper.showToast(text: state.errorMsg,color: AppColor.error);
                     }
                   },
                
@@ -144,7 +163,7 @@ class _LoginBodyState extends State<LoginBody> with SingleTickerProviderStateMix
                                 height: 22.h,
                               ),
                               label: Text(
-                                "Sign in with Google",
+                                AppText.signInWithGoogle,
                                 style: AppStyle.regular18RobotoWhite.copyWith(
                                   color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 16.sp,
@@ -185,11 +204,11 @@ class _LoginBodyState extends State<LoginBody> with SingleTickerProviderStateMix
   void _listenGetStarted(BuildContext context, AuthState state) {
   
                   if(state is GetProfileError){
-                    FlutterToastHelper.showToast(text: state.errorMsg);
+                    FlutterToastHelper.showToast(text: state.errorMsg,color: AppColor.error);
                   }
                   if(state is GetProfileSuccess){
                     
-                    FlutterToastHelper.showToast(text: context.l10n.signInSuccessfully);
+                    FlutterToastHelper.showToast(text: AppText.signInSuccessfully,color: AppColor.success);
                    
                     final isGetStarted=state.isGettingStarted;
                     

@@ -19,7 +19,7 @@ class ChatBubbleWidget extends StatelessWidget {
     final senderName = messageData['senderName'] as String;
     final senderAvatar = messageData['senderAvatar'] as String;
     final senderAvatarSemanticLabel =
-        messageData['senderAvatarSemanticLabel'] as String;
+        messageData['senderAvatarSemanticLabel'] as String?;
 
     return Padding(
 

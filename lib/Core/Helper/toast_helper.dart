@@ -6,14 +6,14 @@ import 'package:sekka/Core/Constants/app_color.dart';
 
 class FlutterToastHelper{
   static Future<void>showToast({required String
-   text,Color?color}) async {
+   text,required Color color}) async {
 
    await  Fluttertoast.showToast(
         msg: text,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 1,
-        backgroundColor: color??AppColor.main,
+        backgroundColor: color,
         textColor: Colors.white,
         fontSize: 14.sp
     );

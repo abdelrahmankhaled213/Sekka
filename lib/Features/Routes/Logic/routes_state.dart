@@ -23,7 +23,8 @@ enum RoutesStateEnum {
 }
 
  class RoutesState extends Equatable {
-  final TransportSwitiching? selectedTransportSwitching;
+
+     final TransportSwitiching? selectedTransportSwitching;
      final RoutesStateEnum routesStateEnum;
      final String? errorMessage;
      final List<Transport>? transports;
@@ -38,10 +39,11 @@ enum RoutesStateEnum {
      final Transport? selectedTransportEnd;
     final List<Transport>? path;
     final List<StepModel> steps ;
-  const RoutesState({
-    this.selectedTransportSwitching,
-    this.steps = const [],
-    this.segments = const [],
+    
+    const RoutesState({
+     this.selectedTransportSwitching,
+     this.steps = const [],
+     this.segments = const [],
      this.path,
      this.isLoading=false,
      this.routesStateEnum = RoutesStateEnum.initial,
@@ -98,6 +100,7 @@ enum RoutesStateEnum {
 
   List<Object?> get props => [steps,routesStateEnum
   , errorMessage, transports, offset, hasMore, isLoading
-  ,searchResults, isSearchLoading,searchText, selectedTransportStart, selectedTransportEnd,path,segments,selectedTransportSwitching];
+  ,searchResults, isSearchLoading,searchText, selectedTransportStart
+  , selectedTransportEnd,path,segments,selectedTransportSwitching,];
 
 }

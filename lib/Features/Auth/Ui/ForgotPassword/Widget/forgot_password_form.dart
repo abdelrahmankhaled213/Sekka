@@ -142,12 +142,12 @@ PasswordRecoveryText(),
                         listener: (context, state) {
                           if (state is ResetPasswordFailure) {
                             FlutterToastHelper.showToast(
-                                text: state.errorMsg
+                                text: state.errorMsg,color: AppColor.error
                             );
                           }
 
                           if (state is ResetPasswordSuccess) {
-FlutterToastHelper.showToast(text: "Password is sent");
+FlutterToastHelper.showToast(text: "Password is sent",color: AppColor.success);
                           }
 
                         },
@@ -167,7 +167,7 @@ FlutterToastHelper.showToast(text: "Password is sent");
                               ?
                           Center(
                                 child: CircularProgressIndicator(
-                                                            color: AppColor.main,
+                                    color: AppColor.main,
                                                           ),
                               )
                               : Align(

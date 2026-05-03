@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_route.dart';
-import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Widget/empty_state_widget.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart';
 import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
@@ -25,12 +23,10 @@ class HomeFeedScreen extends StatefulWidget {
 
 class _HomeFeedScreenState extends State<HomeFeedScreen>
     with SingleTickerProviderStateMixin {
-  
-  
-  String _activeFilter = 'All'; 
-  String _activeCategory = 'All'; 
+  String _activeFilter = 'All';
+  String _activeCategory = 'All';
   String _searchQuery = '';
-  
+
   bool _showFab = true;
   late ScrollController _scrollController;
   late AnimationController _fabAnimController;
@@ -38,7 +34,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen>
   @override
   void initState() {
     super.initState();
-    
+
     context.read<LostAndFoundCubit>().getPosts();
 
     _scrollController = ScrollController();
@@ -72,188 +68,188 @@ class _HomeFeedScreenState extends State<HomeFeedScreen>
   void _openCreatePostModal(BuildContext context) {
     final cubit = context.read<LostAndFoundCubit>();
     showModalBottomSheet(
+
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => BlocProvider.value(
         value: cubit,
-        child: CreatePostModalWidget(),
+        child: const CreatePostModalWidget(),
       ),
     );
   }
 
+  @override
+  Widget build(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width >= 600;
 
-@override
-Widget build(BuildContext context) {
-  final isTablet = MediaQuery.of(context).size.width >= 600;
+    return BlocBuilder<LostAndFoundCubit, LostFoundState>(
+      builder: (context, state) {
+        final allItems = state.items ?? [];
 
-  return BlocBuilder<LostAndFoundCubit, LostFoundState>(
-   
-    builder: (context, state) {
-      
-      final allItems = state.items ?? [];
+    final filteredItems = allItems.where((post) {
+          final matchesFilter = _activeFilter == 'All' ||
+              (_activeFilter == 'Lost' && post.type == ItemType.lost) ||
+              (_activeFilter == 'Found' && post.type == ItemType.found);
 
-      
-      final filteredItems = allItems.where((post) {
-      
-        final matchesFilter = _activeFilter == 'All' ||
-            (_activeFilter == 'Lost' && post.type == ItemType.lost) ||
-            (_activeFilter == 'Found' && post.type == ItemType.found);
+          final matchesCategory = _activeCategory == 'All' ||
+              post.category.name.toLowerCase() == _activeCategory.toLowerCase();
 
-                final matchesCategory = _activeCategory == 'All' ||
-            post.category.name.toLowerCase() == _activeCategory.toLowerCase();
+          final matchesSearch = _searchQuery.isEmpty ||
+              post.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+              post.stationName.toLowerCase().contains(_searchQuery.toLowerCase());
 
-        
-        final matchesSearch = _searchQuery.isEmpty ||
-            post.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            post.stationName.toLowerCase().contains(_searchQuery.toLowerCase());
+          return matchesFilter && matchesCategory && matchesSearch;
+        }).toList();
 
-        return matchesFilter && matchesCategory && matchesSearch;
-      }).toList();
+        final lostCount = allItems.where((e) => e.type == ItemType.lost).length;
+        final foundCount = allItems.where((e) => e.type == ItemType.found).length;
 
-      
-      final lostCount = allItems.where((e) => e.type == ItemType.lost).length;
-      final foundCount = allItems.where((e) => e.type == ItemType.found).length;
+        final bool isInitialLoading = state.status == LostFoundStatus.getPostLoading && allItems.isEmpty;
 
-      return Scaffold(
-   
-        body: RefreshIndicator(
-          onRefresh: () async => context.read<LostAndFoundCubit>().getPosts(),
-          child: Stack(
-            children: [
-              CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: HomeHeaderWidget(
-                      onAddPressed: () => _openCreatePostModal(context),
-                    ),
+        return Scaffold(
+          body: RefreshIndicator(
+            onRefresh: () async => await context.read<LostAndFoundCubit>().getPosts(),
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: HomeHeaderWidget(
+                    onAddPressed: () => _openCreatePostModal(context),
                   ),
-                  SliverToBoxAdapter(
-                    child: HomeSearchFilterWidget(
-                      activeFilter: _activeFilter,
-                      activeCategory: _activeCategory,
-                      searchQuery: _searchQuery,
-                      onFilterChanged: (f) => setState(() => _activeFilter = f),
-                      onCategoryChanged: (c) => setState(() => _activeCategory = c),
-                      onSearchChanged: (q) => setState(() => _searchQuery = q),
-                    ),
+                ),
+                SliverToBoxAdapter(
+                  child: HomeSearchFilterWidget(
+                    activeFilter: _activeFilter,
+                    activeCategory: _activeCategory,
+                    searchQuery: _searchQuery,
+                    onFilterChanged: (f) => setState(() => _activeFilter = f),
+                    onCategoryChanged: (c) => setState(() => _activeCategory = c),
+                    onSearchChanged: (q) => setState(() => _searchQuery = q),
                   ),
-                  SliverToBoxAdapter(
-                    child: HomeStatsWidget(
-                      lostCount: lostCount,
-                      foundCount: foundCount,
-                    ),
+                ),
+                
+                SliverToBoxAdapter(
+                  child: HomeStatsWidget(
+                    lostCount: lostCount,
+                    foundCount: foundCount,
                   ),
+                ),
 
-                  
-                  if (state.status == LostFoundStatus.getPostLoading)
-                    Skeletonizer.sliver(
-                      enabled: true,
-                      child: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) => _buildPostCard(_dummyItem(), index),
-                          childCount: 5,
-                        ),
+                
+                if (isInitialLoading)
+                  Skeletonizer.sliver(
+                    enabled: true,
+                    child: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => _buildPostCard(_dummyItem(), index, isSkeleton: true),
+                        childCount: 5,
                       ),
-                    )
-                  
-                  
-                  else if (state.status == LostFoundStatus.getPostFailure)
-                    SliverFillRemaining(
-                      child: EmptyStateWidget(
-                        icon: Icons.error_outline,
-                        title: 'حدث خطأ ما',
-                        description: 'فشل في تحميل البيانات، يرجى المحاولة مرة أخرى',
-                        ctaLabel: 'إعادة المحاولة',
-                        onCta: () => context.read<LostAndFoundCubit>().getPosts(),
-                      ),
-                    )
+                    ),
+                  )
+                
+                
+                else if (state.status == LostFoundStatus.getPostFailure && allItems.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: EmptyStateWidget(
+                      icon: Icons.error_outline,
+                      title: 'Failure to load posts',
+                      description: 'Please try again later',
+                      ctaLabel: 'Try again',
+                      onCta: () => context.read<LostAndFoundCubit>().getPosts(),
+                    ),
+                  )
 
-                     else if (filteredItems.isEmpty)
-                    SliverFillRemaining(
-                      child: EmptyStateWidget(
-                        icon: Icons.search_off_rounded,
-                        title: 'There is nothing here',
-                        description: 'You have not posted anything yet.',
-                        ctaLabel: 'Post now',
-                        onCta: () => _openCreatePostModal(context),
-                      ),
-                    )
-                  
-                  else
-                    
-                    isTablet
-                        ? SliverPadding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-                            sliver: SliverGrid(
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                                childAspectRatio: 1.1,
-                              ),
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) => _buildPostCard(filteredItems[index], index),
-                                childCount: filteredItems.length,
-                              ),
+                 else if (filteredItems.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: EmptyStateWidget(
+                      icon: Icons.search_off_rounded,
+                      title: 'There are no posts',
+                      description: 'There are no posts matching your search criteria',
+                      ctaLabel: 'Create a post',
+                      onCta: () => _openCreatePostModal(context),
+                    ),
+                  )
+
+              
+                else
+                  isTablet
+                      ? SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                          sliver: SliverGrid(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              childAspectRatio: 1.1,
                             ),
-                          )
-                        : SliverPadding(
-                            padding: const EdgeInsets.only(bottom: 100),
-                            sliver: SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) => _buildPostCard(filteredItems[index], index),
-                                childCount: filteredItems.length,
-                              ),
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) => _buildPostCard(filteredItems[index], index),
+                              childCount: filteredItems.length,
                             ),
                           ),
-                ],
-              ),
-              
-            ],
+                        )
+                      : SliverPadding(
+                          padding:  EdgeInsets.only(bottom: 100.h),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) => _buildPostCard(filteredItems[index], index),
+                              childCount: filteredItems.length,
+                            ),
+                          ),
+                        ),
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 
+  ItemModel _dummyItem() {
+    return ItemModel(
+      id: -1, 
+      title: 'Loading Title Header',
+      description: 'This is a long loading description for skeletonizer',
+      type: ItemType.lost,
+      createdAt: DateTime.now().toIso8601String(),
+      category: Category.phone,
+      stationName: 'Loading Station',
+      userId: '0',
+    );
+  }
 
-ItemModel _dummyItem() {
-  return ItemModel(
-    id: 0,
-    title: 'Loading Title Header',
-    description: 'This is a long loading description for skeletonizer',
-    type: ItemType.lost,
-    createdAt: DateTime.now(),
-    category: Category.phone,
-    stationName: 'Loading Station',
-    userId: '0',
-  );
-} 
-
-  Widget _buildPostCard(ItemModel post, int index) {
+  Widget _buildPostCard(ItemModel post, int index, {bool isSkeleton = false}) {
     return TweenAnimationBuilder<double>(
+      
+      key: ValueKey(post.id == -1 ? "skeleton_$index" : post.id),
       tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 350 + (index * 60).clamp(0, 300)),
+      duration: Duration(milliseconds: isSkeleton ? 200 : 350 + (index * 40).clamp(0, 200)),
       curve: Curves.easeOutCubic,
       builder: (context, value, child) {
         return Opacity(
           opacity: value,
           child: Transform.translate(
-            offset: Offset(0, 20 * (1 - value)),
+            offset: Offset(0, 15 * (1 - value)),
             child: child,
           ),
         );
       },
       child: PostCardWidget(
-        postData: post,  
-        onTap: () => Navigator.pushNamed(
-          context,
-          AppRoute.itemDetailAndChatScreen,
-          arguments: post,
-        ),
+        postData: post,
+        onTap: isSkeleton
+            ? null
+            : () => Navigator.pushNamed(
+                  context,
+                  AppRoute.itemDetailAndChatScreen,
+                  arguments: {
+                    'item': post,
+                    'cubit':BlocProvider.of<LostAndFoundCubit>(context),
+                    'id':null
+                  },
+                ),
       ),
     );
   }

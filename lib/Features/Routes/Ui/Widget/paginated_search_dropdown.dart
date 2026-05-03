@@ -14,6 +14,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 
 class AnimatedListItem extends StatelessWidget {
+
   final int index;
   final AnimationController controller;
   final Widget child;
@@ -44,6 +45,7 @@ class AnimatedListItem extends StatelessWidget {
 }
 
 class PaginatedSearchDropdown extends StatefulWidget {
+
   final bool isLoading;
   final bool isStart;
   final bool hasMore;
@@ -72,6 +74,7 @@ class PaginatedSearchDropdown extends StatefulWidget {
 
 class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
     with SingleTickerProviderStateMixin {
+
   final ScrollController _scroll = ScrollController();
   Timer? _debounce;
 
@@ -109,6 +112,7 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
   
 
   Future<void> _openSheet() async {
+ 
       final cubit = context.read<RoutesCubit>();
 
     setState(() => _isSheetOpen = true);
@@ -123,15 +127,15 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
       builder: (_) => _buildSheet(),
     ).whenComplete(() => setState(() => _isSheetOpen = false));
  
- 
-      if ((cubit.state.transports?.isEmpty ?? true)) {
-       await cubit.fetchTransports();
+if ((cubit.state.transports?.isEmpty ?? true)) {    
+         await cubit.fetchTransports();
   }
  
  
   }
 
   Widget _buildSheet() {
+    
     return BlocProvider.value(
       value: context.read<RoutesCubit>(),
       child: DraggableScrollableSheet(
@@ -145,7 +149,9 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
           ),
           child: Column(
             children: [
+              
               const SizedBox(height: 12),
+
               Container(
                 height: 5.h,
                 width: 40.w,
@@ -176,6 +182,7 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
   Widget _buildList() {
     
     return BlocBuilder<RoutesCubit, RoutesState>(
+
       builder: (context, state) {
         final isFirstLoad =
             state.isLoading && (state.transports?.isEmpty ?? true);
@@ -188,7 +195,10 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
             : state.searchResults;
 
         if (isFirstLoad) {
+
           return Skeletonizer(
+            containersColor: Colors.grey.shade400,
+            enabled: true,
             child: ListView.builder(
               itemCount: 10,
               itemBuilder: (_, __) => _fakeItem(),
@@ -236,7 +246,13 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: selected ? AppColor.darkBlue : Colors.transparent,
+        color: selected ? context.read<RoutesCubit>().state.selectedTransportSwitching?.color1??AppColor.darkBlue.withOpacity(0.4) 
+        : Colors.transparent,
+        border: Border.all(
+          color: selected ? context.read<RoutesCubit>().state.selectedTransportSwitching?.color1??AppColor.darkBlue 
+          : Colors.transparent,
+          width: 2,
+        ),
         borderRadius: BorderRadius.circular(14.r),
       ),
       child: ListTile(
@@ -251,7 +267,9 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
 
   @override
   Widget build(BuildContext context) {
+ 
     return BlocBuilder<RoutesCubit, RoutesState>(
+ 
       builder: (context, state) =>
       MyTextFormField(
         readonly: true,
@@ -261,7 +279,7 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
         onTap: _openSheet,
         icon: AnimatedRotation(
           turns: _isSheetOpen ? 0.5 : 0,
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 600),
           child: const Icon(Icons.keyboard_arrow_down, color: AppColor.grey),
         ),
       ),
@@ -269,8 +287,9 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
   }
 }
 
-/// ripple + press scale
+
 class _RippleScaleItem extends StatefulWidget {
+ 
   final Widget child;
   final VoidCallback onTap;
 

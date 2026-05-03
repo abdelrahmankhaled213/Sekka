@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_route.dart';
+import 'package:sekka/Core/Constants/app_text.dart';
 import 'package:sekka/Core/Helper/validator_helper.dart';
 import '../../../../../Core/Constants/app_color.dart';
 import '../../../../../Core/Constants/app_style.dart';
-import '../../../../../Core/Localization/app_localizations.dart';
 import '../../../../../Core/Helper/animation_helper.dart';
 import '../../../../../Core/Helper/toast_helper.dart';
 import '../../../../../Core/Widget/custom_button_core.dart';
@@ -149,9 +149,9 @@ class _LoginFormState extends State<LoginForm>
                       child: InputField(
                           validator: _validateEmailOrPhone,
                           titleName:
-                          isEmail ? context.l10n.emailAddress : context.l10n.phoneNumber
+                          isEmail ? AppText.emailAddress : AppText.phoneNumber
                           ,
-                          hint: isEmail ? context.l10n.enterYourEmail : context.l10n
+                          hint: isEmail ? AppText.enterYourEmail : AppText
                               .phoneNumber
                           ,
                           controller: isEmail
@@ -172,9 +172,9 @@ class _LoginFormState extends State<LoginForm>
                       child: InputField(
                           validator: _validatePassword,
                           titleName:
-                          context.l10n.password
+                          AppText.password
                           ,
-                          hint: context.l10n.enterYourPassword
+                          hint: AppText.enterYourPassword
                           ,
                           controller: passwordController,
                           prefixIcon:
@@ -200,7 +200,7 @@ class _LoginFormState extends State<LoginForm>
                       .navigateToForgotPassword(),
                   child: Align(
                         alignment: Alignment.bottomRight,
-                        child: Text(context.l10n.forgotPassword
+                        child: Text(AppText.forgotPassword
                           , style: AppStyle.regular16RobotoGrey.copyWith(
                               fontSize: 14.sp,
                               color: AppColor.main
@@ -232,7 +232,7 @@ class _LoginFormState extends State<LoginForm>
 
                             if(state is GetProfileError){
 
-                              FlutterToastHelper.showToast(text: state.errorMsg);
+                              FlutterToastHelper.showToast(text: state.errorMsg,color: AppColor.error);
                             
                             }
                           
@@ -252,7 +252,8 @@ class _LoginFormState extends State<LoginForm>
                                if(state is VerifyUserSuccess && state.isVerified){
                            
                                  FlutterToastHelper.showToast(
-                                     text: context.l10n.signInSuccessfully
+                                     text: AppText.signInSuccessfully,
+                                     color: AppColor.success
                                  );
                            
                                await context.read<AuthCubit>().getProfile();
@@ -279,6 +280,7 @@ class _LoginFormState extends State<LoginForm>
                                 if (state is LoginFailure) {
                                   FlutterToastHelper.showToast(
                                       text: state.errorMsg
+                                      ,color: AppColor.error
                                   );
                                 }
                            
@@ -338,9 +340,9 @@ class _LoginFormState extends State<LoginForm>
                                       ,
                                       thirdColor: AppColor.pink
                                       ,
-                                      text: context.l10n.createAccount,
+                                      text: AppText.signIn,
                                       child: Center(
-                                          child: Text(context.l10n.signIn,
+                                          child: Text(AppText.signIn,
                                               style: AppStyle.regular18RobotoWhite
                                                   .copyWith(
                                                 fontSize: 16.sp,
@@ -358,8 +360,8 @@ class _LoginFormState extends State<LoginForm>
                     SizedBox(
                       height: 24.h,
                     ),
-                    Center(child: CustomTextSpan(text: context.l10n.dontHaveAnAccount
-                      , text2: context.l10n.signUp, onTapGesture: ()=>
+                    Center(child: CustomTextSpan(text: AppText.dontHaveAnAccount
+                      , text2: AppText.signUp, onTapGesture: ()=>
                       context.read<AuthCubit>().navigateToSignUp()
                       ,))
 

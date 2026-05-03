@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
+import 'package:sekka/Core/Constants/app_text.dart';
 class OtpSecurityRule extends StatelessWidget {
 
   const OtpSecurityRule({super.key});
@@ -36,7 +37,7 @@ class OtpSecurityRule extends StatelessWidget {
       SizedBox(
       width: 5.w,
       ),
-      Text("Secure Verification",style: AppStyle.bold14RobotoBlue.copyWith(
+      Text(AppText.secureVerification,style: AppStyle.bold14RobotoBlue.copyWith(
     fontWeight: FontWeight.w400,
       color: AppColor.black
       ),)
@@ -46,7 +47,7 @@ class OtpSecurityRule extends StatelessWidget {
           SizedBox(
             height: 8.h,
           ),
-Text("We use SMS verification to ensure your account security and prevent unauthorized access.",style:
+Text(AppText.secureVerificationDesc,style:
 AppStyle.regular16RobotoBlack.copyWith(
 fontSize: 14.sp
 ),)

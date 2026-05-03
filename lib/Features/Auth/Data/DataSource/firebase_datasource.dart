@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sekka/Core/App/env_variables.dart';
+import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Error/error_handler.dart';
 import 'package:sekka/Core/Helper/toast_helper.dart';
 import 'package:sekka/Features/Auth/Data/Model/signup_request.dart';
@@ -109,7 +110,7 @@ return null;
   }
   void _verificationFailed(FirebaseAuthException error){
 
-FlutterToastHelper.showToast(text: ErrorHandler.handleError(error).message);
+FlutterToastHelper.showToast(color: AppColor.error,text: ErrorHandler.handleError(error).message);
 
   }
 

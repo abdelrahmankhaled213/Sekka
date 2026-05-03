@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
-import 'package:sekka/Core/Localization/app_localizations.dart';
+import 'package:sekka/Core/Constants/app_text.dart';
 
 class OtpInstruction extends StatelessWidget {
 
@@ -27,7 +27,7 @@ class OtpInstruction extends StatelessWidget {
           SizedBox(
             width: 8.w,
           ),
-          Text(context.l10n.otpInstruction
+          Text(AppText.otpInstruction
             ,textAlign: TextAlign.center,
 
             style: AppStyle.regular16RobotoGrey.copyWith(
