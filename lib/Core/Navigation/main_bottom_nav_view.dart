@@ -1,19 +1,17 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/DI/service_locator.dart';
 import 'package:sekka/Core/Navigation/nav_entities.dart';
-import 'package:sekka/Features/LostAndFound/View/home_feed_screen_view.dart';
+import 'package:sekka/Features/NearestStation/Logic/nearest_station_cubit.dart';
+import 'package:sekka/Features/NearestStation/Ui/Widget/View/nearest_station_view.dart';
 import 'package:sekka/Features/Profile/Logic/profile_cubit.dart';
 import 'package:sekka/Features/Profile/UI/profile_screen_view.dart';
 import 'package:sekka/Features/Routes/Logic/routes_cubit.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/View/routes_screen_view.dart';
-import 'package:sekka/main.dart' as AppColor;
 
 class MainScreen extends StatefulWidget {
-
   const MainScreen({super.key});
 
   @override
@@ -24,45 +22,50 @@ class _MainScreenState extends State<MainScreen> {
   int index = 0;
 
   final items = const [
-    NavItemData(label: 'Home', icon: Icons.home_outlined, activeIcon: Icons.home),
-    NavItemData(label: 'Routes', icon: Icons.route_outlined, activeIcon: Icons.route),
-    NavItemData(label: 'Lost', icon: Icons.foundation_outlined, activeIcon: Icons.foundation),
-    NavItemData(label: 'Alerts', icon: Icons.notifications_none, activeIcon: Icons.notifications),
-    NavItemData(label: 'Profile', icon: Icons.person_outline, activeIcon: Icons.person),
+    NavItemData(label: 'Home',    icon: Icons.home_outlined,          activeIcon: Icons.home_rounded),
+    NavItemData(label: 'Routes',  icon: Icons.route_outlined,         activeIcon: Icons.route),
+    NavItemData(label: 'Alerts',  icon: Icons.notifications_outlined,  activeIcon: Icons.notifications_rounded),
+    NavItemData(label: 'Chat',    icon: Icons.chat_bubble_outline,     activeIcon: Icons.chat_bubble_rounded),
+    NavItemData(label: 'Profile', icon: Icons.person_outline,          activeIcon: Icons.person_rounded),
   ];
 
-  final pages =  [
-Text("Home"), 
-BlocProvider( create: (context) => getIt<RoutesCubit>()..fetchTransports()
-, child: const RoutesScreenView(), ) 
-, HomeFeedScreen() 
-, Text('Alerts') 
-, BlocProvider(create: (context) => getIt<ProfileCubit>()..getProfile() 
-,child: const ProfileScreenView()),
-
-
+  List<Widget> get pages => [
+    BlocProvider(
+      create: (_) => getIt<NearestStationCubit>(),
+      child: const NearestStationView(),
+    ),
+    BlocProvider(
+      create: (_) => getIt<RoutesCubit>()..fetchTransports(),
+      child: const RoutesScreenView(),
+    ),
+    const Scaffold(body: Center(child: Text('Lost & Found'))),
+    const Scaffold(body: Center(child: Text('Alerts'))),
+    BlocProvider(
+      create: (_) => getIt<ProfileCubit>()..getProfile(),
+      child: const ProfileScreenView(),
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
+      backgroundColor: Colors.white,
       body: IndexedStack(index: index, children: pages),
-      bottomNavigationBar: FloatingBottomNav(
+      bottomNavigationBar: _BottomNav(
         items: items,
         currentIndex: index,
-        onTap: (i) => setState(() => index = i),
+        onTap: (i) {
+          HapticFeedback.lightImpact();
+          setState(() => index = i);
+        },
       ),
     );
   }
 }
 
-
-
-
-class FloatingBottomNav extends StatelessWidget {
-  const FloatingBottomNav({
-    super.key,
+class _BottomNav extends StatelessWidget {
+  const _BottomNav({
     required this.items,
     required this.currentIndex,
     required this.onTap,
@@ -74,135 +77,79 @@ class FloatingBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding:  EdgeInsets.fromLTRB(16.h, 0.w, 16.h, 18.w),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28.r),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-          child: Container(
-            height: 70.h,
-            padding:  EdgeInsets.all(8.sp),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.85),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: Colors.white.withOpacity(.4)),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x33000000),
-                  blurRadius: 25,
-                  offset: Offset(0, 10),
-                )
-              ],
-            ),
-            child: LayoutBuilder(
-              builder: (context, c) {
-                final itemWidth = c.maxWidth / items.length;
-                return Stack(
-                  children: [
-                    _AnimatedPill(
-                      left: itemWidth * currentIndex,
-                      width: itemWidth,
-                    ),
-                    Row(
-                      children: List.generate(items.length, (index) {
-                        final selected = index == currentIndex;
-                        return Expanded(
-                          child: _NavItem(
-                            item: items[index],
-                            selected: selected,
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              onTap(index);
-                            },
-                          ),
-                        );
-                      }),
-                    )
-                  ],
-                );
-              },
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: const Color(0xFFE5E7EB), width: 1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
           ),
-        ),
+        ],
       ),
-    );
-  }
-  
-}
-class _AnimatedPill extends StatelessWidget {
-  final double left;
-  final double width;
-
-  const _AnimatedPill({required this.left, required this.width});
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedPositioned(
-      duration: const Duration(milliseconds: 350),
-      curve: Curves.easeOutCubic,
-      left: left,
-      top: 0,
-      bottom: 0,
-      width: width,
-      child: Padding(
-        padding:  EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.blue.withOpacity(.15),
-            borderRadius: BorderRadius.circular(22),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 60.h,
+          child: Row(
+            children: List.generate(items.length, (i) {
+              return Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => onTap(i),
+                  child: _NavItem(item: items[i], selected: i == currentIndex),
+                ),
+              );
+            }),
           ),
         ),
       ),
     );
   }
 }
+
 class _NavItem extends StatelessWidget {
+  const _NavItem({required this.item, required this.selected});
+
   final NavItemData item;
   final bool selected;
-  final VoidCallback onTap;
 
-  const _NavItem({
-    required this.item,
-    required this.selected,
-    required this.onTap,
-  });
+  static const _activeColor   = Color(0xFF2B7FFF);
+  static const _inactiveColor = Color(0xFF9CA3AF);
+  static const _activeBg      = Color(0xFFEBF3FF);
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(22),
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOut,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              transitionBuilder: (child, anim) =>
-                  ScaleTransition(scale: anim, child: child),
-              child: Icon(
-                selected ? item.activeIcon : item.icon,
-                key: ValueKey(selected),
-                size: selected ? 27 : 22,
-                color: selected ? Colors.blue : Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 3),
-            AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 250),
-              style: TextStyle(
-                fontSize: selected ? 12.sp : 11.sp,
-                fontWeight: FontWeight.w600,
-                color: selected ? Colors.blue : Colors.grey,
-              ),
-              child: Text(item.label),
-            )
-          ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOut,
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
+          decoration: BoxDecoration(
+            color: selected ? _activeBg : Colors.transparent,
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          child: Icon(
+            selected ? item.activeIcon : item.icon,
+            size: 22.sp,
+            color: selected ? _activeColor : _inactiveColor,
+          ),
         ),
-      ),
+        SizedBox(height: 2.h),
+        AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 220),
+          style: TextStyle(
+            fontSize: 11.sp,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+            color: selected ? _activeColor : _inactiveColor,
+          ),
+          child: Text(item.label),
+        ),
+      ],
     );
   }
 }
