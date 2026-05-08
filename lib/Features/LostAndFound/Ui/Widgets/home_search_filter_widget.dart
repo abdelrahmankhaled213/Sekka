@@ -5,6 +5,7 @@ import 'package:sekka/Core/Widget/custom_text_field.dart';
 import 'package:sekka/core/constants/app_style.dart';
 
 class HomeSearchFilterWidget extends StatelessWidget {
+  
   final String activeFilter;
   final String activeCategory;
   final String searchQuery;

@@ -1,13 +1,15 @@
 import 'package:sekka/Features/LostAndFound/Data/Model/add_comment_request.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/comments.dart';
+import 'package:sekka/Features/LostAndFound/Data/Model/conversation.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart';
 import 'package:sekka/Features/LostAndFound/Data/DataSource/remote_data_source.dart';
+import 'package:sekka/Features/LostAndFound/Data/Model/message.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/update_comment_request.dart';
 
 class LostAndFoundRepo {
 
   final RemoteDataSource remoteDataSource;
-
+  
   LostAndFoundRepo({required this.remoteDataSource});
 
 Future<ItemModel> post(ItemModel data) async {
@@ -41,7 +43,31 @@ return await remoteDataSource.updateComment(data);
 
 Future<void> deleteComment(int commentId)async{
 return await remoteDataSource.deleteComment(commentId);
+}
 
+Future<void> sendMessage(String conversationId,String senderId,String text)async{
+return await remoteDataSource.sendMessage(conversationId,senderId,text);
+}
+
+Future<List<Message>>getMessages(String conversationId)async{
+return await remoteDataSource.getMessages(conversationId);
+}
+
+Future<Conversation> getConversation(String conversationId)async{
+return await remoteDataSource.getConversation(conversationId);
+}
+Future<List<Conversation>> getConversations(String userId)async{
+return await remoteDataSource.getUserConversations(userId);
+}
+
+
+Future<void> createConversation(String userId,String participantId)async{
+return await remoteDataSource.createConversation(userId, participantId);
+}
+
+
+Stream<List<Message>> listenToMessages(String conversationId)async*{
+yield await remoteDataSource.getMessages(conversationId);
 }
 
 }

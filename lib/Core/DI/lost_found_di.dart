@@ -7,7 +7,7 @@ import '../../Features/LostAndFound/Data/DataSource/remote_data_source.dart';
 void initLostAndFound(){
   
  getIt.registerLazySingleton(() => RemoteDataSource(
-  getIt()
+  getIt(),getIt(),
  )); 
  
 getIt.registerLazySingleton(() => LostAndFoundRepo(remoteDataSource: getIt()));

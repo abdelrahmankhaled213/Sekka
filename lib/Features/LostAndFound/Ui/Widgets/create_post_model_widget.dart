@@ -171,8 +171,9 @@ Widget _buildHeader() {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Create Post', style: AppStyle.regular18RobotoWhite.copyWith(fontSize: 17, fontWeight: FontWeight.w800)),
-              Text('Report lost or found item', style: AppStyle.regular18RobotoWhite.copyWith(fontSize: 12, color: Colors.white.withAlpha(217))),
+              Text('Create Post', style: AppStyle.regular18RobotoWhite.copyWith(fontSize: 17.sp, fontWeight: FontWeight.w800,fontFamily: 'Roboto', color: Colors.white)),
+              Text('Report lost or found item', style: AppStyle.regular18RobotoWhite.copyWith(fontSize: 12.sp, 
+              fontFamily: 'Roboto',color: Colors.white.withAlpha(217))),
             ],
           ),
         ),
@@ -195,6 +196,7 @@ Widget _buildHeader() {
       style: AppStyle.regular16RobotoBlack.copyWith(
         fontSize: 13.sp,
         fontWeight: FontWeight.w700,
+        fontFamily: 'Roboto',
 
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NavItemData {
+
   final String label;
   final IconData icon;
   final IconData activeIcon;
@@ -10,4 +11,5 @@ class NavItemData {
     required this.icon,
     required this.activeIcon,
   });
+
 }

@@ -30,6 +30,7 @@ class _NavUiConfig {
 }
 
 class MainBottomNavView extends StatefulWidget {
+  
   const MainBottomNavView({super.key});
 
   @override
@@ -37,8 +38,9 @@ class MainBottomNavView extends StatefulWidget {
 }
 
 class _MainBottomNavViewState extends State<MainBottomNavView> {
+  
   int _currentIndex = 0;
-  bool _isVisible = true; // متغير للتحكم في ظهور الـ Nav Bar
+  bool _isVisible = true; 
 
   List<_NavItemData> get _items => [
         _NavItemData(label: AppText.home, icon: Icons.home_outlined, activeIcon: Icons.home),
@@ -76,7 +78,7 @@ class _MainBottomNavViewState extends State<MainBottomNavView> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      // NotificationListener بيسمع لأي حركة سكرول بتحصل جوه الـ body
+    
       body: NotificationListener<UserScrollNotification>(
         onNotification: (notification) {
           if (notification.direction == ScrollDirection.reverse) {
@@ -111,6 +113,7 @@ class _MainBottomNavViewState extends State<MainBottomNavView> {
 }
 
 class _ComingSoonTab extends StatelessWidget {
+
   const _ComingSoonTab({required this.icon, required this.title});
   final IconData icon;
   final String? title;

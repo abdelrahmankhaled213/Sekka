@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sekka/Features/LostAndFound/Data/Repo/lost_and_found_repo.dart';
 
@@ -18,9 +16,10 @@ class ChatCubit extends Cubit<ChatState> {
   ));
 
   Future<void> getConversations() async {
+
     emit(state.copyWith(status: ChatStateEnum.getConversationsLoading));
     try {
-      final conversations = await lostAndFoundRepo.getConversation(
+      final conversations = await lostAndFoundRepo.getConversations(
         FirebaseAuth.instance.currentUser!.uid,
       );
       emit(state.copyWith(
@@ -36,7 +35,7 @@ class ChatCubit extends Cubit<ChatState> {
     emit(state.copyWith(status: ChatStateEnum.getConversationLoading));
     try {
       final conversation =
-          await lostAndFoundRepo.getConversationById(conversationId);
+          await lostAndFoundRepo.getConversation(conversationId);
       emit(state.copyWith(
         status: ChatStateEnum.getConversationSuccess,
         conversation: conversation,
@@ -47,6 +46,7 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   Future<void> getMessages(String conversationId) async {
+
     emit(state.copyWith(status: ChatStateEnum.getMessagesLoading));
     try {
       final messages = await lostAndFoundRepo.getMessages(conversationId);
@@ -105,8 +105,6 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  // ─── Error Mapper ────────────────────────────────────────────────────────────
-
   void _mapError(
     Object e,
     StackTrace stackTrace,
@@ -125,8 +123,6 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   String _extractMessage(Object e) {
-    // Extend here for your own exception types:
-    // if (e is ServerException) return e.message;
     return e.toString().replaceFirst('Exception: ', '');
   }
 
