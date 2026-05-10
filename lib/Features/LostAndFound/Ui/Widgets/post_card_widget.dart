@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_route.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
+import 'package:sekka/Core/Helper/toast_helper.dart';
 import 'package:sekka/Core/Widget/custom_image_widget.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart';
+import 'package:sekka/Features/LostAndFound/Logic/chat_cubit.dart';
+import 'package:sekka/Features/LostAndFound/Logic/chat_state.dart';
+import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
+import 'package:sekka/Features/LostAndFound/Logic/lost_found_state.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/status_badge_widget.dart';
 import 'package:sekka/core/constants/app_color.dart';
 
@@ -105,21 +111,46 @@ class PostCardWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                Container(
-                  width: 36.w,
-                  height: 36.h,
-                  decoration: BoxDecoration(
-                    color: accentColor.withAlpha(26),
-                    shape: BoxShape.circle,
-                  ),
-                  child: GestureDetector(
-                    onTap: (){
-                      Navigator.pushNamed(context, AppRoute.conversation,arguments: postData.userId);
-                    },
-                    child: Icon(
-                      isFound ? Icons.phone_rounded : Icons.search_rounded,
-                      size: 17.sp,
-                      color: accentColor,
+                BlocListener<LostAndFoundCubit, LostFoundState>(
+
+                     listenWhen: (previous, current) {
+                     return previous.status != current.status ||
+                     current.status == LostFoundStatus.createConversationSuccess ||
+                     current.status == LostFoundStatus.createConversationFailure;
+                                                                     },
+                  listener: (context, state) {
+
+                    if (state.status == LostFoundStatus.createConversationSuccess) {
+
+                      Navigator.pushNamed(context, AppRoute.chat,
+                          arguments:{
+                            "conversationId":state.conversationId,
+                            "userId":postData.userId
+                          });
+                    }
+
+                    if(state.status == LostFoundStatus.createConversationFailure){
+
+                     FlutterToastHelper.showToast(text:state.errorMsg! 
+                     , color: AppColor.error);
+                    }
+                  },
+                  child: Container(
+                    width: 36.w,
+                    height: 36.h,
+                    decoration: BoxDecoration(
+                      color: accentColor.withAlpha(26),
+                      shape: BoxShape.circle,
+                    ),
+                    child: GestureDetector(
+                      onTap: (){
+                        BlocProvider.of<LostAndFoundCubit>(context).createConversation(postData.userId);
+                      },
+                      child: Icon(
+                        isFound ? Icons.phone_rounded : Icons.search_rounded,
+                        size: 17.sp,
+                        color: accentColor,
+                      ),
                     ),
                   ),
                 ),

@@ -29,7 +29,10 @@ enum LostFoundStatus
  updatePostFailure,
  deletePostLoading,
  deletePostSuccess,
- deletePostFailure
+ deletePostFailure,
+ createConversationLoading,
+ createConversationSuccess,
+ createConversationFailure
 }
 
 class LostFoundState extends Equatable {
@@ -43,8 +46,9 @@ class LostFoundState extends Equatable {
   final bool hasText;
   final bool isUpdatePressed;
   final int? editingCommentId;
+  final String? conversationId;
   const LostFoundState({required this.status, this.addCommentResponse, this.isUpdatePressed=false
-  ,  this.errorMsg , this.items, this.comments,this.addedItemModel,this.hasText=false,this.editingCommentId});
+  ,  this.errorMsg , this.items, this.comments,this.addedItemModel,this.hasText=false,this.editingCommentId,this.conversationId});
 
 
 LostFoundState copyWith({
@@ -56,7 +60,8 @@ LostFoundState copyWith({
     CommentModel? addCommentResponse,
     bool? hasText,
     bool?isUpdatePressed,
-    int? editingCommentId
+    int? editingCommentId,
+    String? conversationId
   }) {
     return LostFoundState(
     isUpdatePressed: isUpdatePressed ?? this.isUpdatePressed,
@@ -67,11 +72,11 @@ LostFoundState copyWith({
       addedItemModel: addedItemModel ?? this.addedItemModel,
       addCommentResponse: addCommentResponse ?? this.addCommentResponse,
       hasText: hasText ?? this.hasText,
-      editingCommentId: editingCommentId ?? this.editingCommentId
-    
+      editingCommentId: editingCommentId ?? this.editingCommentId,
+      conversationId: conversationId ?? this.conversationId
     );
   }
 
   @override
-  List<Object?> get props => [status, errorMsg, items, comments, addedItemModel, addCommentResponse, hasText];
+  List<Object?> get props => [status, errorMsg, items, comments, addedItemModel, addCommentResponse, hasText,conversationId];
 }

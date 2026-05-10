@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
+import 'package:sekka/Core/Widget/custom_image_widget.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/conversation.dart';
 class ConversationTile extends StatelessWidget {
 
@@ -31,7 +32,7 @@ class ConversationTile extends StatelessWidget {
       child: Container(
         padding:  EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColor.surface,
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
@@ -44,7 +45,7 @@ class ConversationTile extends StatelessWidget {
         child: Row(
           children: [
 
-            Container(
+     conversation.user2Data?.image==null?  Container(
               width: 52.w,
               height: 52.h,
               decoration: BoxDecoration(
@@ -62,7 +63,13 @@ class ConversationTile extends StatelessWidget {
                   ),
                 ),
               ),
+            ):CustomImageWidget(
+              imageUrl: conversation.user2Data!.image!,
+              width: 52.w,
+              height: 52.h,
+              fit: BoxFit.cover,
             ),
+
 
              SizedBox(width: 14.w),
             

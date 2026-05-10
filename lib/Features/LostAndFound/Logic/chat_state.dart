@@ -13,9 +13,6 @@ enum ChatStateEnum{
  getMessagesLoading,
  getMessagesSuccess,
  getMessagesFailure,
- createConversationLoading,
- createConversationSuccess,
- createConversationFailure,
  sendMessageLoading,
  sendMessageSuccess,
  sendMessageFailure

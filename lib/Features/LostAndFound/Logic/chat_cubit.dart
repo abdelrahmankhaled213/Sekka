@@ -18,10 +18,12 @@ class ChatCubit extends Cubit<ChatState> {
   Future<void> getConversations() async {
 
     emit(state.copyWith(status: ChatStateEnum.getConversationsLoading));
+    
     try {
       final conversations = await lostAndFoundRepo.getConversations(
         FirebaseAuth.instance.currentUser!.uid,
       );
+
       emit(state.copyWith(
         status: ChatStateEnum.getConversationsSuccess,
         conversations: conversations,
@@ -32,18 +34,22 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   Future<void> getConversation(String conversationId) async {
-    emit(state.copyWith(status: ChatStateEnum.getConversationLoading));
-    try {
-      final conversation =
-          await lostAndFoundRepo.getConversation(conversationId);
+  emit(state.copyWith(status: ChatStateEnum.getConversationLoading));
+  try {
+    final conversation = await lostAndFoundRepo.getConversation(conversationId);
+    
+    if (conversation == null) {
+            emit(state.copyWith(status: ChatStateEnum.getConversationFailure, errorMsg: "Conversation not found"));
+    } else {
       emit(state.copyWith(
         status: ChatStateEnum.getConversationSuccess,
         conversation: conversation,
       ));
-    } catch (e, stackTrace) {
-      _mapError(e, stackTrace, ChatStateEnum.getConversationFailure);
     }
+  } catch (e, stackTrace) {
+    _mapError(e, stackTrace, ChatStateEnum.getConversationFailure);
   }
+}
 
   Future<void> getMessages(String conversationId) async {
 
@@ -81,15 +87,7 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
 
-  Future<void> createConversation(String participantId) async {
-    emit(state.copyWith(status: ChatStateEnum.createConversationLoading));
-    try {
-      await lostAndFoundRepo.createConversation(FirebaseAuth.instance.currentUser!.uid,participantId);
-      emit(state.copyWith(status: ChatStateEnum.createConversationSuccess));
-    } catch (e, stackTrace) {
-      _mapError(e, stackTrace, ChatStateEnum.createConversationFailure);
-    }
-  }
+
 
   Future<void> sendMessage(String conversationId, String message) async {
     emit(state.copyWith(status: ChatStateEnum.sendMessageLoading));

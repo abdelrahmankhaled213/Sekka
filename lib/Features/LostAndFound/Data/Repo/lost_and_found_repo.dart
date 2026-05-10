@@ -53,7 +53,7 @@ Future<List<Message>>getMessages(String conversationId)async{
 return await remoteDataSource.getMessages(conversationId);
 }
 
-Future<Conversation> getConversation(String conversationId)async{
+Future<Conversation?> getConversation(String conversationId)async{
 return await remoteDataSource.getConversation(conversationId);
 }
 Future<List<Conversation>> getConversations(String userId)async{
@@ -61,8 +61,8 @@ return await remoteDataSource.getUserConversations(userId);
 }
 
 
-Future<void> createConversation(String userId,String participantId)async{
-return await remoteDataSource.createConversation(userId, participantId);
+Future<String> createConversation(String participantId)async{
+return await remoteDataSource.createConversation( participantId);
 }
 
 

@@ -41,25 +41,21 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
         ),
       );
 
-case AppRoute.conversation:
-      return CustomPageRoute(
-        page: BlocProvider(
-          create: (context) => getIt<ChatCubit>(),
-          child: ConversationsScreen(
-                conversationId: settings.arguments as String,
-                ),
-        )
-      );
-      case AppRoute.chat:
-      return CustomPageRoute(
-        page: BlocProvider(
-          create: (context) => getIt<ChatCubit>(),
-          child: ChatScreen(
-                conversationId: settings.arguments as String,
-                otherUserId: settings.arguments as String,
-          ),
-        )
-      );
+case AppRoute.chat:
+   final args = settings.arguments as Map<String, dynamic>;
+  return CustomPageRoute(
+    
+    page: BlocProvider(
+      create: (context) => getIt<ChatCubit>(),
+      child: ChatScreen(
+        conversationId: args['conversationId'] as String,
+        otherUserId: args['userId'] as String,
+      ),
+    ),
+  );
+
+
+
       case AppRoute.itemDetailAndChatScreen:
       return CustomPageRoute(
         page: BlocProvider.value(

@@ -8,7 +8,9 @@ import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Constants/app_text.dart';
 import 'package:sekka/Core/Cubit/pick_image_cubit.dart';
 import 'package:sekka/Core/DI/service_locator.dart';
+import 'package:sekka/Features/LostAndFound/Logic/chat_cubit.dart';
 import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
+import 'package:sekka/Features/LostAndFound/View/conversation_screen.dart';
 import 'package:sekka/Features/LostAndFound/View/home_feed_screen_view.dart';
 import 'package:sekka/Features/Profile/Logic/profile_cubit.dart';
 import 'package:sekka/Features/Profile/UI/profile_screen_view.dart';
@@ -55,11 +57,16 @@ class _MainBottomNavViewState extends State<MainBottomNavView> {
       ];
 
   late final List<Widget> _tabs = [
-    BlocProvider(create: (_) => getIt<LostAndFoundCubit>(), child: const HomeFeedScreen()),
-    const _ComingSoonTab(icon: Icons.travel_explore_rounded, title: null),
-    BlocProvider(create: (_) => getIt<RoutesCubit>()..fetchTransports()
-    , child: const RoutesScreenView()),
+    
     const _ComingSoonTab(icon: Icons.notifications_active_outlined, title: null),
+    
+     BlocProvider(create: (_) => getIt<RoutesCubit>()..fetchTransports()
+    , child: const RoutesScreenView()),
+
+     BlocProvider(create: (_) => getIt<LostAndFoundCubit>(), child: const HomeFeedScreen()),
+
+     BlocProvider(create: (_) => getIt<ChatCubit>()..getConversations(), child: const ConversationsScreen()),
+
     MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => getIt<ProfileCubit>()..getProfile()),
@@ -70,6 +77,7 @@ class _MainBottomNavViewState extends State<MainBottomNavView> {
   ];
 
   void _onTabSelected(int index) {
+    
     if (_currentIndex == index) return;
     setState(() => _currentIndex = index);
   }

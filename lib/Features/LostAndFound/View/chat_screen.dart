@@ -11,13 +11,14 @@ import 'package:sekka/Features/LostAndFound/Ui/Widgets/message_shimmer.dart';
 
 class ChatScreen extends StatefulWidget {
 
-  final String conversationId;
+
   final String otherUserId;
+  final String conversationId;
 
   const ChatScreen({
 
     super.key,
-    required this.conversationId,
+required this.conversationId,
     required this.otherUserId,
  
   });
@@ -154,7 +155,9 @@ class _ChatScreenState extends State<ChatScreen> {
               listener: (context, state) {
 
                 if (state.status == ChatStateEnum.getMessagesSuccess) {
+
                   _scrollToBottom();
+                
                 }
 
                 if (state.status == ChatStateEnum.getMessagesFailure) {
@@ -171,7 +174,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   return const MessageShimmer();
                 }
 
-                if (state.messages!.isEmpty) {
+                if (state.messages?.isEmpty??true) {
                   return _buildEmptyMessages();
                 }
 
@@ -180,6 +183,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   padding:  EdgeInsets.fromLTRB(16.w, 12.h, 16.h, 8.w),
                   itemCount: state.messages!.length,
                   itemBuilder: (context, index) {
+                    
                     final msg = state.messages![index];
                     final isMine = msg.senderId == _currentUserId;
 
