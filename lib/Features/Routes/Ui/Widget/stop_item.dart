@@ -1,61 +1,65 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:sekka/Core/Constants/app_color.dart';
-import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Helper/segment_helper.dart';
-import 'package:sekka/Features/Routes/Logic/routes_cubit.dart';
+import 'package:sekka/Features/Auth/Logic/transport_model.dart';
+import 'package:sekka/Features/Routes/Ui/Widget/stop_time_line.helper.dart';
 
 class StopItem extends StatelessWidget {
-
   final StepModel stop;
+  final bool isFirst;
   final bool isLast;
 
   const StopItem({
     super.key,
     required this.stop,
+    this.isFirst = false,
     this.isLast = false,
   });
 
+
   @override
   Widget build(BuildContext context) {
-    return IntrinsicHeight(
+    final bool isMuted = !isFirst && !isLast;
+
+    return SizedBox(
+      height: 44,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-
-          Column(
-            children: [
-
-              Container(
-                width: 14.w,
-                height: 14.h,
-                decoration:  BoxDecoration(
-                  color: context.read<RoutesCubit>().state.selectedTransportSwitching?.color1??AppColor.darkBlue,
-                  shape: BoxShape.circle,
-                ),
+          SizedBox(
+            width: 28,
+            child: CustomPaint(
+              painter: StopTimelinePainter(
+                lineColor: isMuted ? Colors.grey : const Color(0xFF1A1A1A),
+                dotColor: isMuted ? Colors.grey : const Color(0xFF1A1A1A),
+                isFirst: isFirst,
+                isLast: isLast,
               ),
-
-            
-              if (!isLast)
-                Expanded(
-                  child: Container(
-                    width: 2,
-                    color:context.read<RoutesCubit>().state.selectedTransportSwitching?.color1??AppColor.darkBlue,
-                  ),
-                ),
-            ],
+            ),
           ),
-
-           SizedBox(width: 12.w),
-
-        
+          const SizedBox(width: 10),
           Expanded(
-            child: Padding(
-              padding:  EdgeInsets.only(bottom: 24.h),
+            child: Container(
+              decoration: isLast
+                  ? null
+                  : BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.grey.withOpacity(0.1),
+                          width: 0.5,
+                        ),
+                      ),
+                    ),
+              alignment: Alignment.centerLeft,
               child: Text(
                 stop.stopName,
-                style: AppStyle.regular16RobotoBlack,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight:
+                      (isFirst || isLast) ? FontWeight.w600 : FontWeight.w400,
+                  color: isMuted
+                      ? const Color(0xFF888888)
+                      : const Color(0xFF1A1A1A),
+                ),
               ),
             ),
           ),

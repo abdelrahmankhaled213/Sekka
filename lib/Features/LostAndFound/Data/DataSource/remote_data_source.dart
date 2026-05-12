@@ -61,7 +61,9 @@ Future<List<CommentModel>>getComments(int postId)async{
 }
 
 Future<CommentModel> postComment(AddCommentRequest request)async{
-  final response =await api.post(endPointCreateComment,data: request.toJson());
+
+final response =await api.post(endPointCreateComment,data: request.toJson());
+
 return CommentModel.fromJson(response);
   
 }
@@ -75,6 +77,7 @@ return await api.put("$endPointUpdateComment/${data.commentId}",data: data.toJso
 Future<void>deleteComment(int commentId)async{
 
 return await api.delete("$endPointDeleteComment/$commentId");
+
 }
 
 Future<List<Conversation>> getUserConversations(String userId) async {
@@ -121,7 +124,7 @@ Future<String> createConversation(String otherUserId) async {
 
   final response = await _supabase
       .from(_conversationsTable)
-      .insert({
+      .upsert({
         'user1_id': currentUserId,
         'user2_id': otherUserId,
       })
@@ -180,6 +183,7 @@ Future<String> createConversation(String otherUserId) async {
                 .map((json) => Message.fromJson(json))
                 .toList(),
           );
+ 
   }
 }
 

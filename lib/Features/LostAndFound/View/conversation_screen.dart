@@ -102,7 +102,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                         AppRoute.chat,
                         arguments: {
                           'conversationId': conv.id,
-                          // تحديد ID الطرف الآخر ديناميكيًا
+                          
                           'userId': conv.user1Id == currentUserId 
                               ? conv.user2Id 
                               : conv.user1Id,

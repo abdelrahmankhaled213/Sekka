@@ -4,9 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sekka/Core/Cubit/pick_image_state.dart';
-import 'package:sekka/Features/Auth/Logic/set_up_profile_cubit.dart';
 import '../../../../../Core/Cubit/pick_image_cubit.dart';
-import '../../../Logic/set_up_profile_state.dart';
 
 
 

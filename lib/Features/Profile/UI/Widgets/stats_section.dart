@@ -16,9 +16,9 @@ class StatsSection extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _StatItem(value: preferredCount.toString(), label: AppText.totalTrips),
-          _StatItem(value: preferredCount.toString(), label: AppText.completed),
-          _StatItem(value: '\$8.00', label: AppText.totalSpent),
+          _StatItem(value: preferredCount.toString(), label: "Total Trips"),
+          _StatItem(value: preferredCount.toString(), label: "Completed"),
+          _StatItem(value: '\$8.00', label: "Total Spent"),
         ],
       ),
     );

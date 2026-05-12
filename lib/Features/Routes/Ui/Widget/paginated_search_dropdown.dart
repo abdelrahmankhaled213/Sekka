@@ -1,20 +1,21 @@
-// ignore_for_file: must_be_immutable
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
+import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Constants/app_text.dart';
 import 'package:sekka/Core/Widget/custom_text_field.dart';
 import 'package:sekka/Features/Routes/Data/Model/Transport.dart';
 import 'package:sekka/Features/Routes/Logic/routes_cubit.dart';
 import 'package:sekka/Features/Routes/Logic/routes_state.dart';
-import 'package:sekka/core/constants/app_style.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Animated list item (unchanged — kept for compatibility)
+// ─────────────────────────────────────────────────────────────────────────────
 
 class AnimatedListItem extends StatelessWidget {
-
   final int index;
   final AnimationController controller;
   final Widget child;
@@ -32,20 +33,22 @@ class AnimatedListItem extends StatelessWidget {
       parent: controller,
       curve: Interval((index * .05).clamp(0, 1), 1, curve: Curves.easeOut),
     );
-
     return FadeTransition(
       opacity: animation,
       child: SlideTransition(
-        position: Tween(begin: const Offset(0, .25), end: Offset.zero)
-            .animate(animation),
+        position:
+            Tween(begin: const Offset(0, .25), end: Offset.zero).animate(animation),
         child: child,
       ),
     );
   }
 }
 
-class PaginatedSearchDropdown extends StatefulWidget {
+// ─────────────────────────────────────────────────────────────────────────────
+// PaginatedSearchDropdown
+// ─────────────────────────────────────────────────────────────────────────────
 
+class PaginatedSearchDropdown extends StatefulWidget {
   final bool isLoading;
   final bool isStart;
   final bool hasMore;
@@ -54,7 +57,7 @@ class PaginatedSearchDropdown extends StatefulWidget {
   final Function(Transport transport) onSelected;
   final String hint;
   final TextEditingController controller;
-  
+
   const PaginatedSearchDropdown({
     required this.controller,
     required this.isStart,
@@ -74,20 +77,18 @@ class PaginatedSearchDropdown extends StatefulWidget {
 
 class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
     with SingleTickerProviderStateMixin {
-
   final ScrollController _scroll = ScrollController();
   Timer? _debounce;
-
-  late AnimationController animationController;
+  late AnimationController _animController;
   bool _isSheetOpen = false;
 
   @override
   void initState() {
     super.initState();
-
-    animationController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
-
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
     _scroll.addListener(() {
       if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 100) {
         if (!widget.isLoading && widget.hasMore) widget.onLoadMore();
@@ -97,7 +98,7 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
 
   @override
   void dispose() {
-    animationController.dispose();
+    _animController.dispose();
     _scroll.dispose();
     _debounce?.cancel();
     super.dispose();
@@ -109,67 +110,99 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
       widget.onSearch(value ?? '');
     });
   }
-  
 
+  // ── FIX: always fetch on open regardless of list state ─────────────────────
   Future<void> _openSheet() async {
- 
-      final cubit = context.read<RoutesCubit>();
-
+    final cubit = context.read<RoutesCubit>();
     setState(() => _isSheetOpen = true);
+    _animController.forward(from: 0);
 
-   animationController.forward(from: 0);
+    // Reset search so stale results don't linger
+    cubit.resetSearch();
 
- 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _buildSheet(),
-    ).whenComplete(() => setState(() => _isSheetOpen = false));
- 
-if ((cubit.state.transports?.isEmpty ?? true)) {    
-         await cubit.fetchTransports();
-  }
- 
- 
+    ).whenComplete(() {
+      if (mounted) setState(() => _isSheetOpen = false);
+    });
+
+    // Always fetch fresh — cubit guards duplicate calls via isLoading flag
+    await cubit.fetchTransports();
   }
 
+  // ─── Sheet ─────────────────────────────────────────────────────────────────
+
   Widget _buildSheet() {
-    
+    final cubit = context.read<RoutesCubit>();
+    final accentColor =
+        cubit.state.selectedTransportSwitching?.color1 ?? AppColor.darkBlue;
+
     return BlocProvider.value(
-      value: context.read<RoutesCubit>(),
+      value: cubit,
       child: DraggableScrollableSheet(
         initialChildSize: .75,
         maxChildSize: .95,
         minChildSize: .5,
         builder: (_, controller) => Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
           ),
           child: Column(
             children: [
-              
-              const SizedBox(height: 12),
-
+              // Handle
               Container(
-                height: 5.h,
                 width: 40.w,
+                height: 4.h,
+                margin: EdgeInsets.only(top: 12.h, bottom: 4.h),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade400,
+                  color: Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(10.r),
                 ),
               ),
-              SizedBox(height: 16.h),
+
+              // Title row
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                child: Row(
+                  children: [
+                    Icon(
+                      widget.isStart
+                          ? Icons.radio_button_checked
+                          : Icons.location_on_rounded,
+                      color: widget.isStart ? accentColor : AppColor.error,
+                      size: 18.sp,
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      widget.isStart
+                          ? "Start"
+                          : "End",
+                      style: AppStyle.regular16RobotoBlack.copyWith(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15.sp,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              Divider(height: 1, color: Colors.grey.shade100),
+
+              // Search field
+              Padding(
+                padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 8.h),
                 child: MyTextFormField(
                   hint: AppText.search,
                   onChange: _onSearchChanged,
-                  prefixIcon: Icon(Icons.search, size: 20.sp),
+                  prefixIcon: Icon(Icons.search_rounded, size: 20.sp,
+                      color: Colors.grey.shade400),
                 ),
               ),
-              SizedBox(height: 12.h),
+
               Expanded(child: _buildList()),
             ],
           ),
@@ -178,11 +211,10 @@ if ((cubit.state.transports?.isEmpty ?? true)) {
     );
   }
 
+  // ─── List ──────────────────────────────────────────────────────────────────
 
   Widget _buildList() {
-    
     return BlocBuilder<RoutesCubit, RoutesState>(
-
       builder: (context, state) {
         final isFirstLoad =
             state.isLoading && (state.transports?.isEmpty ?? true);
@@ -190,27 +222,42 @@ if ((cubit.state.transports?.isEmpty ?? true)) {
         final isPaginationLoading =
             state.isLoading && (state.transports?.isNotEmpty ?? false);
 
-        final list = state.searchResults.isEmpty
-            ? state.transports ?? []
-            : state.searchResults;
+        final isSearchLoading = state.isSearchLoading;
 
+        final list = state.searchResults.isNotEmpty
+            ? state.searchResults
+            : state.transports ?? [];
+
+        // ── First load skeleton ────────────────────────────────────
         if (isFirstLoad) {
-
           return Skeletonizer(
-            containersColor: Colors.grey.shade400,
+            containersColor: Colors.grey.shade300,
             enabled: true,
             child: ListView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
               itemCount: 10,
-              itemBuilder: (_, __) => _fakeItem(),
+              itemBuilder: (_, __) => _fakeItem(context),
             ),
           );
         }
 
+        if (isSearchLoading!) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (list.isEmpty) {
+          return _EmptySearchState();
+        }
         return ListView.builder(
           controller: _scroll,
+          padding: EdgeInsets.fromLTRB(12.w, 4.h, 12.w, 24.h),
           itemCount: list.length + (isPaginationLoading ? 1 : 0),
           itemBuilder: (_, index) {
-            if (index >= list.length) return _paginationLoader();
+            if (index >= list.length) {
+              return Padding(
+                padding: EdgeInsets.all(20.sp),
+                child: const Center(child: CircularProgressIndicator()),
+              );
+            }
 
             final item = list[index];
             final selected = widget.isStart
@@ -218,7 +265,7 @@ if ((cubit.state.transports?.isEmpty ?? true)) {
                 : item.id == state.selectedTransportEnd?.id;
 
             return AnimatedListItem(
-              controller: animationController,
+              controller: _animController,
               index: index,
               child: _RippleScaleItem(
                 onTap: () {
@@ -226,7 +273,7 @@ if ((cubit.state.transports?.isEmpty ?? true)) {
                   Navigator.pop(context);
                   context.read<RoutesCubit>().resetSearch();
                 },
-                child: _itemUI(item.name, selected),
+                child: _itemUI(context, item.name, selected),
               ),
             );
           },
@@ -235,43 +282,49 @@ if ((cubit.state.transports?.isEmpty ?? true)) {
     );
   }
 
-  Widget _paginationLoader() => Padding(
-        padding: EdgeInsets.all(20.sp),
-        child: const Center(child: CircularProgressIndicator()),
-      );
+  Widget _fakeItem(BuildContext context) => _itemUI(context, 'Loading station name', false);
 
-  Widget _fakeItem() => _itemUI("Loading station", false);
+  Widget _itemUI(BuildContext context, String name, bool selected) {
+    final accentColor =
+        context.read<RoutesCubit>().state.selectedTransportSwitching?.color1 ??
+            AppColor.darkBlue;
 
-  Widget _itemUI(String name, bool selected) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+      margin: EdgeInsets.symmetric(vertical: 3.h),
       decoration: BoxDecoration(
-        color: selected ? context.read<RoutesCubit>().state.selectedTransportSwitching?.color1??AppColor.darkBlue.withOpacity(0.4) 
-        : Colors.transparent,
+        color: selected ? accentColor.withOpacity(0.1) : Colors.transparent,
         border: Border.all(
-          color: selected ? context.read<RoutesCubit>().state.selectedTransportSwitching?.color1??AppColor.darkBlue 
-          : Colors.transparent,
-          width: 2,
+          color: selected ? accentColor : Colors.transparent,
+          width: 1.5,
         ),
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 2.h),
+        leading: Icon(
+          Icons.place_outlined,
+          size: 18.sp,
+          color: selected ? accentColor : Colors.grey.shade400,
+        ),
         title: Text(
           name,
           style: AppStyle.regular16RobotoBlack.copyWith(
-              fontSize: 14.sp, color: selected ? Colors.white : AppColor.black),
+            fontSize: 14.sp,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+            color: selected ? accentColor : AppColor.black,
+          ),
         ),
+        trailing: selected
+            ? Icon(Icons.check_circle_rounded, color: accentColor, size: 16.sp)
+            : null,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
- 
     return BlocBuilder<RoutesCubit, RoutesState>(
- 
-      builder: (context, state) =>
-      MyTextFormField(
+      builder: (context, state) => MyTextFormField(
         readonly: true,
         backGroundColor: AppColor.offWhite,
         hint: widget.hint,
@@ -279,17 +332,55 @@ if ((cubit.state.transports?.isEmpty ?? true)) {
         onTap: _openSheet,
         icon: AnimatedRotation(
           turns: _isSheetOpen ? 0.5 : 0,
-          duration: const Duration(milliseconds: 600),
-          child: const Icon(Icons.keyboard_arrow_down, color: AppColor.grey),
+          duration: const Duration(milliseconds: 400),
+          child: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.grey.shade400,
+          ),
         ),
       ),
     );
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Empty search state
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _EmptySearchState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.search_off_rounded,
+              size: 48, color: Colors.grey.shade300),
+          SizedBox(height: 12.h),
+          Text(
+            'No stops found',
+            style: AppStyle.regular16RobotoBlack.copyWith(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF444444),
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            'Try a different name',
+            style: AppStyle.w60012RobotoGrey.copyWith(fontSize: 13),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ripple + scale tap
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _RippleScaleItem extends StatefulWidget {
- 
   final Widget child;
   final VoidCallback onTap;
 
@@ -307,10 +398,13 @@ class _RippleScaleItemState extends State<_RippleScaleItem>
   @override
   void initState() {
     super.initState();
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 120));
-    _scale = Tween(begin: 1.0, end: .96)
-        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+    );
+    _scale = Tween(begin: 1.0, end: .97).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
   }
 
   @override
@@ -333,7 +427,7 @@ class _RippleScaleItemState extends State<_RippleScaleItem>
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(12.r),
             onTap: widget.onTap,
             child: widget.child,
           ),

@@ -170,10 +170,7 @@ BlocListener<RoutesCubit, RoutesState>(
             switch (segment.type) {
               case TransportType.transfer:
                 return TransferWidget(
-                  stationName: state.segments[i].transferAtStop??'',
-                  fromSegment: state.segments[i - 1],
-                  toSegment: state.segments[i + 1],
-
+                 segment: segment,
                                                      );
 
               default:

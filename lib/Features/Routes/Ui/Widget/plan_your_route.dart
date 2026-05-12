@@ -9,8 +9,31 @@ import 'package:sekka/Features/Auth/Logic/transport_model.dart';
 import 'package:sekka/Features/Routes/Logic/routes_cubit.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/best_path_destination.dart';
 
-class PlanYourRoute extends StatefulWidget {
+// ─────────────────────────────────────────────────────────────────────────────
+// TransportSwitiching model
+// ─────────────────────────────────────────────────────────────────────────────
 
+class TransportSwitiching {
+  final String image;
+  final IconData icon;
+  final Color color1;
+  final Color color2;
+  final TransportType title;
+
+  const TransportSwitiching({
+    required this.image,
+    required this.icon,
+    required this.color1,
+    required this.color2,
+    required this.title,
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PlanYourRoute
+// ─────────────────────────────────────────────────────────────────────────────
+
+class PlanYourRoute extends StatefulWidget {
   const PlanYourRoute({super.key});
 
   @override
@@ -18,228 +41,215 @@ class PlanYourRoute extends StatefulWidget {
 }
 
 class _PlanYourRouteState extends State<PlanYourRoute> {
-
-  final List<TransportSwitiching> transportSwitchingList = [
-
+  final List<TransportSwitiching> _transportList = [
     TransportSwitiching(
       image: AppImage.planYourRouteMetro,
-      icon: Icons.train,
+      icon: Icons.directions_subway_rounded,
       color1: AppColor.darkBlue,
       color2: AppColor.lightBlue,
       title: TransportType.metro,
     ),
-
     TransportSwitiching(
       image: AppImage.planYourRouteMonorail,
-      icon: Icons.directions_railway,
+      icon: Icons.directions_railway_rounded,
       color1: AppColor.darkPurple,
       color2: AppColor.lightPurple,
       title: TransportType.monorail,
     ),
-
     TransportSwitiching(
       image: AppImage.planYourRouteBus,
-      icon: Icons.directions_bus,
+      icon: Icons.directions_bus_rounded,
       color1: AppColor.darkGreen,
       color2: AppColor.lightGreen,
       title: TransportType.bus,
     ),
-  
   ];
 
-  static LinearGradient _buildGradient(Color color1, Color color2) {
-    return LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        color1.withOpacity(0.7),
-        color2.withOpacity(0.3),
-      ],
-      stops: const [1,0],
-    );
-  }
+  static LinearGradient _buildGradient(Color c1, Color c2) =>
+      LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [c1.withOpacity(0.8), c2.withOpacity(0.4)],
+        stops: const [0, 1],
+      );
 
   @override
   Widget build(BuildContext context) {
-
     final state = context.watch<RoutesCubit>().state;
+    final selected =
+        state.selectedTransportSwitching ?? _transportList.first;
 
-    final selectedTransport =
-        state.selectedTransportSwitching ?? transportSwitchingList.first;
-
-    return SizedBox(
-      height: 380.h,
-      child: Stack(
-        children: [
-
-          Image.asset(
-            selectedTransport.image,
-            height: 220.h,
-            fit: BoxFit.fill,
-            width: double.infinity,
-          ),
-
-          Container(
-            width: double.infinity,
-            height: 220.h,
-            decoration: BoxDecoration(
-              gradient: _buildGradient(
-                selectedTransport.color1,
-                selectedTransport.color2,
-              ),
-            ),
-          ),
-
-          Positioned(
-            top: 45.h,
-            left: 16.w,
-            right: 16.w,
-            child: BestPathDestination(
-              icon: selectedTransport.icon,
-            ),
-          ),
-          Positioned(
-            top: 180.h,
-            left: 16.w,
-            right: 16.w,
-            child: _buildChooseTransport(selectedTransport),
-          ),
-        ],
-      ),
-    );
-  }
-
-Widget _buildChooseTransport(TransportSwitiching selectedTransport) {
-
-  return Container(
-   
-    padding: EdgeInsets.all(25.sp),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20.r),
-    ),
-    child: IntrinsicHeight( 
-
+    return SingleChildScrollView(
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ── Hero image + gradient ────────────────────────────────
+          _HeroSection(selected: selected, gradient: _buildGradient(selected.color1, selected.color2)),
 
-          _buildSelectTransportTextAndIcon(),
+          // ── Transport type switcher ──────────────────────────────
+          _TransportSwitcher(
+            list: _transportList,
+            selected: selected,
+            gradient: _buildGradient,
+          ),
 
           SizedBox(height: 16.h),
-          
-           SingleChildScrollView( 
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: transportSwitchingList.map((transport) {
-                return _buildTransportSwitchingItem(
-                  context,
-                  transport,
-                  selectedTransport,
-                );
-              }).toList(),
-            ),
+
+          // ── Search + results ─────────────────────────────────────
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: BestPathDestination(icon: selected.icon),
           ),
+
+          SizedBox(height: 32.h),
         ],
       ),
-    ),
-  );
+    );
+  }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Hero image section
+// ─────────────────────────────────────────────────────────────────────────────
 
+class _HeroSection extends StatelessWidget {
+  final TransportSwitiching selected;
+  final LinearGradient gradient;
 
+  const _HeroSection({required this.selected, required this.gradient});
 
-  Widget _buildTransportSwitchingItem(
-    BuildContext context,
-    TransportSwitiching transport,
-    TransportSwitiching selected,
-  ) {
-    final isSelected = selected == transport;
-
-        final cubit = context.read<RoutesCubit>();
-
-    return GestureDetector(
-      onTap: ()=>
-         cubit.changeTransportType(transport),
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 12.w),
-        padding: EdgeInsets.all(17.sp),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? transport.color1.withOpacity(0.2)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(15.r),
-          border: Border.all(
-            color: isSelected
-                ? transport.color1
-                : AppColor.grey.withOpacity(0.2),
-            width: 2,
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 400),
+          child: Image.asset(
+            selected.image,
+            key: ValueKey(selected.title),
+            height: 200.h,
+            width: double.infinity,
+            fit: BoxFit.cover,
           ),
         ),
-        child: _buildContent(transport, isSelected),
+        Container(
+          height: 200.h,
+          width: double.infinity,
+          decoration: BoxDecoration(gradient: gradient),
+        ),
+        // Title overlay
+        Positioned(
+          bottom: 20.h,
+          left: 20.w,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppText.planYourRoute,
+                style: AppStyle.regular16RobotoBlack.copyWith(
+                  color: Colors.white.withOpacity(0.85),
+                  fontSize: 13.sp,
+                ),
+              ),
+              SizedBox(height: 2.h),
+              Text(
+                selected.title.name[0].toUpperCase() +
+                    selected.title.name.substring(1),
+                style: AppStyle.bold14RobotoBlue.copyWith(
+                  color: Colors.white,
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Transport type switcher — pill style
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _TransportSwitcher extends StatelessWidget {
+  final List<TransportSwitiching> list;
+  final TransportSwitiching selected;
+  final LinearGradient Function(Color, Color) gradient;
+
+  const _TransportSwitcher({
+    required this.list,
+    required this.selected,
+    required this.gradient,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+      child: Row(
+        children: list.map((t) {
+          final isSelected = t == selected;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => context.read<RoutesCubit>().changeTransportType(t),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOut,
+                margin: EdgeInsets.symmetric(horizontal: 4.w),
+                padding:
+                    EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? t.color1.withOpacity(0.12)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: isSelected
+                        ? t.color1
+                        : Colors.grey.withOpacity(0.18),
+                    width: isSelected ? 1.5 : 1,
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      width: 36.w,
+                      height: 36.h,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? t.color1
+                            : Colors.grey.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      child: Icon(
+                        t.icon,
+                        size: 18.sp,
+                        color: isSelected ? Colors.white : Colors.grey.shade400,
+                      ),
+                    ),
+                    SizedBox(height: 6.h),
+                    Text(
+                      t.title.name,
+                      style: AppStyle.regular16RobotoBlack.copyWith(
+                        fontSize: 12.sp,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                        color: isSelected ? t.color1 : AppColor.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
-
-  Widget _buildContent(TransportSwitiching transport, bool isSelected) {
-    return Column(
-      children: [
-        Container(
-          height: 45.h,
-          width: 45.w,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16.r),
-            gradient: isSelected
-                ? _buildGradient(transport.color1, transport.color2)
-                : null,
-            color:
-                isSelected ? transport.color1.withOpacity(0.8) : AppColor.offWhite,
-          ),
-          child: Icon(
-            transport.icon,
-            color: isSelected ? Colors.white : AppColor.grey,
-            size: 24.sp,
-          ),
-        ),
-
-        SizedBox(height: 6.h),
-
-        Text(
-          transport.title.name,
-          style: AppStyle.regular16RobotoBlack.copyWith(fontSize: 14.sp),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSelectTransportTextAndIcon() {
-    return Row(
-      children: [
-        Icon(context.read<RoutesCubit>().state.selectedTransportSwitching?.icon??Icons.train
-        , size: 24.sp, color: context.read<RoutesCubit>().state.selectedTransportSwitching?.color2?? AppColor.darkBlue ),
-        SizedBox(width: 8.w),
-        Text(
-          AppText.selectTransport,
-          style: AppStyle.regular16RobotoBlack,
-        ),
-      ],
-    );
-  }
-}
-
-class TransportSwitiching {
-  
-  final String image;
-  final IconData icon;
-  final Color color1;
-  final Color color2;
-  final TransportType title;
-
-  TransportSwitiching({
-    required this.image,
-    required this.icon,
-    required this.color1,
-    required this.color2,
-    required this.title,
-  });
 }

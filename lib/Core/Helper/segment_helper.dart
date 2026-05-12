@@ -25,7 +25,7 @@ class SegmentModel {
   final String? lineName;
   final String? direction;
   final String? transferAtStop;
-  
+  final String? nextLineName;
   bool get hasMoreStops => stops.length > 6;
 
   List<StepModel> get previewStops =>
@@ -36,7 +36,8 @@ class SegmentModel {
     required this.lineName,
     required this.type,
     required this.stops,
-    this.transferAtStop
+    this.transferAtStop,
+    this.nextLineName,
   });
 }
 List<SegmentModel> buildSegmentModel(List<StepModel> steps) {
@@ -44,67 +45,58 @@ List<SegmentModel> buildSegmentModel(List<StepModel> steps) {
   if (steps.isEmpty) return segments;
 
   List<StepModel> currentStops = [];
-  TransportType? currentType;
-  String? currentLineName;
-  String? currentDirection;
-
+  
   for (var i = 0; i < steps.length; i++) {
     var step = steps[i];
-
-    if (currentType == null) {
-      currentType = step.type;
-      currentLineName = step.routeName;
-      currentDirection = step.direction;
+    
+    if (currentStops.isEmpty) {
       currentStops.add(step);
       continue;
     }
 
-    
-    bool isTypeChanged = step.type != currentType;
-    bool isLineChanged = step.routeName != currentLineName;
-    bool isDirectionChanged = step.direction.isNotEmpty && step.direction != currentDirection;
+    var lastStep = currentStops.last;
 
-    if (!isTypeChanged && !isLineChanged && !isDirectionChanged) {
+    // بنشوف لو لسه في نفس الـ Segment
+    bool isSameSegment = step.type == lastStep.type && 
+                         step.routeName == lastStep.routeName &&
+                         step.direction == lastStep.direction;
+
+    if (isSameSegment) {
       currentStops.add(step);
     } else {
-      
-      String? transferStationName;
-      if (currentStops.isNotEmpty) {
-        currentStops.last.isTransferPoint = true;
-        transferStationName = currentStops.last.stopName; // حفظ اسم محطة التبديل
-      }
+      // إحنا هنا لقينا تبديل!
+      lastStep.isTransferPoint = true;
 
       segments.add(
         SegmentModel(
-          direction: currentDirection ?? '',
-          type: currentType!,
-          lineName: currentLineName,
+          direction: lastStep.direction,
+          type: lastStep.type,
+          lineName: lastStep.routeName,
           stops: List.from(currentStops),
-          transferAtStop: transferStationName, 
+          transferAtStop: lastStep.stopName, 
+          // بناخد اسم الخط بتاع الخطوة الحالية عشان ده اللي هنركبه بعد التبديل
+          nextLineName: step.routeName, 
         ),
       );
 
       currentStops = [step];
-      currentType = step.type;
-      currentLineName = step.routeName;
-      currentDirection = step.direction;
     }
   }
 
- 
+  // إضافة آخر Segment
   if (currentStops.isNotEmpty) {
+    var lastPart = currentStops.last;
     segments.add(
       SegmentModel(
-        direction: currentDirection ?? '',
-        type: currentType!,
-        lineName: currentLineName,
+        direction: lastPart.direction,
+        type: lastPart.type,
+        lineName: lastPart.routeName,
         stops: currentStops,
+        // آخر Segment ملوش NextLine لأنه نهاية الرحلة
+        nextLineName: null, 
       ),
     );
   }
 
   return segments;
 }
-
-  
- 

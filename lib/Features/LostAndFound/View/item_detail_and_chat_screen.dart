@@ -12,7 +12,6 @@ import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
 import 'package:sekka/Features/LostAndFound/Logic/lost_found_state.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/chat_bubble.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/chat_input_widget.dart';
-import 'package:sekka/Features/LostAndFound/Ui/Widgets/item_info_card_widget.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/status_badge_widget.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -104,10 +103,10 @@ class _ItemDetailAndChatScreenState extends State<ItemDetailAndChatScreen> {
                       item?.type == ItemType.found,
                       state.comments?.length ?? 0,
                     ),
-                    ItemInfoCardWidget(
-                      station: item?.stationName ?? "...",
-                      description: item?.description ?? "...",
-                    ),
+                    // ItemInfoCardWidget(
+                    //   station: item?.stationName ?? "...",
+                    //   description: item?.description ?? "...",
+                    // ),
                     
                     _buildCommentsSection(state),
 
