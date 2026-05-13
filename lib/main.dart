@@ -20,7 +20,7 @@ void main() async{
   await ScreenUtil.ensureScreenSize();
   final instance=EnvironmentVariable.instance;
   await instance.init(EnvironmentVariableEnum.dev);
-  setUpServiceLocator();
+   init();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
