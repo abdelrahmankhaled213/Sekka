@@ -11,9 +11,6 @@ import 'package:sekka/Features/Routes/Logic/routes_cubit.dart';
 import 'package:sekka/Features/Routes/Logic/routes_state.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Animated list item (unchanged — kept for compatibility)
-// ─────────────────────────────────────────────────────────────────────────────
 
 class AnimatedListItem extends StatelessWidget {
   final int index;
@@ -44,9 +41,6 @@ class AnimatedListItem extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PaginatedSearchDropdown
-// ─────────────────────────────────────────────────────────────────────────────
 
 class PaginatedSearchDropdown extends StatefulWidget {
   final bool isLoading;
@@ -111,13 +105,11 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
     });
   }
 
-  // ── FIX: always fetch on open regardless of list state ─────────────────────
   Future<void> _openSheet() async {
     final cubit = context.read<RoutesCubit>();
     setState(() => _isSheetOpen = true);
     _animController.forward(from: 0);
 
-    // Reset search so stale results don't linger
     cubit.resetSearch();
 
     showModalBottomSheet(
@@ -133,7 +125,6 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
     await cubit.fetchTransports();
   }
 
-  // ─── Sheet ─────────────────────────────────────────────────────────────────
 
   Widget _buildSheet() {
     final cubit = context.read<RoutesCubit>();
@@ -211,8 +202,6 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
     );
   }
 
-  // ─── List ──────────────────────────────────────────────────────────────────
-
   Widget _buildList() {
     return BlocBuilder<RoutesCubit, RoutesState>(
       builder: (context, state) {
@@ -228,7 +217,6 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
             ? state.searchResults
             : state.transports ?? [];
 
-        // ── First load skeleton ────────────────────────────────────
         if (isFirstLoad) {
           return Skeletonizer(
             containersColor: Colors.grey.shade300,
@@ -376,9 +364,6 @@ class _EmptySearchState extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Ripple + scale tap
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _RippleScaleItem extends StatefulWidget {
   final Widget child;

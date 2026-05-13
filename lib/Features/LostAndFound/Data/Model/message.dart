@@ -19,13 +19,14 @@ class Message {
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
+     
     return Message(
       id: json['id'],
       conversationId: json['conversation_id'],
       senderId: json['sender_id'],
       text: json['text'],
       createdAt: DateTimeHelper.formatTimestamp(json['created_at']),
-      isRead: json['is_read'],
+      isRead: json['is_read']?? false,
     );
   }
 }

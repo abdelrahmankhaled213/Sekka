@@ -5,6 +5,7 @@ import 'package:sekka/Core/Navigation/custom_route_builder.dart';
 import 'package:sekka/Core/Navigation/main_bottom_nav_view.dart';
 import 'package:sekka/Features/Auth/Logic/set_up_profile_cubit.dart';
 import 'package:sekka/Features/Auth/Ui/SetUpProfile/View/setup_profile_view.dart';
+import 'package:sekka/Features/LostAndFound/Data/Model/conversation.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart';
 import 'package:sekka/Features/LostAndFound/Logic/chat_cubit.dart';
 import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
@@ -48,7 +49,7 @@ case AppRoute.chat:
     page: BlocProvider(
       create: (context) => getIt<ChatCubit>(),
       child: ChatScreen(
-        conversationId: args['conversationId'] as String,
+        conversation: args['conversationId'] as Conversation,
         otherUserId: args['userId'] as String,
       ),
     ),

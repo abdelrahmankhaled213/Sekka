@@ -49,6 +49,10 @@ Future<void> sendMessage(String conversationId,String senderId,String text)async
 return await remoteDataSource.sendMessage(conversationId,senderId,text);
 }
 
+Future<void> markMessageAsRead(String conversationId)async{
+return await remoteDataSource.markMessageAsRead(conversationId);
+}
+
 Future<List<Message>>getMessages(String conversationId)async{
 return await remoteDataSource.getMessages(conversationId);
 }

@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,14 +27,16 @@ void main() async{
   ]);
   Bloc.observer=MyBlocObserver();
   await Supabase.initialize(url: instance.supabaseUrl
-      , anonKey: instance.supabaseKey);
+      , anonKey: instance.supabaseKey,realtimeClientOptions: RealtimeClientOptions(
+           eventsPerSecond: 10, 
+      ));
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform
   );
 
   await Hive.initFlutter();
-    Hive.registerAdapter(UserModelAdapter());
+  Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(TransportTypeAdapter());
 
 

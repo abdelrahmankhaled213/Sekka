@@ -11,3 +11,4 @@ const endPointUpdatePost="update-post";
 const endPointUpdateComment="update-comment";
 const endPointDeleteComment="delete-comment";
 const endPointCreateComment="create-comment";
+const endPointSendMessage="send-message";

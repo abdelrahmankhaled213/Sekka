@@ -117,7 +117,8 @@ Future<List<Conversation>> getUserConversations(String userId) async {
 
   return Conversation.fromJson(response);
 }
-  
+
+
 Future<String> createConversation(String otherUserId) async {
   
   final currentUserId = FirebaseAuth.instance.currentUser?.uid;
@@ -154,9 +155,11 @@ Future<String> createConversation(String otherUserId) async {
  
   
   Future<void> sendMessage(
+
     String conversationId,
     String senderId,
     String text,
+
   ) async {
       if (text.trim().isEmpty) {
         throw Exception(
@@ -164,15 +167,25 @@ Future<String> createConversation(String otherUserId) async {
         );
       }
  
-      await _supabase.from(_messagesTable).insert({
+      await api.post(endPointSendMessage,data: {
         _colConversationId: conversationId,
         _colSenderId: senderId,
-        _colText: text.trim(),
+        _colText: text,
       });
+
     } 
 
+
+Future<void> markMessageAsRead(String conversationId) async {
+     
+   return await api.put('mark-messages-read/$conversationId',data: {
+        'userId': FirebaseAuth.instance.currentUser?.uid,
+      }
+      );
+    }
+
+
   Stream<List<Message>> listenToMessages(String conversationId) {
-    
       return _supabase
           .from(_messagesTable)
           .stream(primaryKey: [_colId])
@@ -182,8 +195,8 @@ Future<String> createConversation(String otherUserId) async {
             (data) => data
                 .map((json) => Message.fromJson(json))
                 .toList(),
-          );
- 
+          ); 
   }
+
 }
 

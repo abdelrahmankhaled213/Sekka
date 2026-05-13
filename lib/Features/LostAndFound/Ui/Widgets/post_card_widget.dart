@@ -6,8 +6,6 @@ import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Helper/toast_helper.dart';
 import 'package:sekka/Core/Widget/custom_image_widget.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart';
-import 'package:sekka/Features/LostAndFound/Logic/chat_cubit.dart';
-import 'package:sekka/Features/LostAndFound/Logic/chat_state.dart';
 import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
 import 'package:sekka/Features/LostAndFound/Logic/lost_found_state.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/status_badge_widget.dart';
@@ -219,10 +217,16 @@ class PostCardWidget extends StatelessWidget {
             
             Row(
               children: [
-                Icon(
-                  Icons.chat_bubble_outline_rounded,
-                  size: 14.sp,
-                  color: AppColor.secondary,
+                IconButton(
+onPressed: (){
+Navigator.pushNamed(context, AppRoute.itemDetailAndChatScreen, arguments: postData);
+},
+
+                  icon: Icon(
+                    Icons.chat_bubble_outline_rounded,
+                    size: 14.sp,
+                    color: AppColor.secondary,
+                  ),
                 ),
     
                  SizedBox(width: 4.w),
@@ -234,7 +238,9 @@ class PostCardWidget extends StatelessWidget {
                     color: AppColor.secondary,
                   ),
                 ),
+                
                 const Spacer(),
+
                 StatusBadgeWidget(
                   status: isResolved
                       ? PostStatus.resolved

@@ -12,9 +12,10 @@ class Conversation {
   final Message? lastMessage;
   final UserModel? user1Data; 
   final UserModel? user2Data;
+  final int unreadCount;
   
  const Conversation({ 
-
+   required this.unreadCount,
     required this.user1Data,
     required this.user2Data,
     required this.lastMessage,
@@ -35,6 +36,8 @@ String otherUserId(String currentUserId) {
   final lastMsgJson = json['last_message'];
 
   return Conversation(
+
+    unreadCount: json['unread_count'] ?? 0,
     user1Data: UserModel.fromJson(json['user1']),
     user2Data: UserModel.fromJson(json['user2']),
     user2Id: json['user2_id'],

@@ -20,9 +20,8 @@ class ChatCubit extends Cubit<ChatState> {
     emit(state.copyWith(status: ChatStateEnum.getConversationsLoading));
     
     try {
-      final conversations = await lostAndFoundRepo.getConversations(
-        FirebaseAuth.instance.currentUser!.uid,
-      );
+
+      final conversations = await lostAndFoundRepo.getConversations(FirebaseAuth.instance.currentUser!.uid);
 
       emit(state.copyWith(
         status: ChatStateEnum.getConversationsSuccess,
@@ -66,20 +65,23 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   Future<void> listenToMessages(String conversationId) async {
-    _messagesSubscription?.cancel();
-    _messagesSubscription = lostAndFoundRepo
-        .listenToMessages(conversationId)
-        .listen(
-          (event) => emit(state.copyWith(
-            messages: event,
-            status: ChatStateEnum.getMessagesSuccess,
-          )),
-        )
-      ..onError(
-        (e, stackTrace) =>
-            _mapError(e, stackTrace, ChatStateEnum.getMessagesFailure),
-      );
-  }
+  
+  _messagesSubscription?.cancel();
+  
+  
+  _messagesSubscription = lostAndFoundRepo
+      .listenToMessages(conversationId)
+      .listen(
+        (event) => emit(state.copyWith(
+          messages: event,
+          status: ChatStateEnum.getMessagesSuccess,
+        )),
+      )
+    ..onError(
+      (e, stackTrace) =>
+          _mapError(e, stackTrace, ChatStateEnum.getMessagesFailure),
+    );
+}
 
   Future<void> stopListeningToMessages() async {
     await _messagesSubscription?.cancel();
@@ -87,10 +89,20 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
 
+Future<void> markMessagesAsRead(String conversationId) async {
 
+    try {
+      await lostAndFoundRepo.markMessageAsRead(conversationId);
+      emit(state.copyWith(status: ChatStateEnum.MarkMesssageAsReadSuccess));
+    } catch (e, stackTrace) {
+      _mapError(e, stackTrace, ChatStateEnum.MarkMesssageAsReadFailure);
+    }
+  }
 
   Future<void> sendMessage(String conversationId, String message) async {
+    
     emit(state.copyWith(status: ChatStateEnum.sendMessageLoading));
+    
     try {
       await lostAndFoundRepo.sendMessage(
         conversationId,
@@ -98,6 +110,8 @@ class ChatCubit extends Cubit<ChatState> {
         message,
       );
       emit(state.copyWith(status: ChatStateEnum.sendMessageSuccess));
+    
+   
     } catch (e, stackTrace) {
       _mapError(e, stackTrace, ChatStateEnum.sendMessageFailure);
     }
@@ -108,12 +122,10 @@ class ChatCubit extends Cubit<ChatState> {
     StackTrace stackTrace,
     ChatStateEnum failureStatus,
   ) {
-    assert(() {
-      // ignore: avoid_print
-      print('[ChatCubit] Error: $e\n$stackTrace');
-      return true;
-    }());
 
+ print('Error: $e');
+ print('StackTrace: $stackTrace');
+    
     emit(state.copyWith(
       status: failureStatus,
       errorMsg: _extractMessage(e),

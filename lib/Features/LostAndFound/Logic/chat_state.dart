@@ -15,7 +15,9 @@ enum ChatStateEnum{
  getMessagesFailure,
  sendMessageLoading,
  sendMessageSuccess,
- sendMessageFailure
+ sendMessageFailure,
+ MarkMesssageAsReadSuccess,
+ MarkMesssageAsReadFailure
 }
 
 class ChatState extends Equatable{

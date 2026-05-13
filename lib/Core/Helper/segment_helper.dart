@@ -73,8 +73,7 @@ List<SegmentModel> buildSegmentModel(List<StepModel> steps) {
           type: lastStep.type,
           lineName: lastStep.routeName,
           stops: List.from(currentStops),
-          transferAtStop: lastStep.stopName, 
-          // بناخد اسم الخط بتاع الخطوة الحالية عشان ده اللي هنركبه بعد التبديل
+          transferAtStop: lastStep.stopName,
           nextLineName: step.routeName, 
         ),
       );
