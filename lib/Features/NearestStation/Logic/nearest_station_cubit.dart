@@ -4,13 +4,33 @@ import 'package:postgrest/postgrest.dart';
 import 'package:sekka/Core/Error/error_handler.dart';
 import 'package:sekka/Core/Helper/location_helper.dart';
 import 'package:sekka/Features/Auth/Logic/transport_model.dart';
+import 'package:sekka/Features/NearestStation/Data/Model/DataSource/capacity_prediction_service.dart';
+import 'package:sekka/Features/NearestStation/Data/Model/nearest_station_model.dart';
 import 'package:sekka/Features/NearestStation/Data/Model/Repo/nearest_station_repo.dart';
 import 'package:sekka/Features/NearestStation/Logic/nearest_station_state.dart';
 
 class NearestStationCubit extends Cubit<NearestStationState> {
   final NearestStationRepo repo;
+  final CapacityPredictionService predictionService;
 
-  NearestStationCubit(this.repo) : super(const NearestStationState());
+  NearestStationCubit(this.repo, this.predictionService)
+      : super(const NearestStationState());
+
+  Future<List<NearestStationModel>> _withPredictions(
+      List<NearestStationModel> stations) async {
+    final predictions = await Future.wait(
+      stations.map((s) => s.id != null
+          ? predictionService.getPredictionForStation(s.id!)
+          : Future.value(null)),
+    );
+
+    return List.generate(stations.length, (i) {
+      final prediction = predictions[i];
+      return prediction != null
+          ? stations[i].copyWith(crowding: prediction.crowdingLevel)
+          : stations[i];
+    });
+  }
 
   Future<void> loadNearestStations() async {
     emit(state.copyWith(status: NearestStationStatus.loading));
@@ -21,11 +41,11 @@ class NearestStationCubit extends Cubit<NearestStationState> {
       if (position == null) {
         emit(state.copyWith(
           status: NearestStationStatus.error,
-          errorMessage: 'Could not get your location.\nPlease enable location services.',
+          errorMessage:
+          'Could not get your location.\nPlease enable location services.',
         ));
         return;
       }
-
 
       String locationName = 'Your Location';
       try {
@@ -41,11 +61,13 @@ class NearestStationCubit extends Cubit<NearestStationState> {
         }
       } catch (_) {}
 
-      final stations = await repo.getNearestStops(
+      final rawStations = await repo.getNearestStops(
         lat: position.latitude,
         lng: position.longitude,
         type: state.selectedFilter,
       );
+
+      final stations = await _withPredictions(rawStations);
 
       if (isClosed) return;
 
@@ -56,18 +78,50 @@ class NearestStationCubit extends Cubit<NearestStationState> {
         userLat: position.latitude,
         userLng: position.longitude,
       ));
-    } catch (e, st) {
+    } catch (e) {
+      if (isClosed) return;
 
-      print('❌ NearestStation Error: $e');
-      print('❌ Type: ${e.runtimeType}');
-      if (e is PostgrestException) {
-        print('❌ Postgrest message: ${e.message}');
-        print('❌ Postgrest code: ${e.code}');
-        print('❌ Postgrest details: ${e.details}');
-        print('❌ Postgrest hint: ${e.hint}');
-      }
-      print(st);
+      final errorMessage = e is PostgrestException
+          ? e.message
+          : ErrorHandler.handleError(e).message;
 
+      emit(state.copyWith(
+        status: NearestStationStatus.error,
+        errorMessage: errorMessage,
+      ));
+    }
+  }
+
+  Future<void> loadNearestStationsForSearchedLocation({
+    required double lat,
+    required double lng,
+    required String overrideName,
+  }) async {
+    emit(state.copyWith(
+      status: NearestStationStatus.loading,
+      locationName: overrideName,
+      clearFilter: true,
+    ));
+
+    try {
+      final rawStations = await repo.getNearestStops(
+        lat: lat,
+        lng: lng,
+        type: null,
+      );
+
+      final stations = await _withPredictions(rawStations);
+
+      if (isClosed) return;
+
+      emit(state.copyWith(
+        status: NearestStationStatus.loaded,
+        stations: stations,
+        locationName: overrideName,
+        userLat: lat,
+        userLng: lng,
+      ));
+    } catch (e) {
       if (isClosed) return;
 
       final errorMessage = e is PostgrestException
@@ -94,11 +148,13 @@ class NearestStationCubit extends Cubit<NearestStationState> {
     ));
 
     try {
-      final stations = await repo.getNearestStops(
+      final rawStations = await repo.getNearestStops(
         lat: state.userLat!,
         lng: state.userLng!,
         type: newType,
       );
+
+      final stations = await _withPredictions(rawStations);
 
       if (isClosed) return;
 
@@ -106,14 +162,7 @@ class NearestStationCubit extends Cubit<NearestStationState> {
         status: NearestStationStatus.loaded,
         stations: stations,
       ));
-    } catch (e, st) {
-      print('❌ Filter Error: $e');
-      if (e is PostgrestException) {
-        print('❌ Postgrest message: ${e.message}');
-        print('❌ Postgrest hint: ${e.hint}');
-      }
-      print(st);
-
+    } catch (e) {
       if (isClosed) return;
 
       final errorMessage = e is PostgrestException

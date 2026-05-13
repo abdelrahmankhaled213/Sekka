@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/DI/service_locator.dart';
 import 'package:sekka/Core/Navigation/nav_entities.dart';
+import 'package:sekka/Features/ChatBot/Ui/View/chat_bot_view.dart';
 import 'package:sekka/Features/NearestStation/Logic/nearest_station_cubit.dart';
 import 'package:sekka/Features/NearestStation/Ui/Widget/View/nearest_station_view.dart';
 import 'package:sekka/Features/Profile/Logic/profile_cubit.dart';
@@ -38,8 +39,8 @@ class _MainScreenState extends State<MainScreen> {
       create: (_) => getIt<RoutesCubit>()..fetchTransports(),
       child: const RoutesScreenView(),
     ),
-    const Scaffold(body: Center(child: Text('Lost & Found'))),
     const Scaffold(body: Center(child: Text('Alerts'))),
+    const ChatBotView(),
     BlocProvider(
       create: (_) => getIt<ProfileCubit>()..getProfile(),
       child: const ProfileScreenView(),

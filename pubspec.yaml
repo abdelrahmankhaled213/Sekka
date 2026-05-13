@@ -51,6 +51,7 @@ dependencies:
   cached_network_image: ^3.4.1
   flutter_local_notifications: ^20.1.0
   flutter_svg: ^2.2.4
+  http: ^1.2.1
 #  flutter_local_notifications: ^20.1.0
 #  material_floating_search_bar_2: any
 dev_dependencies:

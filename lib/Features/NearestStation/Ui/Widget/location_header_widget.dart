@@ -21,23 +21,27 @@ class LocationHeaderWidget extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          
           Positioned.fill(
             child: Opacity(
               opacity: 0.12,
               child: CustomPaint(painter: _GridPainter()),
             ),
           ),
-
-          
-          Positioned(top: 45.h, left: 45.w,
-              child: _Dot(color: AppColor.secondary)),
-          Positioned(top: 75.h, right: 65.w,
-              child: _Dot(color: AppColor.primaryColor)),
-          Positioned(top: 130.h, right: 35.w,
-              child: _Dot(color: AppColor.lightGreen, size: 13)),
-
-          
+          Positioned(
+            top: 45.h,
+            left: 45.w,
+            child: _Dot(color: AppColor.secondary),
+          ),
+          Positioned(
+            top: 75.h,
+            right: 65.w,
+            child: _Dot(color: AppColor.primaryColor),
+          ),
+          Positioned(
+            top: 130.h,
+            right: 35.w,
+            child: _Dot(color: AppColor.lightGreen, size: 13),
+          ),
           SafeArea(
             child: Center(
               child: Column(
@@ -50,10 +54,15 @@ class LocationHeaderWidget extends StatelessWidget {
                       shape: BoxShape.circle,
                       color: Colors.white.withOpacity(0.2),
                       border: Border.all(
-                          color: Colors.white.withOpacity(0.4), width: 1.5),
+                        color: Colors.white.withOpacity(0.4),
+                        width: 1.5,
+                      ),
                     ),
-                    child: Icon(Icons.navigation_rounded,
-                        color: Colors.white, size: 28.sp),
+                    child: Icon(
+                      Icons.navigation_rounded,
+                      color: Colors.white,
+                      size: 28.sp,
+                    ),
                   ),
                   SizedBox(height: 12.h),
                   Text(
@@ -96,7 +105,9 @@ class _Dot extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
-        boxShadow: [BoxShadow(color: color.withOpacity(0.5), blurRadius: 6)],
+        boxShadow: [
+          BoxShadow(color: color.withOpacity(0.5), blurRadius: 6),
+        ],
       ),
     );
   }

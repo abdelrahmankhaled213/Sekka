@@ -42,7 +42,6 @@ class NearestStationModel {
   });
 
   factory NearestStationModel.fromJson(Map<String, dynamic> json) {
-
     final distanceM = (json['distance_m'] as num?)?.toDouble() ?? 0.0;
 
     return NearestStationModel(
@@ -51,6 +50,22 @@ class NearestStationModel {
       location: GeoPoint.fromJson(json['location']),
       distanceKm: distanceM / 1000,
       crowding: CrowdingLevelX.fromString(json['crowding_level']),
+    );
+  }
+
+  NearestStationModel copyWith({
+    int? id,
+    String? name,
+    GeoPoint? location,
+    double? distanceKm,
+    CrowdingLevel? crowding,
+  }) {
+    return NearestStationModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      location: location ?? this.location,
+      distanceKm: distanceKm ?? this.distanceKm,
+      crowding: crowding ?? this.crowding,
     );
   }
 }
