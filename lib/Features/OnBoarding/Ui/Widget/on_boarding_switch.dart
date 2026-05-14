@@ -124,7 +124,7 @@ class _OnBoardingSwitchState extends State<OnBoardingSwitch> {
               Text(data[index].title
                 , style: AppStyle.regular18RobotoWhite.copyWith(
                     fontSize: 16.sp,
-                    color: AppColor.black
+                    color: AppColor.background
                 ),),
               SizedBox(
                 height: 16.h,

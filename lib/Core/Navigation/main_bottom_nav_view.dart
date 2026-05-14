@@ -194,7 +194,7 @@ class _NavBar extends StatelessWidget {
 
 class _CenterItem extends StatefulWidget {
   const _CenterItem({required this.isSelected, required this.onTap});
-  final bool         isSelected;
+  final bool isSelected;
   final VoidCallback onTap;
 
   @override
