@@ -8,8 +8,9 @@ class Message {
   final String text;
   final String createdAt;
   final bool isRead;
-
+  final bool isEdited;
   Message({
+    required this.isEdited,
     required this.id,
     required this.conversationId,
     required this.senderId,
@@ -21,6 +22,7 @@ class Message {
   factory Message.fromJson(Map<String, dynamic> json) {
      
     return Message(
+      isEdited: json['is_edited'] ?? false,
       id: json['id'],
       conversationId: json['conversation_id'],
       senderId: json['sender_id'],

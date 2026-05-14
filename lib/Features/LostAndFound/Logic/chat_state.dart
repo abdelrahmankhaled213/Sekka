@@ -17,7 +17,15 @@ enum ChatStateEnum{
  sendMessageSuccess,
  sendMessageFailure,
  MarkMesssageAsReadSuccess,
- MarkMesssageAsReadFailure
+ MarkMesssageAsReadFailure,
+ updateMessageLoading,
+ updateMessageSuccess,
+ updateMessageFailure,
+ deleteMessageLoading,
+ deleteMessageSuccess,
+ deleteMessageFailure,
+ createConversationAndSendSuccess,
+ createConversationAndSendFailure
 }
 
 class ChatState extends Equatable{
@@ -40,11 +48,13 @@ class ChatState extends Equatable{
   }) {
     
     return ChatState(
+      
       conversation: conversation ?? this.conversation,
       status: status ?? this.status,
       errorMsg: errorMsg ?? this.errorMsg,
       messages: messages ?? this.messages,
       conversations: conversations ?? this.conversations
+    
     );
   }
   

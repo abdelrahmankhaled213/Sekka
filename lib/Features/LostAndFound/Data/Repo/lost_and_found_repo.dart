@@ -65,13 +65,26 @@ return await remoteDataSource.getUserConversations(userId);
 }
 
 
-Future<String> createConversation(String participantId)async{
+Future<Conversation> createConversation(String participantId)async{
 return await remoteDataSource.createConversation( participantId);
 }
 
 
 Stream<List<Message>> listenToMessages(String conversationId)async*{
 yield await remoteDataSource.getMessages(conversationId);
+}
+
+Future<void> setCurrentChat(String? conversationId) async {
+  await remoteDataSource.setCurrentChat(conversationId);
+}
+
+Future<void>updateMessage(String messageId, String text) async {
+return await remoteDataSource.updateMessage(messageId, text);
+}
+
+
+Future<void>deleteMessage(String messageId)async{  
+return await remoteDataSource.deleteMessage(messageId);
 }
 
 }

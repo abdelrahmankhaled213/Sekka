@@ -49,8 +49,9 @@ case AppRoute.chat:
     page: BlocProvider(
       create: (context) => getIt<ChatCubit>(),
       child: ChatScreen(
-        conversation: args['conversationId'] as Conversation,
+        conversation: args['conversationId'] as Conversation?,
         otherUserId: args['userId'] as String,
+        item: args['postData'] as ItemModel?,
       ),
     ),
   );

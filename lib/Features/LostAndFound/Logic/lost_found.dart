@@ -64,15 +64,15 @@ _mapError(e, stackTrace, LostFoundStatus.getPostFailure);
   }
 
 
-  Future<void> createConversation(String participantId) async {
-    emit(state.copyWith(status: LostFoundStatus.createConversationLoading));
-    try {
-     final id= await lostAndFoundRepo.createConversation(participantId);
-      emit(state.copyWith(status: LostFoundStatus.createConversationSuccess,conversationId: id));
-    } catch (e, stackTrace) {
-      _mapError(e, stackTrace, LostFoundStatus.createConversationFailure);
-    }
-  }
+  // Future<void> createConversation(String participantId) async {
+  //   emit(state.copyWith(status: LostFoundStatus.createConversationLoading));
+  //   try {
+  //    final id= await lostAndFoundRepo.createConversation(participantId);
+  //     emit(state.copyWith(status: LostFoundStatus.createConversationSuccess,conversationId: id));
+  //   } catch (e, stackTrace) {
+  //     _mapError(e, stackTrace, LostFoundStatus.createConversationFailure);
+  //   }
+  // }
 
 Future<void> deletePost(int postId)async{
 

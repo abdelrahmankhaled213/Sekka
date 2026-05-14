@@ -35,8 +35,6 @@ class ConversationsScreen extends StatelessWidget {
   }
 }
 
-// ── Header ────────────────────────────────────────────────────────────────────
-
 class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -91,7 +89,6 @@ class _Header extends StatelessWidget {
   }
 }
 
-// ── Search Bar ────────────────────────────────────────────────────────────────
 
 class _SearchBar extends StatelessWidget {
   @override
@@ -153,6 +150,7 @@ class _Body extends StatelessWidget {
         }
       },
       builder: (context, state) {
+
         if (state.status == ChatStateEnum.getConversationsLoading) {
           return _ConversationShimmer();
         }

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sekka/Features/LostAndFound/Data/Repo/lost_and_found_repo.dart';
-
 import 'chat_state.dart';
 
 class ChatCubit extends Cubit<ChatState> {
@@ -15,6 +14,33 @@ class ChatCubit extends Cubit<ChatState> {
     status: ChatStateEnum.initial
   ));
 
+
+
+
+
+Future<void> updateMessage(String messageId, String text) async {
+ 
+  emit(state.copyWith(status: ChatStateEnum.updateMessageLoading));
+  try {
+    await lostAndFoundRepo.updateMessage(messageId, text);
+    emit(state.copyWith(status: ChatStateEnum.updateMessageSuccess));
+  } catch (e, s) {
+    _mapError(e, s, ChatStateEnum.updateMessageFailure);
+  }
+}
+
+Future<void> deleteMessage(String messageId) async {
+  emit(state.copyWith(status: ChatStateEnum.deleteMessageLoading));
+  try {
+    await lostAndFoundRepo.deleteMessage(messageId);
+    emit(state.copyWith(status: ChatStateEnum.deleteMessageSuccess));
+  } catch (e, s) {
+    _mapError(e, s, ChatStateEnum.deleteMessageFailure);
+  }
+}
+
+
+
   Future<void> getConversations() async {
 
     emit(state.copyWith(status: ChatStateEnum.getConversationsLoading));
@@ -22,7 +48,6 @@ class ChatCubit extends Cubit<ChatState> {
     try {
 
       final conversations = await lostAndFoundRepo.getConversations(FirebaseAuth.instance.currentUser!.uid);
-
       emit(state.copyWith(
         status: ChatStateEnum.getConversationsSuccess,
         conversations: conversations,
@@ -99,6 +124,13 @@ Future<void> markMessagesAsRead(String conversationId) async {
     }
   }
 
+Future<void> setCurrentChat(String? conversationId) async {
+  try {
+    await lostAndFoundRepo.setCurrentChat(conversationId);
+  } catch (e, s) {
+    _mapError(e, s, ChatStateEnum.sendMessageFailure);
+  }
+}
   Future<void> sendMessage(String conversationId, String message) async {
     
     emit(state.copyWith(status: ChatStateEnum.sendMessageLoading));
@@ -117,6 +149,7 @@ Future<void> markMessagesAsRead(String conversationId) async {
     }
   }
 
+
   void _mapError(
     Object e,
     StackTrace stackTrace,
@@ -131,6 +164,29 @@ Future<void> markMessagesAsRead(String conversationId) async {
       errorMsg: _extractMessage(e),
     ));
   }
+
+Future<void> createConversationAndSend(String otherUserId, String text) async {
+  
+  emit(state.copyWith(status: ChatStateEnum.sendMessageLoading));
+  
+  try {
+    final conversation = await lostAndFoundRepo.createConversation(otherUserId);
+    await lostAndFoundRepo.sendMessage(
+      conversation.id,
+      FirebaseAuth.instance.currentUser!.uid,
+      text,
+    );
+    listenToMessages(conversation.id);
+    markMessagesAsRead(conversation.id);
+    setCurrentChat(conversation.id);
+    emit(state.copyWith(
+      status: ChatStateEnum.createConversationAndSendSuccess,
+      conversation: conversation,
+    ));
+  } catch (e, s) {
+    _mapError(e, s, ChatStateEnum.createConversationAndSendFailure);
+  }
+}
 
   String _extractMessage(Object e) {
     return e.toString().replaceFirst('Exception: ', '');

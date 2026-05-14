@@ -101,8 +101,9 @@ Future<List<Conversation>> getUserConversations(String userId) async {
       .toList();
 }
 
-   Future<Conversation?> getConversation(String conversationId) async {
-  final response = await _supabase
+Future<Conversation?> getConversation(String conversationId) async {
+      
+      final response = await _supabase
       .from(_conversationsTable)
       .select('''
         *,
@@ -118,25 +119,32 @@ Future<List<Conversation>> getUserConversations(String userId) async {
   return Conversation.fromJson(response);
 }
 
-
-Future<String> createConversation(String otherUserId) async {
+Future<Conversation> createConversation(String otherUserId) async {
   
-  final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+  final currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
-  final response = await _supabase
+  
+  final existing = await _supabase
       .from(_conversationsTable)
-      .upsert({
-        'user1_id': currentUserId,
-        'user2_id': otherUserId,
-      })
+      .select('id')
+      .or('and(user1_id.eq.$currentUserId,user2_id.eq.$otherUserId),and(user1_id.eq.$otherUserId,user2_id.eq.$currentUserId)')
+      .maybeSingle();
 
-      .select('id') 
-      .single();    
+  final conversationId = existing != null
+      ? existing['id'] as String
+      : await _createNew(currentUserId, otherUserId);
 
-  return response['id'] as String;
-
+  return (await getConversation(conversationId))!;
 }
 
+Future<String> _createNew(String currentUserId, String otherUserId) async {
+  final response = await _supabase
+      .from(_conversationsTable)
+      .insert({'user1_id': currentUserId, 'user2_id': otherUserId})
+      .select('id')
+      .single();
+  return response['id'] as String;
+}
 
   Future<List<Message>> getMessages(String conversationId) async {
   
@@ -152,8 +160,32 @@ Future<String> createConversation(String otherUserId) async {
     }
     
   
- 
-  
+ Future<void> setCurrentChat(String? conversationId) async {
+  final userId = FirebaseAuth.instance.currentUser!.uid;
+  await _supabase
+      .from('user_devices')
+      .update({'current_chat_id': conversationId})
+      .eq('user_id', userId);
+}
+
+ Future<void> updateMessage(String messageId, String text) async {
+  await api.put(
+    'update-message/$messageId',
+    data: {
+      'text': text,
+      'sender_id': FirebaseAuth.instance.currentUser!.uid,
+    },
+  );
+}
+
+Future<void> deleteMessage(String messageId) async {
+  await api.delete(
+    'delete-message/$messageId',
+    data: {
+      'sender_id': FirebaseAuth.instance.currentUser!.uid,
+    },
+  );
+} 
   Future<void> sendMessage(
 
     String conversationId,
@@ -197,6 +229,7 @@ Future<void> markMessageAsRead(String conversationId) async {
                 .toList(),
           ); 
   }
+
 
 }
 

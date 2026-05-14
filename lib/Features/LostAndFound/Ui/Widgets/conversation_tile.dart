@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
-import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Widget/custom_image_widget.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/conversation.dart';
+
 class ConversationTile extends StatelessWidget {
 
   final Conversation conversation;
@@ -17,20 +17,32 @@ class ConversationTile extends StatelessWidget {
     required this.onTap,
   });
 
+  static const List<List<Color>> _gradients = [
+    [AppColor.main, AppColor.secondary],
+    [AppColor.pink, AppColor.secondary],
+    [AppColor.green, AppColor.main],
+    [AppColor.orange, AppColor.pink],
+    [AppColor.lightPurple, AppColor.pink],
+  ];
+
   @override
   Widget build(BuildContext context) {
-
-    final otherUserId = conversation.otherUserId(currentUserId);
-    final shortId = otherUserId.length > 8
-        ? otherUserId.substring(0, 8).toUpperCase()
-        : otherUserId.toUpperCase();
-    final initial = shortId.isNotEmpty ? shortId[0] : '?';
-
-    return InkWell(
+    
+    final isUser1   = conversation.user1Id == currentUserId;
+    final otherData = isUser1 ? conversation.user2Data : conversation.user1Data;
+    final name      = otherData?.name ?? 'Sekka Member';
+    final avatar    = otherData?.image;
+    final hasUnread = conversation.unreadCount > 0;
+    final lastMsg   = conversation.lastMessage?.text ?? 'No messages yet';
+    final gradient  = _gradients[name.codeUnitAt(0) % _gradients.length];
+    
+    print("last message equals: ${conversation.lastMessage?.text}");
+ 
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16.r),
+      behavior: HitTestBehavior.opaque,
       child: Container(
-        padding:  EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         decoration: BoxDecoration(
           color: AppColor.surface,
           borderRadius: BorderRadius.circular(16.r),
@@ -45,34 +57,58 @@ class ConversationTile extends StatelessWidget {
         child: Row(
           children: [
 
-     conversation.user2Data?.image==null?  Container(
-              width: 52.w,
-              height: 52.h,
-              decoration: BoxDecoration(
-                gradient: AppStyle.brandGradient,
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  initial,
-                  style:  TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20.sp,
-                    fontFamily: 'Roboto',
+            Stack(
+              children: [
+                Container(
+                  width: 52.w,
+                  height: 52.w,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: gradient,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: avatar != null
+                      ? ClipOval(
+                          child: CustomImageWidget(
+                            imageUrl: avatar,
+                            width: 52.w,
+                            height: 52.w,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Center(
+                          child: Text(
+                            name[0].toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 20.sp,
+                              fontFamily: 'Roboto',
+                            ),
+                          ),
+                        ),
+                ),
+                // online dot
+                Positioned(
+                  bottom: 1,
+                  right: 1,
+                  child: Container(
+                    width: 12.w,
+                    height: 12.w,
+                    decoration: BoxDecoration(
+                      color: AppColor.lightGreen,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColor.surface, width: 2),
+                    ),
                   ),
                 ),
-              ),
-            ):CustomImageWidget(
-              imageUrl: conversation.user2Data!.image!,
-              width: 52.w,
-              height: 52.h,
-              fit: BoxFit.cover,
+              ],
             ),
 
-
-             SizedBox(width: 14.w),
-            
+            SizedBox(width: 12.w),
 
             Expanded(
               child: Column(
@@ -81,54 +117,98 @@ class ConversationTile extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'User $shortId',
-                        style: const TextStyle(
-                          color: AppColor.textPrimary,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15,
-                          fontFamily: 'Roboto',
+                      Expanded(
+                        child: Text(
+                          name,
+                          style: TextStyle(
+                            color: AppColor.textPrimary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14.sp,
+                            fontFamily: 'Roboto',
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      SizedBox(width: 8.w),
                       Text(
-                        conversation.createdAt,
-                        style:  TextStyle(
-                          color: AppColor.textSecondary,
-                          fontSize: 12.sp,
+                        conversation.lastMessageTime.isNotEmpty
+                            ? conversation.lastMessageTime
+                            : conversation.createdAt,
+                        style: TextStyle(
+                          color: hasUnread ? AppColor.main : AppColor.muted,
+                          fontSize: 11.sp,
                           fontFamily: 'Roboto',
+                          fontWeight: hasUnread ? FontWeight.w600 : FontWeight.w400,
                         ),
                       ),
                     ],
                   ),
 
-                   SizedBox(height: 4.h),
+                  SizedBox(height: 4.h),
 
-                   Text(
-                    'Tap to open conversation',
-                    style: TextStyle(
-                      color: AppColor.textSecondary,
-                      fontSize: 13.sp,
-                      fontFamily: 'Roboto',
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          lastMsg,
+                          style: TextStyle(
+                            color: hasUnread
+                                ? AppColor.textPrimary
+                                : AppColor.textSecondary,
+                            fontSize: 13.sp,
+                            fontFamily: 'Roboto',
+                            fontWeight: hasUnread
+                                ? FontWeight.w500
+                                : FontWeight.w400,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      // unread badge
+                      if (hasUnread)
+                        Container(
+                          width: 20.w,
+                          height: 20.w,
+                          decoration: const BoxDecoration(
+                            color: AppColor.main,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              conversation.unreadCount > 99
+                                  ? '99+'
+                                  : '${conversation.unreadCount}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w700,
+                                fontFamily: 'Roboto',
+                              ),
+                            ),
+                          ),
+                        )
+                      else
+                        // read ticks
+                        Icon(
+                          conversation.lastMessage?.isRead == true
+                              ? Icons.done_all_rounded
+                              : Icons.done_rounded,
+                          size: 14.sp,
+                          color: conversation.lastMessage?.isRead == true
+                              ? AppColor.main
+                              : AppColor.muted,
+                        ),
+                    ],
                   ),
                 ],
               ),
-            ),
-           
-             SizedBox(width: 8.w),
-           
-           Icon(
-              Icons.chevron_right_rounded,
-              color: AppColor.muted,
-              size: 20.sp,
             ),
           ],
         ),
       ),
     );
   }
-
-  
 }

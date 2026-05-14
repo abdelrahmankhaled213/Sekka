@@ -38,8 +38,7 @@ void main() async{
   await Hive.initFlutter();
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(TransportTypeAdapter());
-
-
+  
   runApp(
   const Sekka()
   );

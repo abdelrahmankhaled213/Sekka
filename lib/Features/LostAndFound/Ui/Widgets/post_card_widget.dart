@@ -109,46 +109,25 @@ class PostCardWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                BlocListener<LostAndFoundCubit, LostFoundState>(
-
-                     listenWhen: (previous, current) {
-                     return previous.status != current.status ||
-                     current.status == LostFoundStatus.createConversationSuccess ||
-                     current.status == LostFoundStatus.createConversationFailure;
-                                                                     },
-                  listener: (context, state) {
-
-                    if (state.status == LostFoundStatus.createConversationSuccess) {
-
+                Container(
+                  width: 36.w,
+                  height: 36.h,
+                  decoration: BoxDecoration(
+                    color: accentColor.withAlpha(26),
+                    shape: BoxShape.circle,
+                  ),
+                  child: GestureDetector(
+                    onTap: () =>
                       Navigator.pushNamed(context, AppRoute.chat,
                           arguments:{
-                            "conversationId":state.conversationId,
-                            "userId":postData.userId
-                          });
-                    }
-
-                    if(state.status == LostFoundStatus.createConversationFailure){
-
-                     FlutterToastHelper.showToast(text:state.errorMsg! 
-                     , color: AppColor.error);
-                    }
-                  },
-                  child: Container(
-                    width: 36.w,
-                    height: 36.h,
-                    decoration: BoxDecoration(
-                      color: accentColor.withAlpha(26),
-                      shape: BoxShape.circle,
-                    ),
-                    child: GestureDetector(
-                      onTap: (){
-                        BlocProvider.of<LostAndFoundCubit>(context).createConversation(postData.userId);
-                      },
-                      child: Icon(
-                        isFound ? Icons.phone_rounded : Icons.search_rounded,
-                        size: 17.sp,
-                        color: accentColor,
-                      ),
+                            "conversationId":null,
+                            "userId":postData.userId,
+                            'postData': postData,
+                          }),
+                    child: Icon(
+                      Icons.send, 
+                      size: 17.sp,
+                      color: accentColor,
                     ),
                   ),
                 ),
