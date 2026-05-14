@@ -19,7 +19,7 @@ extension TransportTypeX on TransportType {
     }
   }
 
-  // أيقونة كل نوع
+  
   String get emoji {
     switch (this) {
       case TransportType.metro:    return '🚇';

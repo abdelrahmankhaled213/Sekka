@@ -3,6 +3,7 @@ import 'package:sekka/Features/NearestStation/Data/Model/DataSource/nearest_stat
 import 'package:sekka/Features/NearestStation/Data/Model/nearest_station_model.dart';
 
 class NearestStationRepo {
+  
   final NearestStationDataSource dataSource;
 
   NearestStationRepo({required this.dataSource});

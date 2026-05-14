@@ -1,9 +1,10 @@
-import '../models/nearest_station_model.dart';
 
-/// Cache بسيط في الـ memory — بيحتفظ بالنتيجة الأخيرة
+import 'package:sekka/Features/NearestStation/Data/Model/nearest_station_model.dart';
+
 class NearestStationLocalDataSource {
+  
   List<NearestStationModel>? _cachedStations;
-  DateTime?                  _cacheTime;
+  DateTime? _cacheTime;
 
   static const Duration _cacheDuration = Duration(minutes: 5);
 

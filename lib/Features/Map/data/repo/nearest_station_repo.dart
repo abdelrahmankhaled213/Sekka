@@ -1,13 +1,15 @@
-import '../datasource/nearest_station_local_datasource.dart';
-import '../datasource/nearest_station_remote_datasource.dart';
-import '../models/nearest_station_model.dart';
-import '../models/transport_type.dart';
+import 'package:sekka/Features/Auth/Logic/transport_model.dart';
+import 'package:sekka/Features/NearestStation/Data/Model/DataSource/nearest_station_data_source.dart';
+import 'package:sekka/Features/NearestStation/Data/Model/nearest_station_model.dart';
 
-class NearestStationRepo {
-  final NearestStationRemoteDataSource remote;
+import '../DataSource/nearest_station_local_datasource.dart';
+
+class MapRepo {
+
+  final NearestStationDataSource remote;
   final NearestStationLocalDataSource  local;
 
-  const NearestStationRepo({required this.remote, required this.local});
+  const MapRepo({required this.remote, required this.local});
 
   Future<List<NearestStationModel>> getNearestStations({
     required double lat,
@@ -15,7 +17,7 @@ class NearestStationRepo {
     TransportType? type,
     bool forceRefresh = false,
   }) async {
-    // لو مفيش force refresh وفي cache صالح — ارجع الـ cache
+    
     if (!forceRefresh) {
       final cached = local.getCache();
       if (cached != null) return cached;
@@ -26,7 +28,6 @@ class NearestStationRepo {
       lng:  lng,
       type: type,
     );
-
     local.saveCache(stations);
     return stations;
   }
