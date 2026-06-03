@@ -5,6 +5,7 @@ import 'package:sekka/Features/NearestStation/Data/Model/Repo/nearest_station_re
 import 'package:sekka/Features/NearestStation/Logic/nearest_station_cubit.dart';
 
 Future<void> initNearestStationDI() async {
+  
   getIt.registerLazySingleton(
         () => NearestStationDataSource(supabaseClient: getIt()),
   );

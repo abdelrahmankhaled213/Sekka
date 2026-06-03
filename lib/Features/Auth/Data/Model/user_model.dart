@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 import 'package:sekka/Core/Helper/transport_type_helper.dart';
-import '../../Logic/transport_model.dart';
 
 part 'user_model.g.dart';
 
@@ -23,7 +22,7 @@ class UserModel {
   final String? name;
 
   @HiveField(5)
-  final List<TransportType>? favTrasnportation;
+  final List<TransportType?>? favTrasnportation;
 
   @HiveField(6)
   final bool? isGetStarted;
@@ -50,7 +49,7 @@ class UserModel {
       favTrasnportation: json["Favourite_Transport"] == null
           ? []
           : List<String>.from(json["Favourite_Transport"])
-          .map((e) => TransportTypeMapper.fromJson(e))
+          .map((e) => TransportTypeX.fromString(e))
           .toList(),
       isGetStarted: json["flag"]==1?true:false,    
     );
@@ -65,7 +64,7 @@ Map<String, dynamic> toJson() {
     if (image != null) 'image': image,
     if (isGetStarted != null) 'flag': isGetStarted==true?1:0,
     if (favTrasnportation != null)
-      'Favourite_Transport': favTrasnportation!.map((e) => e.name).toList(),
+      'Favourite_Transport': favTrasnportation!.map((e) => e?.name).toList(),
   };
 }
 
@@ -75,7 +74,7 @@ Map<String, dynamic> toJson() {
     String? image,
     String? email,
     String? name,
-    List<TransportType>? favTrasnportation,
+    List<TransportType?>? favTrasnportation,
     bool? isGetStarted
   }) {
     return UserModel(

@@ -1,14 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_update.dart';
 import 'package:sekka/Features/Auth/Data/UseCase/upsert_user_usecase.dart';
 import 'package:sekka/Features/Auth/Logic/set_up_profile_state.dart';
-import 'package:sekka/Features/Auth/Logic/transport_model.dart';
-
 import '../../../Core/Error/error_handler.dart';
-import '../Data/Model/user_model.dart';
-
 class SetUpProfileCubit extends Cubit<SetupProfileState> {
 
   final UpsertUserUseCase upsertUserUseCase;
@@ -22,7 +20,7 @@ class SetUpProfileCubit extends Cubit<SetupProfileState> {
 
   final globalKey=GlobalKey<FormState>();
 
-  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
 
   final  ExpandablePageController controller=
   ExpandablePageController(itemCount: 2, initialPage: 0);
@@ -92,8 +90,8 @@ setUpProfileEnum: SetUpProfileEnum.upsertUserLoading
      setUpProfileEnum: SetUpProfileEnum.upsertUserLoaded
    ));
     }catch(e,stackTrace){
-print(e.toString());
-      print(stackTrace);
+      debugPrint('SetUpProfileCubit error: $e');
+      debugPrint('StackTrace: $stackTrace');
       final failure=ErrorHandler.handleError(e);
       emit(state.copyWith(
         setUpProfileEnum: SetUpProfileEnum.upsertUserError,
@@ -109,7 +107,7 @@ print(e.toString());
 @override
   Future<void> close() {
     controller.dispose();
-    nameController.dispose();
+    phoneController.dispose();
       return super.close();
   }
 }

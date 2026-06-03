@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_model.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_update.dart';
 import 'package:sekka/Features/Auth/Logic/transport_model.dart';
@@ -10,7 +11,10 @@ enum ProfileStateEnum{
   getProfileError,
   editProfileLoading,
   editProfileSuccess,
-  editProfileError
+  editProfileError,
+  logoutLoading,
+  logoutSuccess,
+  logoutError
 }
 class ProfileState extends Equatable{
 
@@ -19,7 +23,7 @@ final UserModel? userModel;
 final UpdateUserRequest?updateUserRequest;
 
 final String? errorMsg;
-final List<TransportType> selectedTransports;
+final List<TransportType?> selectedTransports;
 final bool isImageRemoved;
 
 
@@ -34,7 +38,7 @@ final bool isImageRemoved;
     UpdateUserRequest?updateUserRequest,
     String? errorMsg,
    TransportType? selectedTransport,
-  List<TransportType>? selectedTransports,
+  List<TransportType?>? selectedTransports,
   bool? isImageRemoved,
   }) {
     return ProfileState(

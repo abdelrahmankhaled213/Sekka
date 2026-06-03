@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
-import 'package:sekka/Features/Routes/Data/Model/Transport.dart';
-part 'transport_model.g.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
+
 class TransportModel {
+  
   final String title;
   final String subtitle;
   final IconData icon;
@@ -28,17 +29,3 @@ class TransportModel {
   }
 }
 
-@HiveType(typeId: 1)
-enum TransportType {
-  @HiveField(0)
-  metro,
-  @HiveField(1)
-  bus,
-  @HiveField(2)
-  monorail,
-  @HiveField(3)
-  microbus,
-
-  transfer
-
-}

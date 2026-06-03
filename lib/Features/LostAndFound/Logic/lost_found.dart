@@ -1,10 +1,12 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sekka/Core/Error/error_handler.dart';
 import 'package:sekka/Core/Error/failure.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/add_comment_request.dart';
-import 'package:sekka/Features/LostAndFound/Data/Model/comments.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/update_comment_request.dart';
 import 'package:sekka/Features/LostAndFound/Data/Repo/lost_and_found_repo.dart';
@@ -23,11 +25,10 @@ class LostAndFoundCubit extends Cubit<LostFoundState> {
 
 
 
-void _mapError(Object e, StackTrace stackTrace,LostFoundStatus status) {
-  
-   print(stackTrace.toString());
-      print(e.toString());
-      final Failure failure = ErrorHandler.handleError(e);
+void _mapError(Object e, StackTrace stackTrace, LostFoundStatus status) {
+  debugPrint('LostAndFoundCubit error: $e');
+  debugPrint('StackTrace: $stackTrace');
+  final Failure failure = ErrorHandler.handleError(e);
       emit(state.copyWith(status: LostFoundStatus.addPostfailure,errorMsg: failure.message));
 }
 
@@ -38,11 +39,14 @@ void _mapError(Object e, StackTrace stackTrace,LostFoundStatus status) {
     try {
     
    final addedItemModel= await lostAndFoundRepo.post(item);
-     
+
+print("Added Item Model: ${addedItemModel.toJson()}");
+
 
       emit(state.copyWith( status: LostFoundStatus.addPostsuccess,addedItemModel:addedItemModel ));
 
     } catch (e,stackTrace) {
+
      _mapError(e, stackTrace, LostFoundStatus.addPostfailure);
     }
   }
@@ -64,15 +68,6 @@ _mapError(e, stackTrace, LostFoundStatus.getPostFailure);
   }
 
 
-  // Future<void> createConversation(String participantId) async {
-  //   emit(state.copyWith(status: LostFoundStatus.createConversationLoading));
-  //   try {
-  //    final id= await lostAndFoundRepo.createConversation(participantId);
-  //     emit(state.copyWith(status: LostFoundStatus.createConversationSuccess,conversationId: id));
-  //   } catch (e, stackTrace) {
-  //     _mapError(e, stackTrace, LostFoundStatus.createConversationFailure);
-  //   }
-  // }
 
 Future<void> deletePost(int postId)async{
 
@@ -191,8 +186,6 @@ _mapError(e, stackTrace, LostFoundStatus.createCommentFailure);
 
 }
 
-
-
 Future<void>deleteComment(int commentId)async{
 
 emit(
@@ -214,6 +207,10 @@ catch(e,stackTrace){
 _mapError(e, stackTrace, LostFoundStatus.deleteCommentFailure);
 
 }
+}
+
+Future<String> uploadPostImage(File file, String userId) async {
+  return await lostAndFoundRepo.uploadPostImage(file, userId);
 }
 
 Future<void> updateComment(String newContent) async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:sekka/core/theme/app_radius.dart';
+import 'package:sekka/core/theme/app_spacing.dart';
 import '../../logic/on_boarding_item.dart';
 
 class OnBoardingContainer extends StatelessWidget {
@@ -12,12 +13,8 @@ class OnBoardingContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-
       height: 256.h,
-
-margin: EdgeInsets.symmetric(
-  horizontal: 16.w
-),
+      margin: AppSpacing.horizontalLG,
 decoration: BoxDecoration(
   boxShadow: [
     BoxShadow(
@@ -32,9 +29,10 @@ decoration: BoxDecoration(
 child: Stack(
   fit: StackFit.expand,
   children: [
-    ClipRRect(
-        borderRadius: BorderRadius.circular(24.r)
-        ,child: Image.asset(onBoardingItem.image,fit: BoxFit.cover,)),
+  ClipRRect(
+        borderRadius: AppRadius.allXXL,
+        child: Image.asset(onBoardingItem.image, fit: BoxFit.cover),
+      ),
 
     Container(
       decoration: BoxDecoration(
@@ -47,13 +45,12 @@ child: Stack(
             ,stops: [0,0.5,1],begin: Alignment.topCenter
             ,end: Alignment.bottomCenter),
 
-        borderRadius:BorderRadius.circular(25.r),
+  borderRadius: AppRadius.allXXXL,
 
       ),
     ),
 
-    Center(child: Image.asset(onBoardingItem.icon
-      ,height: 80.h,width: 80.w,))
+  Center(child: Image.asset(onBoardingItem.icon, height: 80.h, width: 80.w))
   ],
 ),
     );

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sekka/Core/API/api_constants.dart';
 import 'package:sekka/Core/API/api_service.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/add_comment_request.dart';
@@ -13,6 +16,7 @@ class RemoteDataSource {
 
 final ApiConsumer api;
 final SupabaseClient _supabase;
+
 RemoteDataSource(this.api,this._supabase);
 
 
@@ -187,24 +191,27 @@ Future<void> deleteMessage(String messageId) async {
   );
 } 
   Future<void> sendMessage(
-
     String conversationId,
     String senderId,
-    String text,
-
-  ) async {
-      if (text.trim().isEmpty) {
+    String text, {
+    MessageType messageType = MessageType.text,
+    String? fileUrl,
+    String? fileName,
+    String? fileSize,
+  }) async {
+      if (text.trim().isEmpty && messageType == MessageType.text) {
         throw Exception(
           'Message text cannot be empty.',
         );
       }
  
-      await api.post(endPointSendMessage,data: {
+      await api.post(endPointSendMessage, data: {
         _colConversationId: conversationId,
         _colSenderId: senderId,
         _colText: text,
+        'message_type': messageType.name,
+        'file_url': fileUrl,
       });
-
     } 
 
 
@@ -227,9 +234,30 @@ Future<void> markMessageAsRead(String conversationId) async {
             (data) => data
                 .map((json) => Message.fromJson(json))
                 .toList(),
-          ); 
+          );
   }
 
+  Future<String> uploadChatFile(File file, String userId) async {
+    final fileExt = file.path.split('.').last;
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+    final filePath = 'chat/$userId/$fileName';
+
+    await _supabase.storage.from('chat_files').upload(filePath, file);
+
+    final fileUrl = _supabase.storage.from('chat_files').getPublicUrl(filePath);
+    return fileUrl;
+  }
+
+  Future<String> uploadPostImage(File file, String userId) async {
+    final fileExt = file.path.split('.').last;
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+    final filePath = 'posts/$userId/$fileName';
+
+    await _supabase.storage.from('post_images').upload(filePath, file);
+
+    final fileUrl = _supabase.storage.from('post_images').getPublicUrl(filePath);
+    return fileUrl;
+  }
 
 }
 

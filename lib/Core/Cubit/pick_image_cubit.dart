@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:sekka/Core/Cubit/pick_image_state.dart';
@@ -38,8 +39,8 @@ void removeImage(){
 imagePathFromSupa:url
       ));
     }catch(e,stacktrace){
-      print(stacktrace.toString());
-      print(e.toString());
+      debugPrint('PickImageCubit error: $e');
+      debugPrint('StackTrace: $stacktrace');
       final failure=ErrorHandler.handleError(e);
       emit(state.copyWith(
           errorMsg: failure.message,

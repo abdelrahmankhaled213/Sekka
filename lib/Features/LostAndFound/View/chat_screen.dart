@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/conversation.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart';
@@ -30,6 +32,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final _scrollCtrl = ScrollController();
   bool _canSend     = false;
   Message? _editingMessage;
+  XFile? _selectedFile;
+  MessageType? _selectedFileType;
 
 
   Conversation? _conversation;
@@ -76,7 +80,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _sendOrUpdate() {
     final txt = _textCtrl.text.trim();
-    if (txt.isEmpty) return;
+    if (txt.isEmpty && _selectedFile == null) return;
     _textCtrl.clear();
 
     final cubit = context.read<ChatCubit>();
@@ -84,6 +88,21 @@ class _ChatScreenState extends State<ChatScreen> {
     if (_editingMessage != null) {
       cubit.updateMessage(_editingMessage!.id, txt);
       setState(() => _editingMessage = null);
+    } else if (_selectedFile != null && _selectedFileType != null) {
+      if (_conversation == null) {
+        cubit.createConversationAndSend(widget.otherUserId, txt);
+      } else {
+        cubit.sendMessageWithAttachment(
+          _conversation!.id,
+          txt,
+         File(_selectedFile!.path),
+          _selectedFileType!,
+        );
+      }
+      setState(() {
+        _selectedFile = null;
+        _selectedFileType = null;
+      });
     } else if (_conversation == null) {
        cubit.createConversationAndSend(widget.otherUserId, txt);
     } else {
@@ -100,8 +119,82 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _cancelEdit() {
-    setState(() => _editingMessage = null);
+    setState(() {
+      _editingMessage = null;
+      _selectedFile = null;
+      _selectedFileType = null;
+    });
     _textCtrl.clear();
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedFile = pickedFile;
+        _selectedFileType = MessageType.image;
+      });
+    }
+  }
+
+  Future<void> _pickCamera() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedFile = pickedFile;
+        _selectedFileType = MessageType.image;
+      });
+    }
+  }
+
+  void _showAttachmentOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        margin: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: AppColor.surface,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 36.w,
+              height: 4.h,
+              margin: EdgeInsets.symmetric(vertical: 10.h),
+              decoration: BoxDecoration(
+                color: AppColor.outline,
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library, color: AppColor.main, size: 20.sp),
+              title: Text('Photo from Gallery',
+                  style: TextStyle(fontSize: 14.sp, fontFamily: 'Roboto', color: AppColor.textPrimary)),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage();
+              },
+            ),
+            Divider(height: 0.5, color: AppColor.outline),
+            ListTile(
+              leading: Icon(Icons.camera_alt, color: AppColor.main, size: 20.sp),
+              title: Text('Take Photo',
+                  style: TextStyle(fontSize: 14.sp, fontFamily: 'Roboto', color: AppColor.textPrimary)),
+              onTap: () {
+                Navigator.pop(context);
+                _pickCamera();
+              },
+            ),
+            SizedBox(height: 8.h),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showMessageOptions(BuildContext context, Message msg) {
@@ -387,9 +480,44 @@ class _ChatScreenState extends State<ChatScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(msg.text,
-                                    style: TextStyle(fontSize: 13.sp, fontFamily: 'Roboto',
-                                        color: isMine ? Colors.white : AppColor.textPrimary, height: 1.5)),
+                                if (msg.messageType == MessageType.image && msg.fileUrl != null)
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    child: Image.network(
+                                      msg.fileUrl!,
+                                      width: 200.w,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                if (msg.messageType == MessageType.file && msg.fileUrl != null)
+                                  Container(
+                                    padding: EdgeInsets.all(12.w),
+                                    decoration: BoxDecoration(
+                                      color: isMine ? Colors.white24 : AppColor.offWhite,
+                                      borderRadius: BorderRadius.circular(8.r),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.insert_drive_file, 
+                                            color: isMine ? Colors.white : AppColor.main, size: 24.sp),
+                                        SizedBox(width: 8.w),
+                                        Flexible(
+                                          child: Text(
+                                            msg.fileName ?? 'File',
+                                            style: TextStyle(fontSize: 12.sp, fontFamily: 'Roboto',
+                                                color: isMine ? Colors.white : AppColor.textPrimary),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                if (msg.text.isNotEmpty)
+                                  Text(msg.text,
+                                      style: TextStyle(fontSize: 13.sp, fontFamily: 'Roboto',
+                                          color: isMine ? Colors.white : AppColor.textPrimary, height: 1.5)),
                                 if (msg.isEdited)
                                   Text('edited',
                                       style: TextStyle(fontSize: 10.sp, fontFamily: 'Roboto',
@@ -429,59 +557,122 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildInputBar() {
     final isEditing = _editingMessage != null;
+    final hasAttachment = _selectedFile != null;
     return Container(
       color: AppColor.surface,
       padding: EdgeInsets.fromLTRB(14.w, 8.h, 14.w, 14.h),
       child: SafeArea(
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.attach_file_rounded, color: AppColor.muted, size: 22.sp),
-            SizedBox(width: 10.w),
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                decoration: BoxDecoration(
-                  color: AppColor.offWhite,
-                  borderRadius: BorderRadius.circular(22.r),
+            if (hasAttachment) _buildAttachmentPreview(),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: _showAttachmentOptions,
+                  child: Icon(Icons.attach_file_rounded, color: AppColor.muted, size: 22.sp),
                 ),
-                child: TextField(
-                  controller: _textCtrl,
-                  style: TextStyle(fontSize: 13.sp, fontFamily: 'Roboto', color: AppColor.textPrimary),
-                  maxLines: 4,
-                  minLines: 1,
-                  decoration: InputDecoration(
-                    hintText: isEditing ? 'Edit message...' : 'Type a message...',
-                    hintStyle: TextStyle(fontSize: 13.sp, fontFamily: 'Roboto', color: AppColor.muted),
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                    decoration: BoxDecoration(
+                      color: AppColor.offWhite,
+                      borderRadius: BorderRadius.circular(22.r),
+                    ),
+                    child: TextField(
+                      controller: _textCtrl,
+                      style: TextStyle(fontSize: 13.sp, fontFamily: 'Roboto', color: AppColor.textPrimary),
+                      maxLines: 4,
+                      minLines: 1,
+                      decoration: InputDecoration(
+                        hintText: isEditing ? 'Edit message...' : 'Type a message...',
+                        hintStyle: TextStyle(fontSize: 13.sp, fontFamily: 'Roboto', color: AppColor.muted),
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            SizedBox(width: 10.w),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 38.w,
-              height: 38.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _canSend
-                    ? (isEditing ? AppColor.green : AppColor.main)
-                    : AppColor.offWhite,
-              ),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: _canSend ? _sendOrUpdate : null,
-                icon: Icon(
-                  isEditing ? Icons.check_rounded : Icons.send_rounded,
-                  color: _canSend ? Colors.white : AppColor.muted,
-                  size: 17.sp,
+                SizedBox(width: 10.w),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 38.w,
+                  height: 38.w,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: (_canSend || hasAttachment)
+                        ? (isEditing ? AppColor.green : AppColor.main)
+                        : AppColor.offWhite,
+                  ),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: (_canSend || hasAttachment) ? _sendOrUpdate : null,
+                    icon: Icon(
+                      isEditing ? Icons.check_rounded : Icons.send_rounded,
+                      color: (_canSend || hasAttachment) ? Colors.white : AppColor.muted,
+                      size: 17.sp,
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAttachmentPreview() {
+    if (_selectedFile == null) return const SizedBox.shrink();
+    
+    return Container(
+      margin: EdgeInsets.only(bottom: 8.h),
+      padding: EdgeInsets.all(8.w),
+      decoration: BoxDecoration(
+        color: AppColor.offWhite,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
+            child: Image.file(
+              File(_selectedFile!.path),
+              width: 50.w,
+              height: 50.w,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(width: 10.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _selectedFile!.name,
+                  style: TextStyle(fontSize: 12.sp, fontFamily: 'Roboto', color: AppColor.textPrimary),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  _selectedFileType == MessageType.image ? 'Image' : 'File',
+                  style: TextStyle(fontSize: 10.sp, fontFamily: 'Roboto', color: AppColor.muted),
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedFile = null;
+                _selectedFileType = null;
+              });
+            },
+            child: Icon(Icons.close_rounded, color: AppColor.muted, size: 20.sp),
+          ),
+        ],
       ),
     );
   }

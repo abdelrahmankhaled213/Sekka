@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Constants/app_text.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Core/Localization/app_localizations.dart';
 import 'package:sekka/Core/Widget/custom_text_field.dart';
 import 'package:sekka/Features/Auth/Logic/transport_model.dart';
@@ -63,7 +64,7 @@ class _EditProfileContent extends State<EditProfileContent> {
   final user = cubit.state.userModel;
 
   cubit.nameController.text = user?.name ?? "";
-  cubit.initSelectedTransport(user?.favTrasnportation ?? []);
+  cubit.initSelectedTransport(user?.favTrasnportation??[]);
 
 });
 

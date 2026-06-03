@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sekka/Core/App/env_variables.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
@@ -99,6 +100,7 @@ return null;
   bool isAccountVerified() {
 
     return FirebaseAuth.instance.currentUser?.emailVerified ?? false;
+ 
   }
 
 
@@ -115,13 +117,11 @@ FlutterToastHelper.showToast(color: AppColor.error,text: ErrorHandler.handleErro
   }
 
   void _codeSentFunc(String verificationId,int? forceSendingToken)  {
-
     this.verificationId=verificationId;
-print(verificationId);
-
+    debugPrint('Verification ID: $verificationId');
   }
   void _codeAutoRetrievalTimeOut(String verificationId){
-    print("timeout");
+    debugPrint('Code auto retrieval timeout');
   }
 
   Future<UserCredential> _signIn(PhoneAuthCredential cred)async{

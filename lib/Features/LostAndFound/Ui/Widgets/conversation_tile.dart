@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
@@ -36,7 +37,7 @@ class ConversationTile extends StatelessWidget {
     final lastMsg   = conversation.lastMessage?.text ?? 'No messages yet';
     final gradient  = _gradients[name.codeUnitAt(0) % _gradients.length];
     
-    print("last message equals: ${conversation.lastMessage?.text}");
+    debugPrint("last message equals: ${conversation.lastMessage?.text}");
  
     return GestureDetector(
       onTap: onTap,

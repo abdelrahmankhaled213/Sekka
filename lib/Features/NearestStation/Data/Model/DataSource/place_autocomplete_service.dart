@@ -7,6 +7,7 @@ class PlaceAutocompleteService {
   static const _baseUrl = 'https://maps.googleapis.com/maps/api/place';
 
   Future<List<PlacePrediction>> getSuggestions(String input) async {
+
     if (input.trim().isEmpty) return [];
 
     final uri = Uri.parse(

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sekka/Core/Error/error_handler.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_update.dart';
 import 'package:sekka/Features/Auth/Logic/transport_model.dart';
 
@@ -20,7 +21,7 @@ class ProfileCubit extends Cubit<ProfileState> {
 TextEditingController nameController = TextEditingController();
 final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-void initSelectedTransport(List<TransportType> favList) {
+void initSelectedTransport(List<TransportType?> favList) {
 
   emit(state.copyWith(selectedTransports: favList));
 
@@ -28,7 +29,7 @@ void initSelectedTransport(List<TransportType> favList) {
 
 void toggleTransport(TransportType type) {
   
-  final list = List<TransportType>.from(state.selectedTransports);
+  final list = List<TransportType?>.from(state.selectedTransports);
 
   if (list.contains(type)) {
     list.remove(type);
@@ -126,7 +127,28 @@ Future<void> editProfile(UpdateUserRequest request) async {
   }
 }
 
+Future<void> logout() async {
+  emit(state.copyWith(
+    profileStateEnum: ProfileStateEnum.logoutLoading,
+  ));
 
+  try {
+    await FirebaseAuth.instance.signOut();
+    emit(state.copyWith(
+      profileStateEnum: ProfileStateEnum.logoutSuccess,
+    ));
+  } catch (e, stackTrace) {
+    debugPrint(e.toString());
+    debugPrint(stackTrace.toString());
+
+    final failure = ErrorHandler.handleError(e);
+
+    emit(state.copyWith(
+      profileStateEnum: ProfileStateEnum.logoutError,
+      errorMsg: failure.message,
+    ));
+  }
+}
 
 @override
   Future<void> close() {

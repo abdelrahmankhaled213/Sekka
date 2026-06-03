@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:image_picker/image_picker.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/add_comment_request.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/comments.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/conversation.dart';
@@ -45,8 +48,32 @@ Future<void> deleteComment(int commentId)async{
 return await remoteDataSource.deleteComment(commentId);
 }
 
-Future<void> sendMessage(String conversationId,String senderId,String text)async{
-return await remoteDataSource.sendMessage(conversationId,senderId,text);
+Future<void> sendMessage(
+  String conversationId,
+  String senderId,
+  String text, {
+  MessageType messageType = MessageType.text,
+  String? fileUrl,
+  String? fileName,
+  String? fileSize,
+}) async {
+  return await remoteDataSource.sendMessage(
+    conversationId,
+    senderId,
+    text,
+    messageType: messageType,
+    fileUrl: fileUrl,
+    fileName: fileName,
+    fileSize: fileSize,
+  );
+}
+
+Future<String> uploadChatFile(File file, String userId) async {
+  return await remoteDataSource.uploadChatFile(file, userId);
+}
+
+Future<String> uploadPostImage(File file, String userId) async {
+  return await remoteDataSource.uploadPostImage(file, userId);
 }
 
 Future<void> markMessageAsRead(String conversationId)async{
@@ -70,8 +97,8 @@ return await remoteDataSource.createConversation( participantId);
 }
 
 
-Stream<List<Message>> listenToMessages(String conversationId)async*{
-yield await remoteDataSource.getMessages(conversationId);
+Stream<List<Message>> listenToMessages(String conversationId){
+  return remoteDataSource.listenToMessages(conversationId);
 }
 
 Future<void> setCurrentChat(String? conversationId) async {

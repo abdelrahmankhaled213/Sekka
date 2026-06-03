@@ -59,7 +59,7 @@ class _VerifyEmailBodyState extends State<VerifyEmailBody> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     final authCubit = BlocProvider.of<AuthCubit>(context);
-print(authCubit.state);
+    debugPrint('AuthCubit state: ${authCubit.state}');
     return
       SingleChildScrollView(
           child: ImageBackground(

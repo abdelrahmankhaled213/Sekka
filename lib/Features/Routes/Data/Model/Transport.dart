@@ -1,5 +1,5 @@
 import 'package:sekka/Core/Helper/transport_type_helper.dart';
-import 'package:sekka/Features/Auth/Logic/transport_model.dart';
+
 class Transport{
 final int? id;
 final String name;
@@ -26,7 +26,7 @@ required this.directionName,
     
         directionName: json['direction_name'],
         id:json['id'],
-         type: json['edge_type']==null?null:TransportTypeMapper.fromJson(json['edge_type']),
+         type: json['edge_type']==null?null:TransportTypeX.fromString(json['edge_type']),
         name: json['stop_name'],
         location: GeoPoint.fromJson(json['location']),
         routeName: json['routes'],
@@ -34,6 +34,7 @@ required this.directionName,
 
         );
   }
+
 }
 
 class GeoPoint {
@@ -55,4 +56,5 @@ class GeoPoint {
       lat: coords[1].toDouble(), // latitude
     );
   }
+  
 }

@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sekka/Core/Error/error_handler.dart';
 import 'package:sekka/Features/Auth/Data/Model/signup_request.dart';
 import 'package:sekka/Features/Auth/Data/UseCase/get_profile_usecase.dart';
@@ -25,7 +26,7 @@ class AuthCubit extends Cubit<AuthState> {
    String? signUpEmail;
    String? signUpPassword;
    String? signUpConfirmPassword;
-
+   String ? signUpName;
   AuthCubit({
     required this.getProfileUsecase,
     required this.resendEmailVerification,
@@ -42,6 +43,7 @@ class AuthCubit extends Cubit<AuthState> {
     signUpEmail=null;
     signUpPassword=null;
     signUpConfirmPassword=null;
+    signUpName=null;
   }
 
 
@@ -98,35 +100,24 @@ Future<void> submitOtp(String otp, String phone) async {
   );
 }
 
-Future<void>isVerifiedUser()async{
+Future<void> isVerifiedUser() async {
+  emit(VerifyUserLoading());
+  try {
+    if (isClosed) return;
 
-    emit(VerifyUserLoading());
- try{
+    final isVerified = await handleVerificationUsecase(
+      pendingName: signUpName,
+    );
 
-if(isClosed) return;
-
-   final isVerified= await handleVerificationUsecase();
-
-  if(isVerified) {
-  emit(VerifyUserSuccess(
-      isVerified: true
-  ));
-
-}else{
-  emit(VerifyUserSuccess(
-    isVerified: false
-  ));
-
-}
-
- }catch(e){
-
-   _handleError(e, StackTrace.current, (msg) => VerifyUserFailed(msg));
- 
- }
-
+    if (isVerified) {
+      emit(VerifyUserSuccess(isVerified: true));
+    } else {
+      emit(VerifyUserSuccess(isVerified: false));
+    }
+  } catch (e) {
+    _handleError(e, StackTrace.current, (msg) => VerifyUserFailed(msg));
   }
-
+}
 
 Future<void> getProfile() async{
 
@@ -192,8 +183,8 @@ void _handleError(
   StackTrace s,
   AuthState Function(String) failure,
 ) {
-  print(e.toString());
-  print(s.toString());
+  debugPrint('AuthCubit error: $e');
+  debugPrint('StackTrace: $s');
   final error = ErrorHandler.handleError(e);
   emit(failure(error.message));
 }

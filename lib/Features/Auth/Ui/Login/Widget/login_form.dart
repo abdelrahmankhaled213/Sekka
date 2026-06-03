@@ -4,11 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_route.dart';
 import 'package:sekka/Core/Constants/app_text.dart';
 import 'package:sekka/Core/Helper/validator_helper.dart';
-import '../../../../../Core/Constants/app_color.dart';
-import '../../../../../Core/Constants/app_style.dart';
+import 'package:sekka/core/theme/app_colors.dart';
+import 'package:sekka/core/theme/app_radius.dart';
+import 'package:sekka/core/theme/app_spacing.dart';
+import 'package:sekka/core/theme/app_text_styles.dart';
+import 'package:sekka/core/widgets/app_button.dart';
+import 'package:sekka/core/widgets/app_loading.dart';
 import '../../../../../Core/Helper/animation_helper.dart';
 import '../../../../../Core/Helper/toast_helper.dart';
-import '../../../../../Core/Widget/custom_button_core.dart';
 import '../../../Data/Model/signInRequest.dart';
 import '../../../Logic/auth_cubit.dart';
 import '../../../Logic/auth_state.dart';
@@ -32,7 +35,6 @@ class _LoginFormState extends State<LoginForm>
   SignUpMethod method = SignUpMethod.email;
   bool isObscurePassword = true;
   late final TextEditingController emailController;
-  late final TextEditingController phoneController;
   late final TextEditingController passwordController;
   late final AnimationController animationController;
   late final Animation<Offset>slideAnimationEmailOrPhone;
@@ -41,7 +43,6 @@ class _LoginFormState extends State<LoginForm>
 
   bool isSubmit=false;
 
-  bool get isEmail => SignUpMethod.email == method;
 
   bool _localizedSlideAnimationsReady = false;
 
@@ -52,7 +53,7 @@ class _LoginFormState extends State<LoginForm>
 
     emailController = TextEditingController();
     passwordController = TextEditingController();
-    phoneController = TextEditingController();
+
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -92,7 +93,6 @@ class _LoginFormState extends State<LoginForm>
     animationController.dispose();
     emailController.dispose();
     passwordController.dispose();
-    phoneController.dispose();
       super.dispose();
   }
 
@@ -107,17 +107,13 @@ class _LoginFormState extends State<LoginForm>
       autovalidateMode:
       isSubmit ? AutovalidateMode.always : AutovalidateMode.disabled,
 
-      child: Padding(
-
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-
+  child: Padding(
+          padding: AppSpacing.horizontalLG,
           child: Container(
-
-              padding: EdgeInsets.all(33.sp),
-
+              padding: EdgeInsets.all(AppSpacing.xxxl.sp),
               decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(24.r)
+                  borderRadius: AppRadius.allXXL
               ),
               child: Column(
 
@@ -125,47 +121,41 @@ class _LoginFormState extends State<LoginForm>
 
                   children: [
 
-                    PhoneOrEmail(method: method, onChanged: (value) {
-                      setState(() {
-                        method = value;
-                        if (method == SignUpMethod.email) {
-                          phoneController.clear();
-                        } else {
-                          emailController.clear();
-                        }
-                      });
+                    // PhoneOrEmail(method: method, onChanged: (value) {
+                    //   setState(() {
+                    //     method = value;
+                    //     if (method == SignUpMethod.email) {
+                    //       phoneController.clear();
+                    //     } else {
+                    //       emailController.clear();
+                    //     }
+                    //   });
 
 
 
-                    },),
+                    // },),
 
-                    SizedBox(
-                      height: 24.h,
-                    ),
-
+                    // SizedBox(height: AppSpacing.xxl.h),
 
                     SlideTransition(
                       position: slideAnimationEmailOrPhone,
                       child: InputField(
                           validator: _validateEmailOrPhone,
                           titleName:
-                          isEmail ? AppText.emailAddress : AppText.phoneNumber
+                         AppText.emailAddress 
                           ,
-                          hint: isEmail ? AppText.enterYourEmail : AppText
-                              .phoneNumber
+                          hint: AppText.enterYourEmail
                           ,
-                          controller: isEmail
-                              ? emailController
-                              : phoneController
+                          controller: 
+                               emailController
+                              
                           ,
                           prefixIcon:
-                          Icon(isEmail ? Icons.mail : Icons.phone
-                            , size: 20.sp, color: AppColor.grey,)),
+                          Icon( Icons.mail 
+                            , size: 20.sp, color: AppColors.grey)),
                     ),
 
-                    SizedBox(
-                      height: 12.h,
-                    ),
+  SizedBox(height: AppSpacing.md.h),
 
             SlideTransition(
                       position: password,
@@ -178,7 +168,7 @@ class _LoginFormState extends State<LoginForm>
                           ,
                           controller: passwordController,
                           prefixIcon:
-                          Icon(Icons.lock, size: 20.sp, color: AppColor.grey,),
+                          Icon(Icons.lock, size: 20.sp, color: AppColors.grey,),
                           suffixIcon: IconButton(onPressed: () {
                             setState(() {
                               isObscurePassword = !isObscurePassword;
@@ -191,27 +181,17 @@ class _LoginFormState extends State<LoginForm>
                     ),
 
 
-                    SizedBox(
-                      height: 15.h,
-                    ),
+  SizedBox(height: AppSpacing.xl.h),
 
-                isEmail?    GestureDetector(
-                  onTap: ()=>context.read<AuthCubit>()
-                      .navigateToForgotPassword(),
+   GestureDetector(
+                  onTap: () => context.read<AuthCubit>().navigateToForgotPassword(),
                   child: Align(
                         alignment: Alignment.bottomRight,
-                        child: Text(AppText.forgotPassword
-                          , style: AppStyle.regular16RobotoGrey.copyWith(
-                              fontSize: 14.sp,
-                              color: AppColor.main
-                          ),),
+                        child: Text(AppText.forgotPassword, style: AppTextStyles.labelMedium(context).copyWith(color: AppColors.primary)),
                       ),
-                ):SizedBox(),
-
-
-                    SizedBox(
-                      height: 16.h,
-                    ),
+                ) ,
+           
+              SizedBox(height: AppSpacing.lg.h),
 
 
                          BlocListener<AuthCubit,AuthState>(
@@ -232,7 +212,7 @@ class _LoginFormState extends State<LoginForm>
 
                             if(state is GetProfileError){
 
-                              FlutterToastHelper.showToast(text: state.errorMsg,color: AppColor.error);
+                              FlutterToastHelper.showToast(text: state.errorMsg, color: AppColors.error);
                             
                             }
                           
@@ -251,9 +231,9 @@ class _LoginFormState extends State<LoginForm>
                            
                                if(state is VerifyUserSuccess && state.isVerified){
                            
-                                 FlutterToastHelper.showToast(
+  FlutterToastHelper.showToast(
                                      text: AppText.signInSuccessfully,
-                                     color: AppColor.success
+                                     color: AppColors.success
                                  );
                            
                                await context.read<AuthCubit>().getProfile();
@@ -277,22 +257,15 @@ class _LoginFormState extends State<LoginForm>
                              child: BlocConsumer<AuthCubit, AuthState>(
                            
                               listener: (context, state) {
-                                if (state is LoginFailure) {
+  if (state is LoginFailure) {
                                   FlutterToastHelper.showToast(
-                                      text: state.errorMsg
-                                      ,color: AppColor.error
+                                      text: state.errorMsg,
+                                      color: AppColors.error
                                   );
                                 }
                            
                                 if (state is LoginSuccess) {
-                                                   
-                                if(!isEmail) {
-                                 context.read<AuthCubit>().navigateToOtpState(phoneController.text);
-                                                                                                  }
-                             else{
                                context.read<AuthCubit>().isVerifiedUser();
-                               }
-                           
                                 }
                            
                               },
@@ -309,46 +282,30 @@ class _LoginFormState extends State<LoginForm>
                            
                               builder: (context, state) {
                                 return state is LoginLoading
-                                    ? CircularProgressIndicator(
-                                  color: AppColor.main,
-                                ) : Align(
-                                  child: CustomButtonCore(onPressed: () async {
-                           
-                                    setState(() {
-                                      isSubmit = true;
-                                    });
-                                    if (globalKey.currentState!.validate()) {
-                                      final signUpRequest = SignInRequest(
-                                        email: isEmail
-                                            ? emailController.text
-                                            : null,
-                                        phone: isEmail ? null : phoneController
-                                            .text,
-                                        password: passwordController.text,
-                                      );
-                           
-                                      await BlocProvider.of<AuthCubit>(context)
-                                          .login(signUpRequest);
-                                    }
-                                  },
-                           
-                                      width: 274.w,
-                                      height: 56.h
-                                      ,
-                                      firstColor: AppColor.main,
-                                      secondColor: AppColor.secondary
-                                      ,
-                                      thirdColor: AppColor.pink
-                                      ,
-                                      text: AppText.signIn,
-                                      child: Center(
-                                          child: Text(AppText.signIn,
-                                              style: AppStyle.regular18RobotoWhite
-                                                  .copyWith(
-                                                fontSize: 16.sp,
-                                              )
-                                          )
-                                      )
+                                    ? const AppLoading(variant: AppLoadingVariant.circular)
+                                    : Align(
+                                  child: AppButton(
+
+                                    text: AppText.signIn,
+                                    variant: AppButtonVariant.gradient,
+                                    size: AppButtonSize.large,
+                                    fullWidth: true,
+                                    isLoading: state is LoginLoading,
+                                    onPressed: () async {
+                                      setState(() {
+                                        isSubmit = true;
+                                      });
+                                      if (globalKey.currentState!.validate()) {
+                                        final signUpRequest = SignInRequest(
+                                          email: 
+                                               emailController.text,
+                                              
+                                          password: passwordController.text,
+                                        );
+                                        await BlocProvider.of<AuthCubit>(context)
+                                            .login(signUpRequest);
+                                      }
+                                    },
                                   ),
                                 );
                            
@@ -357,9 +314,8 @@ class _LoginFormState extends State<LoginForm>
                            ),
                          ),
 
-                    SizedBox(
-                      height: 24.h,
-                    ),
+                    SizedBox(height: AppSpacing.xxl.h),
+
                     Center(child: CustomTextSpan(text: AppText.dontHaveAnAccount
                       , text2: AppText.signUp, onTapGesture: ()=>
                       context.read<AuthCubit>().navigateToSignUp()
@@ -373,8 +329,9 @@ class _LoginFormState extends State<LoginForm>
 
 
   String? _validateEmailOrPhone(String? value) {
-     return isEmail ? ValidatorHelper.email(value,)
-        : ValidatorHelper.phone(value);
+
+     return  ValidatorHelper.email(value);
+        
   }
 
   String? _validatePassword(String? value) {

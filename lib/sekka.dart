@@ -5,10 +5,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sekka/Core/Helper/notification_helper.dart';
 import 'package:sekka/Core/Localization/app_localizations.dart';
 import 'package:sekka/Core/Localization/locale_cubit.dart';
-import 'package:sekka/Core/Navigation/main_bottom_nav_view.dart';
 import 'package:sekka/Core/Navigation/on_generate_route.dart';
-import 'package:sekka/Features/Auth/Ui/Login/View/login_view.dart';
-import 'Core/Constants/app_color.dart';
+import 'package:sekka/core/theme/app_theme.dart';
 
 class Sekka extends StatelessWidget {
 
@@ -46,13 +44,9 @@ return GestureDetector(
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          theme: ThemeData(
-            textSelectionTheme: TextSelectionThemeData(
-              cursorColor: AppColor.grey,
-              selectionColor: AppColor.main,
-              selectionHandleColor: AppColor.main
-            )
-          ),
+          theme: AppTheme.lightTheme(context),
+          darkTheme: AppTheme.darkTheme(context),
+          themeMode: ThemeMode.system,
         debugShowCheckedModeBanner:false,
   
           title: 'Sekka',

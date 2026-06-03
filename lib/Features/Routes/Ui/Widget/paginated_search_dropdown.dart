@@ -121,7 +121,6 @@ class _PaginatedSearchDropdownState extends State<PaginatedSearchDropdown>
       if (mounted) setState(() => _isSheetOpen = false);
     });
 
-    // Always fetch fresh — cubit guards duplicate calls via isLoading flag
     await cubit.fetchTransports();
   }
 

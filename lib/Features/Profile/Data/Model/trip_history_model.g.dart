@@ -1,0 +1,92 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'trip_history_model.dart';
+
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
+class TripHistoryModelAdapter extends TypeAdapter<TripHistoryModel> {
+  @override
+  final int typeId = 2;
+
+  @override
+  TripHistoryModel read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return TripHistoryModel(
+      id: fields[0] as String,
+      fromTransport: fields[1] as String,
+      toTransport: fields[2] as String,
+      dateTime: fields[3] as String,
+      status: fields[4] as TripStatus,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, TripHistoryModel obj) {
+    writer
+      ..writeByte(5)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.fromTransport)
+      ..writeByte(2)
+      ..write(obj.toTransport)
+      ..writeByte(3)
+      ..write(obj.dateTime)
+      ..writeByte(4)
+      ..write(obj.status);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TripHistoryModelAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class TripStatusAdapter extends TypeAdapter<TripStatus> {
+  @override
+  final int typeId = 1;
+
+  @override
+  TripStatus read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return TripStatus.completed;
+      case 1:
+        return TripStatus.cancelled;
+      default:
+        return TripStatus.completed;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, TripStatus obj) {
+    switch (obj) {
+      case TripStatus.completed:
+        writer.writeByte(0);
+        break;
+      case TripStatus.cancelled:
+        writer.writeByte(1);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TripStatusAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

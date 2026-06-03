@@ -193,12 +193,14 @@ class _SetupProfileBodyState extends State<SetupProfileBody>
               
         ),
         GestureDetector(
+          
           onTap: () async{
             
             Navigator.pushReplacementNamed(context, AppRoute.bottomNavigation);
+
           },
+
           child: Text(
-            
             AppText.skip,
             style: AppStyle.regular16RobotoBlack.copyWith(fontSize: 14.sp),
           ),

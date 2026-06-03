@@ -315,6 +315,7 @@ class _SegmentsList extends StatelessWidget {
       itemCount: segments.length,
       separatorBuilder: (_, __) => SizedBox(height: 10.h),
       itemBuilder: (_, i) => RouteWidget(
+        allSegments: segments,
         segment: segments[i],
         isLastSegment: i == segments.length - 1,
       ),

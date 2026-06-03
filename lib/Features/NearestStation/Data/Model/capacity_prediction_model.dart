@@ -1,4 +1,4 @@
-import 'package:sekka/Features/NearestStation/Data/Model/nearest_station_model.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 
 class CapacityPredictionModel {
   final String timestamp;

@@ -6,6 +6,7 @@ import 'package:sekka/Core/Constants/app_text.dart';
 import 'package:sekka/Core/Cubit/pick_image_cubit.dart';
 import 'package:sekka/Core/Cubit/pick_image_state.dart';
 import 'package:sekka/Core/Helper/toast_helper.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_update.dart';
 import 'package:sekka/Features/Auth/Logic/transport_model.dart';
 import 'package:sekka/Features/Auth/Ui/SetUpProfile/Widget/select_your_fav_transport.dart';
@@ -219,7 +220,7 @@ SizedBox(
 
     final model = UpdateUserRequest(
       favTrasnportation: setupProfileCubit.chosenType,
-      name: setupProfileCubit.nameController.text,
+       phone: setupProfileCubit.phoneController.text,
       image: pickImageCubit.state.imagePathFromSupa,
       isGetStarted: true
     );

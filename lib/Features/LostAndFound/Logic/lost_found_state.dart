@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:sekka/Features/LostAndFound/Data/Model/add_comment_response.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/comments.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart';
 

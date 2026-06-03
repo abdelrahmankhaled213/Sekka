@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Features/NearestStation/Data/Model/nearest_station_model.dart';
 
 class StationCardWidget extends StatelessWidget {
@@ -93,6 +94,8 @@ class _CrowdingBadge extends StatelessWidget {
       case CrowdingLevel.low:    return AppColor.successContainer;
       case CrowdingLevel.medium: return AppColor.warningContainer;
       case CrowdingLevel.high:   return AppColor.errorContainer;
+      case CrowdingLevel.unknown:
+        return AppColor.errorContainer.withOpacity(0.5);  
     }
   }
 
@@ -102,6 +105,8 @@ class _CrowdingBadge extends StatelessWidget {
       case CrowdingLevel.low:    return AppColor.success;
       case CrowdingLevel.medium: return AppColor.warning;
       case CrowdingLevel.high:   return AppColor.error;
+      case CrowdingLevel.unknown:
+        return AppColor.error.withOpacity(0.5);
     }
   }
 

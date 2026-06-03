@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:sekka/Core/Constants/app_color.dart';
+import 'package:sekka/core/theme/app_colors.dart';
+import 'package:sekka/core/theme/app_radius.dart';
+import 'package:sekka/core/theme/app_spacing.dart';
+import 'package:sekka/core/theme/app_text_styles.dart';
+import 'package:sekka/core/widgets/app_button.dart';
+import 'package:sekka/core/widgets/app_empty_state.dart';
+import 'package:sekka/core/widgets/app_loading.dart';
+import 'package:sekka/Features/Auth/Logic/transport_model.dart';
 import 'package:sekka/Features/NearestStation/Data/Model/nearest_station_model.dart';
 import 'package:sekka/Features/NearestStation/Logic/nearest_station_cubit.dart';
 import 'package:sekka/Features/NearestStation/Logic/nearest_station_state.dart';
@@ -9,8 +16,6 @@ import 'package:sekka/Features/NearestStation/Ui/Widget/location_header_widget.d
 import 'package:sekka/Features/NearestStation/Ui/Widget/search_location_bottom_sheet.dart';
 import 'package:sekka/Features/NearestStation/Ui/Widget/station_card_widget.dart';
 import 'package:sekka/Features/NearestStation/Ui/Widget/transport_filter_widget.dart';
-import 'package:skeletonizer/skeletonizer.dart';
-import 'package:sekka/Features/Routes/Data/Model/Transport.dart';
 
 class NearestStationView extends StatefulWidget {
 
@@ -30,85 +35,54 @@ class _NearestStationViewState extends State<NearestStationView> {
 
   @override
   Widget build(BuildContext context) {
+    
     final bottomNavHeight = 80.h;
 
-    return Scaffold(
-      backgroundColor: AppColor.background,
+  return Scaffold(
+      backgroundColor: AppColors.background,
       body: BlocBuilder<NearestStationCubit, NearestStationState>(
         builder: (context, state) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
+  SizedBox(
                 height: 285.h,
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
                     LocationHeaderWidget(locationName: state.locationName),
-                    Positioned(
+  Positioned(
                       bottom: 0,
-                      left: 16.w,
-                      right: 16.w,
+                      left: AppSpacing.lg.w,
+                      right: AppSpacing.lg.w,
                       child: _FloatingSearchCard(),
                     ),
                   ],
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h),
+  Padding(
+                padding: EdgeInsets.fromLTRB(AppSpacing.lg.w, 0, AppSpacing.lg.w, AppSpacing.md.h),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+  Text(
                       'Nearest Stations',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w700,
-                        color: AppColor.textPrimary,
-                        fontFamily: 'Roboto'
-                      ),
+                      style: AppTextStyles.titleMedium(context),
                     ),
-                    Icon(Icons.my_location,
-                        size: 18.sp, color: AppColor.grey),
+                    Icon(Icons.my_location, size: 18.sp, color: AppColors.grey),
                   ],
                 ),
               ),
               Expanded(child: _buildBody(context, state)),
-              Padding(
-                padding:
-                EdgeInsets.fromLTRB(16.w, 8.h, 16.w, bottomNavHeight),
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColor.secondary, AppColor.primaryColor],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColor.primaryColor.withOpacity(0.35),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+  Padding(
+                padding: EdgeInsets.fromLTRB(AppSpacing.lg.w, AppSpacing.sm.h, AppSpacing.lg.w, bottomNavHeight),
+                child: AppButton(
+                      text: 'Plan My Route',
+                      variant: AppButtonVariant.gradient,
+                      size: AppButtonSize.large,
+                      fullWidth: true,
+                      onPressed: () {},
                     ),
-                    child: Center(
-                      child: Text(
-                        'Plan My Route',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
               ),
             ],
           );
@@ -132,12 +106,12 @@ class _NearestStationViewState extends State<NearestStationView> {
 
   Widget _buildList(
       BuildContext context, List<NearestStationModel> stations) {
-    return ListView.separated(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
+  return ListView.separated(
+      padding: AppSpacing.horizontalLG,
       itemCount: stations.length,
-      separatorBuilder: (_, __) => SizedBox(height: 10.h),
+      separatorBuilder: (_, __) => SizedBox(height: AppSpacing.md.h),
       itemBuilder: (_, i) => InkWell(
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: AppRadius.allLG,
         onTap: () {},
         child: StationCardWidget(station: stations[i]),
       ),
@@ -145,77 +119,23 @@ class _NearestStationViewState extends State<NearestStationView> {
   }
 
   Widget _buildSkeleton() {
-    final dummy = List.generate(
-      4,
-          (_) => NearestStationModel(
-        name: 'Loading Station Name Here',
-        routes: 'Loading Routes Here',
-        location: GeoPoint(lat: 0, lng: 0),
-        distanceKm: 0.5,
-        crowding: CrowdingLevel.low,
-      ),
-    );
-
-    return Skeletonizer(
-      child: ListView.separated(
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
-        itemCount: dummy.length,
-        separatorBuilder: (_, __) => SizedBox(height: 10.h),
-        itemBuilder: (_, i) => StationCardWidget(station: dummy[i]),
-      ),
-    );
+    return const AppLoading(variant: AppLoadingVariant.circular);
   }
 
   Widget _buildError(BuildContext context, String? msg) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(24.w),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.location_off_outlined,
-                size: 48.sp, color: AppColor.muted),
-            SizedBox(height: 12.h),
-            Text(
-              msg ?? 'Something went wrong',
-              textAlign: TextAlign.center,
-              style:
-              TextStyle(color: AppColor.textSecondary, fontSize: 14.sp),
-            ),
-            SizedBox(height: 16.h),
-            ElevatedButton.icon(
-              onPressed: () =>
-                  context.read<NearestStationCubit>().loadNearestStations(),
-              icon: const Icon(Icons.refresh),
-              label: const Text('Try Again'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.primaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return AppErrorState(
+      title: 'Error Loading Stations',
+      description: msg ?? 'Something went wrong',
+      actionLabel: 'Try Again',
+      onActionPressed: () => context.read<NearestStationCubit>().loadNearestStations(),
     );
   }
 
   Widget _buildEmpty() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.train_outlined, size: 48.sp, color: AppColor.muted),
-          SizedBox(height: 12.h),
-          Text(
-            'No stations found nearby',
-            style:
-            TextStyle(color: AppColor.textSecondary, fontSize: 14.sp),
-          ),
-        ],
-      ),
+    return const AppEmptyState(
+      icon: Icons.train_outlined,
+      title: 'No Stations Found',
+      description: 'No stations found nearby',
     );
   }
 }
@@ -223,16 +143,16 @@ class _NearestStationViewState extends State<NearestStationView> {
 class _FloatingSearchCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Material(
+  return Material(
       elevation: 8,
-      borderRadius: BorderRadius.circular(20.r),
+      borderRadius: AppRadius.allXXL,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg.w, vertical: AppSpacing.xl.h),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            InkWell(
-              borderRadius: BorderRadius.circular(12.r),
+  InkWell(
+              borderRadius: AppRadius.allLG,
               onTap: () {
                 showModalBottomSheet(
                   context: context,
@@ -244,27 +164,25 @@ class _FloatingSearchCard extends StatelessWidget {
                   ),
                 );
               },
-              child: Container(
-                padding:
-                EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+  child: Container(
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl.w, vertical: AppSpacing.md.h),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF5F6F8),
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: AppRadius.allLG,
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.search, color: AppColor.muted, size: 20.sp),
-                    SizedBox(width: 10.w),
+                    Icon(Icons.search, color: AppColors.muted, size: 20.sp),
+                    SizedBox(width: AppSpacing.md.w),
                     Text(
                       'Where do you want to go?',
-                      style:
-                      TextStyle(color: AppColor.muted, fontSize: 14.sp),
+                      style: AppTextStyles.bodyMedium(context).copyWith(color: AppColors.muted),
                     ),
                   ],
                 ),
               ),
-            ),
-            SizedBox(height: 12.h),
+  ),
+            SizedBox(height: AppSpacing.md.h),
             TransportFilterWidget(),
           ],
         ),

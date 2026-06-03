@@ -35,6 +35,14 @@ abstract class ValidatorHelper {
     }
     return null;
   }
+  
+  static String? name(String? value) {
+
+    if (value == null || value.isEmpty) {
+      return "Name is Empty";
+    }
+    return null;
+  }
 
   static String? custom(String? value, String? Function(String?) validator) {
     return validator(value);

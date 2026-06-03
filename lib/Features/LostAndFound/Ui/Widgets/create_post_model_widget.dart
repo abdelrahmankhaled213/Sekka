@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart';
@@ -26,6 +28,8 @@ class _CreatePostModalWidgetState extends State<CreatePostModalWidget> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _stationController = TextEditingController();
+  XFile? _selectedImage;
+  bool _isUploading = false;
 
 
   @override
@@ -70,21 +74,38 @@ void _buildScafoldMessenger(String text,Color color) {
     return;
   }
 
+  if (_selectedImage == null) {
+    _buildScafoldMessenger("Please select an image for the post",AppColor.error);
+    return;
+  }
 
-  final post = ItemModel(
-    isActive: true , 
-    createdAt: DateTime.now().toIso8601String(),
-    userId: FirebaseAuth.instance.currentUser!.uid,
-    category: _selectedCategory!,
-    title: _titleController.text.trim(),
-    description: _descriptionController.text.trim(),
-    stationName: _stationController.text.trim(),
-    type: _postType!,
-  );
+  setState(() => _isUploading = true);
 
-await context.read<LostAndFoundCubit>().postLostAndFound(post);
+  try {
+    final cubit = context.read<LostAndFoundCubit>();
+    final userId = FirebaseAuth.instance.currentUser!.uid;
 
+    final imageUrl = await cubit.uploadPostImage( File(_selectedImage!.path), userId);
 
+    final post = ItemModel(
+      isActive: true, 
+      createdAt: DateTime.now().toIso8601String(),
+      userId: userId,
+      category: _selectedCategory!,
+      title: _titleController.text.trim(),
+      description: _descriptionController.text.trim(),
+      stationName: _stationController.text.trim(),
+      type: _postType!,
+      imageUrl: imageUrl,
+    );
+
+    await cubit.postLostAndFound(post);
+
+  } catch (e) {
+    _buildScafoldMessenger("Failed to upload image: $e", AppColor.error);
+  } finally {
+    setState(() => _isUploading = false);
+  }
 }
 
 @override
@@ -135,6 +156,10 @@ Widget build(BuildContext context) {
                   _buildSectionLabel('Station *'),
                   SizedBox(height: 8.h),
                   _buildStationField(),
+                  SizedBox(height: 18.h),
+                  _buildSectionLabel('Image *'),
+                  SizedBox(height: 8.h),
+                  _buildImagePicker(),
                   SizedBox(height: 24.h),
                   _buildSubmitButton(),
                 ],
@@ -268,7 +293,7 @@ Widget _buildHeader() {
               title,
               textAlign: TextAlign.center,
               style: AppStyle.regular11RobotoGrey.copyWith(
-                fontSize: 13,
+                fontSize: 13.sp,
                 fontWeight: FontWeight.w700,
                 color: isSelected ? selectedColor : AppColor.textSecondary,
                 height: 1.3,
@@ -281,7 +306,7 @@ Widget _buildHeader() {
               subtitle,
               textAlign: TextAlign.center,
               style: AppStyle.regular11RobotoGrey.copyWith(
-                fontSize: 11,
+                fontSize: 11.sp,
                 color: AppColor.muted,
               ),
             ),
@@ -324,11 +349,11 @@ Widget _buildHeader() {
           borderSide: const BorderSide(color: AppColor.secondary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: AppColor.error, width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: AppColor.error, width: 2),
         ),
       ),
@@ -472,6 +497,74 @@ Widget _buildHeader() {
     );
   }
 
+  Widget _buildImagePicker() {
+    return GestureDetector(
+      onTap: _pickImage,
+      child: Container(
+        width: double.infinity,
+        height: 150.h,
+        decoration: BoxDecoration(
+          color: AppColor.surfaceVariant,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(
+            color: _selectedImage != null ? AppColor.secondary : AppColor.outline,
+            width: _selectedImage != null ? 2 : 1.5,
+          ),
+        ),
+        child: _selectedImage != null
+            ? Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12.r),
+                    child: Image.file(
+                      File(_selectedImage!.path),
+                      width: double.infinity,
+                      height: 150.h,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedImage = null),
+                      child: Container(
+                        padding: EdgeInsets.all(4.w),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.close, color: Colors.white, size: 16.sp),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add_photo_alternate_rounded, 
+                      color: AppColor.muted, size: 32.sp),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'Tap to add image',
+                    style: TextStyle(fontSize: 12.sp, fontFamily: 'Roboto', 
+                        color: AppColor.muted),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() => _selectedImage = pickedFile);
+    }
+  }
+
   Widget _buildSubmitButton() {
     return SizedBox(
     
@@ -481,7 +574,7 @@ Widget _buildHeader() {
         
         listener: (context, state)  {
           if(state.status == LostFoundStatus.addPostsuccess){
-  context.read<LostAndFoundCubit>().getPosts();
+           context.read<LostAndFoundCubit>().getPosts();
           _buildScafoldMessenger("Item posted successfully", AppColor.success);
           Navigator.pop(context);
           } 
@@ -494,7 +587,7 @@ Widget _buildHeader() {
         builder: (BuildContext context, LostFoundState state) {
 
        return 
-      state.status == LostFoundStatus.addPostloading ? Center(
+      _isUploading || state.status == LostFoundStatus.addPostloading ? Center(
         child: const CircularProgressIndicator(
         color: AppColor.secondary,
       )) 

@@ -1,9 +1,10 @@
-import 'package:sekka/Features/Auth/Logic/transport_model.dart';
-import 'package:sekka/Features/NearestStation/Data/Model/nearest_station_model.dart';
+
 import 'package:sekka/Core/Helper/transport_type_helper.dart';
+import 'package:sekka/Features/NearestStation/Data/Model/nearest_station_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NearestStationDataSource {
+
   final SupabaseClient supabaseClient;
 
   NearestStationDataSource({required this.supabaseClient});

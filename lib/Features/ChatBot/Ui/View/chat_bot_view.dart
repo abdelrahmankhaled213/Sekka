@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sekka/core/theme/app_colors.dart';
 import 'package:sekka/Features/ChatBot/Data/Model/chat_message_model.dart';
 import 'package:sekka/Features/ChatBot/Data/Model/DataSource/chat_bot_service.dart';
 import 'package:sekka/Features/ChatBot/Ui/Widget/chat_header_widget.dart';
@@ -116,7 +117,7 @@ class _ChatBotViewState extends State<ChatBotView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F2F8),
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Column(
           children: [

@@ -3,6 +3,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:postgrest/postgrest.dart';
 import 'package:sekka/Core/Error/error_handler.dart';
 import 'package:sekka/Core/Helper/location_helper.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Features/Auth/Logic/transport_model.dart';
 import 'package:sekka/Features/NearestStation/Data/Model/DataSource/capacity_prediction_service.dart';
 import 'package:sekka/Features/NearestStation/Data/Model/nearest_station_model.dart';
@@ -10,6 +11,7 @@ import 'package:sekka/Features/NearestStation/Data/Model/Repo/nearest_station_re
 import 'package:sekka/Features/NearestStation/Logic/nearest_station_state.dart';
 
 class NearestStationCubit extends Cubit<NearestStationState> {
+  
   final NearestStationRepo repo;
   final CapacityPredictionService predictionService;
 

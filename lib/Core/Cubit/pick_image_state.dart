@@ -15,7 +15,7 @@ enum PickImageEnum{
   final String? errorMsg;
   final String? imagePathFromSupa;
 
-  PickImageState({
+  const PickImageState({
      this.pickImageEnum,
     this.file,
     this.imagePath,
@@ -38,7 +38,5 @@ enum PickImageEnum{
 }
 
   @override
-  // TODO: implement props
-  List<Object?> get props => [file,imagePath,errorMsg,pickImageEnum,imagePathFromSupa];
+  List<Object?> get props => [file, imagePath, errorMsg, pickImageEnum, imagePathFromSupa];
  }
-

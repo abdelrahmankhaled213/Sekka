@@ -1,4 +1,4 @@
-import 'package:sekka/Features/Auth/Logic/transport_model.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Features/NearestStation/Data/Model/DataSource/nearest_station_data_source.dart';
 import 'package:sekka/Features/NearestStation/Data/Model/nearest_station_model.dart';
 

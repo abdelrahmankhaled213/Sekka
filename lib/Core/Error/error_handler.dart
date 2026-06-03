@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sekka/Core/Constants/app_text.dart';
 import 'package:sekka/Core/Error/failure.dart';
 
@@ -65,8 +66,7 @@ class ErrorHandler {
   }
 
   static Failure _handleFirebaseAuthException(FirebaseAuthException e) {
-    print(e.code);
-
+    debugPrint('FirebaseAuthException code: ${e.code}');
     switch (e.code) {
       case 'invalid-phone-number':
         return ServerFailure(AppText.invalidPhoneNumber);

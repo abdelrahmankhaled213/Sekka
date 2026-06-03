@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:sekka/Features/Routes/Data/Model/DataSource/routes_data_source.dart';
 import 'package:sekka/Features/Routes/Data/Model/Transport.dart';
 import 'package:sekka/Features/Routes/Data/Model/fetch_params.dart';
@@ -22,12 +23,10 @@ Future<List<Transport>> fetchTransportsFilter(ParamsOfFetchRoutesWithSearch para
 
 }
 
-Future<List<Transport>> fetchTransportsPath(ParamsRoutePath params) async{
+Future<List<dynamic>> fetchTransportsPath(ParamsRoutePath params) async{
 
 final data=await routesDataSource.fetchTransportsPath(params);
-
-print("data length ${data.length}");
-
+debugPrint('RoutesRepo data length: ${data.length}');
 return data;
 
 }

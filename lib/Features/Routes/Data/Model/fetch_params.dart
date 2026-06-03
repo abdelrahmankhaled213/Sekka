@@ -1,5 +1,6 @@
+
+
 import 'package:sekka/Core/Helper/transport_type_helper.dart';
-import 'package:sekka/Features/Auth/Logic/transport_model.dart';
 
 class ParamsOfFetchRoutes {
  final int limit;

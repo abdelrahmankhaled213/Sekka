@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:sekka/Features/NearestStation/Data/Model/capacity_prediction_model.dart';
 
@@ -12,6 +13,7 @@ class CapacityPredictionService {
       final response = await http.get(uri);
       if (response.statusCode != 200) return null;
       final data = json.decode(response.body) as Map<String, dynamic>;
+      debugPrint('Prediction data for station $stationId: $data');
       return CapacityPredictionModel.fromJson(data);
     } catch (_) {
       return null;

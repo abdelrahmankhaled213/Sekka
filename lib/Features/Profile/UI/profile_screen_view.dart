@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:sekka/Core/Constants/app_color.dart';
-import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Constants/app_text.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Core/Helper/transport_ui_helper.dart';
 import 'package:sekka/Core/Localization/locale_cubit.dart';
-import 'package:sekka/Features/Auth/Logic/transport_model.dart';
+import 'package:sekka/core/theme/app_colors.dart';
+import 'package:sekka/core/theme/app_radius.dart';
+import 'package:sekka/core/theme/app_spacing.dart';
+import 'package:sekka/core/theme/app_text_styles.dart';
+import 'package:sekka/core/widgets/app_button.dart';
 import 'package:sekka/Features/Profile/Logic/profile_cubit.dart';
 import 'package:sekka/Features/Profile/Logic/profile_state.dart';
 import 'package:sekka/Features/Profile/UI/Widgets/preferred_transport_section.dart';
@@ -34,37 +37,35 @@ class ProfileScreenView extends StatelessWidget {
           slivers: [
             const SliverToBoxAdapter(child: ProfileStack()),
             SliverToBoxAdapter(
-              child: Transform.translate(
-                offset: Offset(0, -14.h),
+  child: Transform.translate(
+                offset: Offset(0, -AppSpacing.xl.h),
                 child: Column(
-                  
                   children: [
-                    
-                    SizedBox(height: 16.h),
+                    SizedBox(height: AppSpacing.lg.h),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      padding: AppSpacing.horizontalLG,
                       child: preferred.isEmpty
                           ? const PreferredTransportSection()
                           : _PreferredTransportDynamic(preferred: preferred),
                     ),
-                    SizedBox(height: 16.h),
+                    SizedBox(height: AppSpacing.lg.h),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      padding: AppSpacing.horizontalLG,
                       child: _RecentTripsSection(recentTrips: recentTrips),
                     ),
-                    SizedBox(height: 16.h),
+                    SizedBox(height: AppSpacing.lg.h),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      padding: AppSpacing.horizontalLG,
                       child: _ActionsSection(
                         onAboutUsTap: _openWebsite,
                       ),
                     ),
-                    SizedBox(height: 16.h),
+                    SizedBox(height: AppSpacing.lg.h),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      padding: AppSpacing.horizontalLG,
                       child: _LogoutButton(),
-                    ),
-                    SizedBox(height: 24.h),
+  ),
+                    SizedBox(height: AppSpacing.xxl.h),
                   ],
                 ),
               ),
@@ -93,7 +94,7 @@ class _PreferredTransportDynamic extends StatelessWidget {
 
   const _PreferredTransportDynamic({required this.preferred});
 
-  final List<TransportType> preferred;
+  final List<TransportType?> preferred;
 
   @override
   Widget build(BuildContext context) {
@@ -102,27 +103,26 @@ class _PreferredTransportDynamic extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           
-          Text(AppText.preferredTransport, style: AppStyle.regular16RobotoBlack),
-
-          SizedBox(height: 14.h),
-          Wrap(
-            spacing: 10.w,
-            runSpacing: 10.h,
+  Text(AppText.preferredTransport, style: AppTextStyles.titleMedium(context)),
+          SizedBox(height: AppSpacing.xl.h),
+  Wrap(
+            spacing: AppSpacing.md.w,
+            runSpacing: AppSpacing.md.h,
             children: preferred.map((type) {
-              return Container(
+  return Container(
                 width: 80.w,
-                padding: EdgeInsets.all(10.sp),
+                padding: EdgeInsets.all(AppSpacing.md.sp),
                 decoration: BoxDecoration(
-                  color: TransportUIHelper.color(type).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(14.r),
+                  color: TransportUIHelper.color(type!).withOpacity(0.2),
+                  borderRadius: AppRadius.allXL,
                   border: Border.all(color: TransportUIHelper.color(type)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(TransportUIHelper.icon(type), color: TransportUIHelper.color(type), size: 18.sp),
-                    SizedBox(height: 8.h),
-                    Text(TransportUIHelper.label(type), style: AppStyle.regular16RobotoBlack.copyWith(fontSize: 13.sp)),
+  Icon(TransportUIHelper.icon(type), color: TransportUIHelper.color(type), size: 18.sp),
+                    SizedBox(height: AppSpacing.sm.h),
+                    Text(TransportUIHelper.label(type), style: AppTextStyles.labelMedium(context)),
                   ],
                 ),
               );
@@ -147,23 +147,23 @@ class _RecentTripsSection extends StatelessWidget {
     return ProfileSectionCard(
       child: Column(
         children: [
-          Row(
+  Row(
             children: [
-              Icon(Icons.history, size: 18.sp, color: AppColor.grey),
-              SizedBox(width: 8.w),
-              Text(AppText.recentTrips, style: AppStyle.regular16RobotoBlack.copyWith(fontSize: 14.sp)),
+              Icon(Icons.history, size: 18.sp, color: AppColors.grey),
+              SizedBox(width: AppSpacing.sm.w),
+              Text(AppText.recentTrips, style: AppTextStyles.labelLarge(context)),
               const Spacer(),
-              Text(AppText.seeAll, style: AppStyle.regular16RobotoGrey.copyWith(color: AppColor.main, fontSize: 12.sp)),
+              Text(AppText.seeAll, style: AppTextStyles.labelSmall(context).copyWith(color: AppColors.primary)),
             ],
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: AppSpacing.md.h),
           ...recentTrips.map((trip) {
-            return Container(
-              margin: EdgeInsets.only(bottom: 10.h),
-              padding: EdgeInsets.all(10.sp),
+  return Container(
+              margin: EdgeInsets.only(bottom: AppSpacing.md.h),
+              padding: EdgeInsets.all(AppSpacing.md.sp),
               decoration: BoxDecoration(
-                color: AppColor.offWhite,
-                borderRadius: BorderRadius.circular(12.r),
+                color: AppColors.offWhite,
+                borderRadius: AppRadius.allLG,
               ),
               child: Row(
                 children: [
@@ -171,13 +171,13 @@ class _RecentTripsSection extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(trip.$1, style: AppStyle.regular16RobotoBlack.copyWith(fontSize: 12.sp)),
-                        SizedBox(height: 4.h),
-                        Text('${trip.$2} - ${trip.$3}', style: AppStyle.regular11RobotoGrey),
+  Text(trip.$1, style: AppTextStyles.labelSmall(context)),
+                        SizedBox(height: AppSpacing.xs.h),
+                        Text('${trip.$2} - ${trip.$3}', style: AppTextStyles.caption(context)),
                       ],
                     ),
                   ),
-                  Text(trip.$4, style: AppStyle.regular16RobotoBlack.copyWith(fontSize: 13.sp)),
+  Text(trip.$4, style: AppTextStyles.labelMedium(context)),
                 ],
               ),
             );
@@ -209,22 +209,22 @@ class _ActionsSection extends StatelessWidget {
           _ActionRow(
             icon: Icons.language,
             title: AppText.language,
-            trailing: Switch(
+  trailing: Switch(
               value: isArabic,
-              activeColor: AppColor.main,
+              activeColor: AppColors.primary,
               onChanged: (_) => localeCubit.toggleLanguage(),
             ),
           ),
           _ActionRow(
             icon: Icons.notifications_none,
             title: AppText.notificationsTitle,
-            trailing: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+  trailing: Container(
+              padding: AppSpacing.horizontalLG,
               decoration: BoxDecoration(
-                color: AppColor.green.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(14.r),
+                color: AppColors.lightGreen.withOpacity(0.2),
+                borderRadius: AppRadius.allXL,
               ),
-              child: Text(AppText.onLabel, style: AppStyle.regular11RobotoGrey.copyWith(color: AppColor.darkGreen)),
+              child: Text(AppText.onLabel, style: AppTextStyles.caption(context).copyWith(color: AppColors.darkGreen)),
             ),
           ),
           _ActionRow(icon: Icons.settings_outlined, title: AppText.settings),
@@ -252,18 +252,18 @@ class _ActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+  return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10.r),
+      borderRadius: AppRadius.allMD,
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.h),
+        padding: EdgeInsets.symmetric(vertical: AppSpacing.sm.h),
         child: Row(
-          children: [
-            Icon(icon, size: 18.sp, color: AppColor.grey),
-            SizedBox(width: 10.w),
-            Expanded(child: Text(title, style: AppStyle.regular16RobotoBlack.copyWith(fontSize: 14.sp))),
+  children: [
+            Icon(icon, size: 18.sp, color: AppColors.grey),
+            SizedBox(width: AppSpacing.md.w),
+            Expanded(child: Text(title, style: AppTextStyles.labelLarge(context))),
             if (trailing != null) trailing!,
-            if (showChevron && trailing == null) Icon(Icons.chevron_right, color: AppColor.grey, size: 18.sp),
+            if (showChevron && trailing == null) Icon(Icons.chevron_right, color: AppColors.grey, size: 18.sp),
           ],
         ),
       ),
@@ -274,19 +274,53 @@ class _ActionRow extends StatelessWidget {
 class _LogoutButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 12.h),
-      decoration: BoxDecoration(
-        color: AppColor.errorContainer,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.logout, color: AppColor.error, size: 18.sp),
-          SizedBox(width: 8.w),
-          Text(AppText.logOut, style: AppStyle.regular16RobotoBlack.copyWith(color: AppColor.error)),
+    return BlocConsumer<ProfileCubit, ProfileState>(
+      listener: (context, state) {
+        if (state.profileStateEnum == ProfileStateEnum.logoutSuccess) {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            '/login',
+            (route) => false,
+          );
+        }
+        if (state.profileStateEnum == ProfileStateEnum.logoutError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errorMsg ?? AppText.somethingWentWrong)),
+          );
+        }
+      },
+      builder: (context, state) {
+        return AppButton(
+          text: AppText.logOut,
+          variant: AppButtonVariant.secondary,
+          icon: Icons.logout,
+          fullWidth: true,
+          isLoading: state.profileStateEnum == ProfileStateEnum.logoutLoading,
+          onPressed: () {
+            _showLogoutDialog(context);
+          },
+        );
+      },
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppText.logOut),
+        content: Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<ProfileCubit>().logout();
+            },
+            child: Text('Logout', style: TextStyle(color: AppColors.error)),
+          ),
         ],
       ),
     );

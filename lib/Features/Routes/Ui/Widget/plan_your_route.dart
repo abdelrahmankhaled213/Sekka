@@ -5,15 +5,12 @@ import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_image.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Constants/app_text.dart';
-import 'package:sekka/Features/Auth/Logic/transport_model.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Features/Routes/Logic/routes_cubit.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/best_path_destination.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TransportSwitiching model
-// ─────────────────────────────────────────────────────────────────────────────
-
 class TransportSwitiching {
+
   final String image;
   final IconData icon;
   final Color color1;
@@ -29,10 +26,6 @@ class TransportSwitiching {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PlanYourRoute
-// ─────────────────────────────────────────────────────────────────────────────
-
 class PlanYourRoute extends StatefulWidget {
   const PlanYourRoute({super.key});
 
@@ -45,22 +38,22 @@ class _PlanYourRouteState extends State<PlanYourRoute> {
     TransportSwitiching(
       image: AppImage.planYourRouteMetro,
       icon: Icons.directions_subway_rounded,
-      color1: AppColor.darkBlue,
-      color2: AppColor.lightBlue,
+      color1: AppColor.main,
+      color2: AppColor.pink,
       title: TransportType.metro,
     ),
     TransportSwitiching(
       image: AppImage.planYourRouteMonorail,
       icon: Icons.directions_railway_rounded,
-      color1: AppColor.darkPurple,
-      color2: AppColor.lightPurple,
+      color1: AppColor.main,
+      color2: AppColor.pink,
       title: TransportType.monorail,
     ),
     TransportSwitiching(
       image: AppImage.planYourRouteBus,
       icon: Icons.directions_bus_rounded,
-      color1: AppColor.darkGreen,
-      color2: AppColor.lightGreen,
+      color1: AppColor.main,
+      color2: AppColor.pink,
       title: TransportType.bus,
     ),
   ];
@@ -75,19 +68,20 @@ class _PlanYourRouteState extends State<PlanYourRoute> {
 
   @override
   Widget build(BuildContext context) {
+
     final state = context.watch<RoutesCubit>().state;
     final selected =
         state.selectedTransportSwitching ?? _transportList.first;
 
     return SingleChildScrollView(
+    
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Hero image + gradient ────────────────────────────────
+          
           _HeroSection(selected: selected, gradient: _buildGradient(selected.color1, selected.color2)),
 
-          // ── Transport type switcher ──────────────────────────────
-          _TransportSwitcher(
+           _TransportSwitcher(
             list: _transportList,
             selected: selected,
             gradient: _buildGradient,
@@ -95,8 +89,7 @@ class _PlanYourRouteState extends State<PlanYourRoute> {
 
           SizedBox(height: 16.h),
 
-          // ── Search + results ─────────────────────────────────────
-          Padding(
+           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: BestPathDestination(icon: selected.icon),
           ),
@@ -108,11 +101,8 @@ class _PlanYourRouteState extends State<PlanYourRoute> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Hero image section
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _HeroSection extends StatelessWidget {
+  
   final TransportSwitiching selected;
   final LinearGradient gradient;
 
@@ -169,9 +159,6 @@ class _HeroSection extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Transport type switcher — pill style
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _TransportSwitcher extends StatelessWidget {
   final List<TransportSwitiching> list;
@@ -253,3 +240,4 @@ class _TransportSwitcher extends StatelessWidget {
     );
   }
 }
+

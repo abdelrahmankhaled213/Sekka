@@ -18,9 +18,8 @@ import 'package:skeletonizer/skeletonizer.dart';
 class ItemDetailAndChatScreen extends StatefulWidget {
 
   final ItemModel? item;
-  final int? id;
 
-  const ItemDetailAndChatScreen({super.key, this.item, this.id});
+  const ItemDetailAndChatScreen({super.key, this.item});
 
   @override
   State<ItemDetailAndChatScreen> createState() => _ItemDetailAndChatScreenState();

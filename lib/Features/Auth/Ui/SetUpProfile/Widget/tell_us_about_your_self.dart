@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
+import 'package:sekka/Core/Helper/app_regex_helper.dart';
 import 'package:sekka/Core/Widget/custom_text_field.dart';
 import 'package:sekka/Features/Auth/Logic/set_up_profile_cubit.dart';
 import 'package:sekka/Features/Auth/Ui/SetUpProfile/Widget/instruction_tell_about_yourself.dart';
 import 'package:sekka/Features/Auth/Ui/SetUpProfile/Widget/photo_widget.dart';
 import 'package:sekka/Features/Auth/Ui/SetUpProfile/Widget/setup_icon_switch.dart';
 import 'package:sekka/Features/Auth/Ui/SetUpProfile/Widget/tell_us_button.dart';
-
 import '../../../../../Core/Constants/app_style.dart';
 import '../../../../../Core/Localization/app_localizations.dart';
 
@@ -84,7 +84,7 @@ crossAxisAlignment: CrossAxisAlignment.start,
             height: 12.sp,
           ),
 
-            Text(context.l10n.fullName
+            Text("Phone Number"
               ,style: AppStyle.regular24RobotoBlack.copyWith(
                   fontSize: 14.sp
               ),),
@@ -99,12 +99,17 @@ crossAxisAlignment: CrossAxisAlignment.start,
             child: MyTextFormField(
             validator: (value) {
               if(value==null||value.isEmpty){
-                return context.l10n.enterYourName;
+                return "Phone number is empty";
               }
+              if(!AppRegex.isPhoneNumberValid(value)){
+                return "Phone number is not valid";
+              }
+              
               return null;
             }
-            ,prefixIcon: Icon(Icons.person,color: AppColor.grey,size: 20.sp,),controller: context.read<SetUpProfileCubit>().nameController
-                , hint: context.l10n.enterYourName,),
+            ,prefixIcon: Icon(Icons.phone,color: AppColor.grey,size: 20.sp,),
+            controller: context.read<SetUpProfileCubit>().phoneController
+                , hint: "Phone number",),
           ),
 
           SizedBox(

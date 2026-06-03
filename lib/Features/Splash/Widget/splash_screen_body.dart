@@ -1,12 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_route.dart';
-import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Constants/cached_keys.dart';
 import 'package:sekka/Core/DI/service_locator.dart';
 import 'package:sekka/Core/Database/cache_helper.dart';
+import 'package:sekka/core/theme/app_colors.dart';
+import 'package:sekka/core/theme/app_radius.dart';
+import 'package:sekka/core/theme/app_spacing.dart';
+import 'package:sekka/core/theme/app_text_styles.dart';
 import 'package:sekka/Features/Splash/Widget/logo_container.dart';
 
 class SplashScreenBody extends StatefulWidget {
@@ -63,11 +65,11 @@ class _SplashScreenBodyState extends State<SplashScreenBody>
       );
 
       if (data == true) {
-        if(FirebaseAuth.instance.currentUser != null) {
-          Navigator.pushReplacementNamed(context, AppRoute.bottomNavigation);
-        } else {
-          Navigator.pushReplacementNamed(context, AppRoute.login);
-        }
+        // if(FirebaseAuth.instance.currentUser != null) {
+        //   Navigator.pushReplacementNamed(context, AppRoute.bottomNavigation);
+        // } else {
+          Navigator.pushReplacementNamed(context, AppRoute.authWrapper);
+        // }
       } else {
         Navigator.pushReplacementNamed(context, AppRoute.onBoarding);
       }
@@ -88,10 +90,10 @@ class _SplashScreenBodyState extends State<SplashScreenBody>
       child: _SplashStaticContent(),
 
       builder: (context, child) {
-        return Container(
+  return Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [AppColor.main, AppColor.secondary, AppColor.pink],
+              colors: [AppColors.primary, AppColors.secondary, AppColors.pink],
               begin: _beginAlignment.value,
               end: _endAlignment.value,
             ),
@@ -99,22 +101,21 @@ class _SplashScreenBodyState extends State<SplashScreenBody>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FadeTransition(
+  FadeTransition(
                 opacity: _fadeInAnimation,
-                child: LogoContainer(height: 160.h, width: 160.h, radius: 40.r),
+                child: LogoContainer(height: 160.h, width: 160.h, radius: AppSpacing.xl),
               ),
-
-              const SizedBox(height: 24),
+              SizedBox(height: AppSpacing.xxl),
 
               child!,
 
-              const SizedBox(height: 30),
+  SizedBox(height: AppSpacing.xxxl),
 
-              SizedBox(
+  SizedBox(
                 width: 166.w,
                 child: Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppRadius.allLG,
                     boxShadow: [
                       BoxShadow(
                         color: _colorIndicatorAnimate.value!.withOpacity(0.9),
@@ -124,7 +125,7 @@ class _SplashScreenBodyState extends State<SplashScreenBody>
                     ],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppRadius.allLG,
                     child: LinearProgressIndicator(
                       minHeight: 6.h,
                       valueColor: _colorIndicatorAnimate,
@@ -133,12 +134,11 @@ class _SplashScreenBodyState extends State<SplashScreenBody>
                   ),
                 ),
               ),
+              SizedBox(height: AppSpacing.xl.h),
 
-               SizedBox(height: 15.h),
-
-              Text(
+  Text(
                 "loading your journey..",
-                style: AppStyle.regular18RobotoWhite.copyWith(fontSize: 14.sp),
+                style: AppTextStyles.labelMedium(context),
               ),
             ],
           ),
@@ -155,9 +155,9 @@ class _SplashStaticContent extends StatelessWidget {
       width: double.infinity,
       child: Column(
         children: [
-          Text("Sekka", style: AppStyle.bold48RobotoWhite),
-          SizedBox(height: 6.h),
-          Text("Smart Transportation", style: AppStyle.regular18RobotoWhite),
+          Text("Sekka", style: AppTextStyles.headlineLarge(context)),
+          SizedBox(height: AppSpacing.sm.h),
+          Text("Smart Transportation", style: AppTextStyles.labelLarge(context)),
         ],
       ),
     );

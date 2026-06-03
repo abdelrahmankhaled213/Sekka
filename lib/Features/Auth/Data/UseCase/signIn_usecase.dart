@@ -1,4 +1,5 @@
-import '../Model/signInRequest.dart';
+import 'package:sekka/Features/Auth/Data/Model/signInRequest.dart';
+
 import '../Repo/Auth_repo.dart';
 
 class LoginUseCase {
@@ -15,11 +16,7 @@ class LoginUseCase {
  request
   );
 
-  } else {
-
-  await repository.signInWithPhone(request.phone!);
-
-  }
+  } 
 
   }
 

@@ -10,7 +10,6 @@ import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart';
 import 'package:sekka/Features/LostAndFound/Logic/chat_cubit.dart';
 import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
 import 'package:sekka/Features/LostAndFound/View/chat_screen.dart';
-import 'package:sekka/Features/LostAndFound/View/conversation_screen.dart';
 import 'package:sekka/Features/LostAndFound/View/item_detail_and_chat_screen.dart';
 import 'package:sekka/Features/OnBoarding/Ui/Views/OnBoardingView.dart';
 import '../../Features/Auth/Ui/auth_wrapper_view.dart';

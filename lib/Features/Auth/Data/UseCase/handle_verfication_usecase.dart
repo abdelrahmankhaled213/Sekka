@@ -1,10 +1,9 @@
 import 'package:sekka/Features/Auth/Data/Repo/Auth_repo.dart';
 
-class HandleVerificationUsecase{
+class HandleVerificationUsecase {
+  final AuthRepo _repo;
+  HandleVerificationUsecase(this._repo);
 
-final AuthRepo authRepo;
-HandleVerificationUsecase(this.authRepo);
-  Future<bool>call()async{
-return await authRepo.isVerified();
-  }
+  Future<bool> call({String? pendingName}) => 
+      _repo.isVerified(pendingName: pendingName);
 }

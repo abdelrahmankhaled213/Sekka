@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
-import 'package:sekka/Features/Auth/Logic/transport_model.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 
 class TransportUIHelper {
-  static IconData icon(TransportType type) {
+  static IconData icon(TransportType? type) {
     switch (type) {
       case TransportType.bus:
         return Icons.directions_bus;
@@ -18,29 +18,33 @@ case TransportType.microbus:
         return Icons.directions_bus;
       case TransportType.transfer:
         return Icons.swap_horiz;
+      default:
+        return Icons.location_on;
     }
   }
 
-  static Color color(TransportType type) {
+  static Color color(TransportType? type) {
     switch (type) {
       case TransportType.bus:
-        return AppColor.darkGreen;
+        return AppColor.lightGreen;
 
       case TransportType.metro:
-        return AppColor.darkBlue;
+        return AppColor.lightBlue;
 
       case TransportType.monorail:
-        return AppColor.darkPurple;
+        return AppColor.lightPurple;
 
       case TransportType.microbus:
         return AppColor.orange;
 
       case TransportType.transfer:
         return AppColor.grey;
+      default:
+        return AppColor.grey;
     }
   }
 
-  static String label(TransportType type) {
+  static String label(TransportType? type) {
     switch (type) {
       case TransportType.bus:
         return "Bus";
@@ -55,6 +59,8 @@ case TransportType.microbus:
         return "Transfer";
       case TransportType.microbus:
         return "Microbus";  
+      default:
+        return "All";
     }
   }
 }

@@ -23,7 +23,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       image: fields[2] as String?,
       email: fields[3] as String?,
       name: fields[4] as String?,
-      favTrasnportation: (fields[5] as List?)?.cast<TransportType>(),
+      favTrasnportation: (fields[5] as List?)?.cast<TransportType?>(),
     );
   }
 

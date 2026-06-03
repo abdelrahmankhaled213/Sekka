@@ -1,9 +1,7 @@
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
-
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import '../../../../../Core/Constants/app_color.dart';
-import '../../Features/Auth/Logic/transport_model.dart';
-
 abstract class TransportColorsHelper {
 
   static Color background(bool isSelected) =>

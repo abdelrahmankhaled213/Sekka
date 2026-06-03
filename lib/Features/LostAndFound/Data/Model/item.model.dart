@@ -8,7 +8,7 @@ class ItemModel {
   final int? id;
   final String userId;
   final String? userName;
-  final String ?userImage;
+  final String? userImage;
   final String title;
   final String description;
   final ItemType type;
@@ -17,11 +17,14 @@ class ItemModel {
   final String createdAt;
   final bool isActive;
   final int? commentCount;
+  final String? imageUrl;
+  final List<String>? images;
+
   ItemModel({
     this.id,
     required this.userId,
-     this.userName,
-     this.userImage,
+    this.userName,
+    this.userImage,
     required this.title,
     required this.description,
     required this.type,
@@ -29,11 +32,13 @@ class ItemModel {
     required this.stationName,
     required this.createdAt,
     this.isActive = true,
-    this.commentCount
+    this.commentCount,
+    this.imageUrl,
+    this.images,
   });
 
 ItemModel copyWith({
- int? id,
+  int? id,
   String? userId,
   String? userName,
   String? userImage,
@@ -44,8 +49,10 @@ ItemModel copyWith({
   String? stationName,
   String? createdAt,
   bool? isActive,
-  int? commentCount 
-}){
+  int? commentCount,
+  String? imageUrl,
+  List<String>? images,
+}) {
   return ItemModel(
     id: id ?? this.id,
     userId: userId ?? this.userId,
@@ -58,8 +65,11 @@ ItemModel copyWith({
     stationName: stationName ?? this.stationName,
     createdAt: createdAt ?? this.createdAt,
     isActive: isActive ?? this.isActive,
-    commentCount: commentCount ?? this.commentCount
-  );}
+    commentCount: commentCount ?? this.commentCount,
+    imageUrl: imageUrl ?? this.imageUrl,
+    images: images ?? this.images,
+  );
+}
 
  factory ItemModel.fromJson(Map<String, dynamic> json) {
   final userData = json['users'] as Map<String, dynamic>?;
@@ -74,7 +84,7 @@ ItemModel copyWith({
 
   return ItemModel(
     id: json['id'],
-    userId: json['user_id'] ?? '', 
+    userId: json['user_id'] ?? '',
     userName: userData != null ? userData['name'] : 'Sekka Member',
     userImage: userData != null ? userData['image'] : null,
     title: json['title'] ?? 'No Title',
@@ -85,11 +95,13 @@ ItemModel copyWith({
       orElse: () => Category.other,
     ),
     stationName: json['station_name'] ?? '',
-    createdAt: json['created_at'] == null 
+    createdAt: json['created_at'] == null
         ? ''
         : DateTimeHelper.formatTimestamp(json['created_at']),
     isActive: json['is_active'] ?? true,
-    commentCount: count, 
+    commentCount: count,
+    imageUrl: json['image_url'],
+
   );
 }
 
@@ -105,6 +117,8 @@ ItemModel copyWith({
       'category': category.name,
       'station_name': stationName,
       'is_active': isActive,
+      'image_url': imageUrl,
+
     };
   }
 }

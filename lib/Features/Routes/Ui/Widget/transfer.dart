@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sekka/Core/Helper/segment_helper.dart';
 
 class TransferWidget extends StatelessWidget {
+  
   final SegmentModel segment;
 
   const TransferWidget({super.key, required this.segment});

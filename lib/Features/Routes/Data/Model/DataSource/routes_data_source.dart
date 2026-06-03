@@ -6,7 +6,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RoutesDataSource {
 
-
   
 final SupabaseClient supabaseClient;
 
@@ -32,14 +31,14 @@ Future<List<Transport>> fetchMetrosWithFilter(ParamsOfFetchRoutesWithSearch para
   return data.map((json) => Transport.fromJson(json)).toList();
 }
 
-Future<List<Transport>> fetchTransportsPath(ParamsRoutePath params) async {
+Future<List<dynamic>> fetchTransportsPath(ParamsRoutePath params) async {
 
   final response = await supabaseClient.
-  rpc('get_route_between_stops',params:params.toJson()).select();
+  rpc('get_route_segments',params:params.toJson()).select();
      
   final data = response as List<dynamic>;
 
-  return data.map((json) => Transport.fromJson(json)).toList();
+  return data;
 
 }
 

@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:sekka/Features/LostAndFound/Data/Model/message.dart';
 import 'package:sekka/Features/LostAndFound/Data/Repo/lost_and_found_repo.dart';
 import 'chat_state.dart';
 
@@ -149,16 +153,42 @@ Future<void> setCurrentChat(String? conversationId) async {
     }
   }
 
+Future<void> sendMessageWithAttachment(
+  String conversationId,
+  String message,
+  File file,
+  MessageType messageType,
+) async {
+  emit(state.copyWith(status: ChatStateEnum.sendMessageLoading));
+  
+  try {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final fileUrl = await lostAndFoundRepo.uploadChatFile(file, userId);
+    
+    await lostAndFoundRepo.sendMessage(
+      conversationId,
+      userId,
+      message,
+      messageType: messageType,
+      fileUrl: fileUrl,
+      fileName: file.path.split('/').last,
+      fileSize: file.length().toString(),
+    );
+    
+    emit(state.copyWith(status: ChatStateEnum.sendMessageSuccess));
+  } catch (e, stackTrace) {
+    _mapError(e, stackTrace, ChatStateEnum.sendMessageFailure);
+  }
+}
+
 
   void _mapError(
     Object e,
     StackTrace stackTrace,
     ChatStateEnum failureStatus,
   ) {
-
- print('Error: $e');
- print('StackTrace: $stackTrace');
-    
+    debugPrint('ChatCubit error: $e');
+    debugPrint('StackTrace: $stackTrace');
     emit(state.copyWith(
       status: failureStatus,
       errorMsg: _extractMessage(e),

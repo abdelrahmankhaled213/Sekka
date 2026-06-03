@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'package:sekka/Core/Database/local_data_source.dart';
 import 'package:sekka/Features/Auth/Data/DataSource/supabase_data_source.dart';
 import 'package:sekka/Features/Auth/Data/Model/signup_request.dart';
@@ -24,6 +24,7 @@ class AuthRepo {
 
 
   Future<void> signInWithEmail(SignInRequest request) async {
+
     final isVerified = firebaseDataSource.isAccountVerified();
 
     if (isVerified) {
@@ -33,42 +34,23 @@ class AuthRepo {
     }
   }
 
-  Future<void> loginWithGoogle() async {
-    final account = await firebaseDataSource.loginWithGoogle();
+Future<void> loginWithGoogle() async {
+  
+  
+  UserModel? existingUser;
+  
+  try {
+    existingUser = await supabaseDataSource.getUser();
+  } catch (_) {}
 
-    if (account == null) {
-      throw Exception("No Google account selected");
-    }
+  final userModel = (existingUser ?? UserModel()).copyWith(
+    id: FirebaseAuth.instance.currentUser!.uid,
+    email: FirebaseAuth.instance.currentUser?.email ?? existingUser?.email,
+  );
 
-    final googleAuth = account.authentication;
-
-    final credential = GoogleAuthProvider.credential(
-      idToken: googleAuth.idToken,
-    );
-
-    final userCredential =
-        await FirebaseAuth.instance.signInWithCredential(credential);
-
-    final firebaseUser = userCredential.user;
-
-    if (firebaseUser == null) {
-      throw Exception("Firebase user is null");
-    }
-
-    final cached = await localUserDataSource.getUser(firebaseUser.uid);
-
-
-
-
-    final userModel = (cached ?? UserModel()).copyWith(
-      id: firebaseUser.uid,
-      email: firebaseUser.email ?? cached?.email,
-    );
-
-    await supabaseDataSource.upsertUser(userModel);
-    await localUserDataSource.upsertUser(userModel);
-  }
-
+  await supabaseDataSource.upsertUser(userModel);
+  await localUserDataSource.upsertUser(userModel);
+}
 
   Future<void> signup(SignUpRequest request) async {
     await firebaseDataSource.signUp(request);
@@ -81,25 +63,32 @@ class AuthRepo {
 
   // ---------------- VERIFY ----------------
 
-  Future<bool> isVerified() async {
-    await firebaseDataSource.reloadUser();
 
-    final user = firebaseDataSource.user;
-    final isVerified = firebaseDataSource.isAccountVerified();
+Future<bool> isVerified({String? pendingName}) async {
+  await firebaseDataSource.reloadUser();
+  final user = firebaseDataSource.user;
+  final isVerified = firebaseDataSource.isAccountVerified();
 
-    if (user != null && isVerified) {
+  if (user != null && isVerified) {
+    UserModel? existingUser;
+    try {
+      existingUser = await supabaseDataSource.getUser();
+    } catch (_) {}
 
-      final userModel = UserModel(
-        id: user.uid,
-        email: user.email,
-      );
+    final userModel = UserModel(
+      id: user.uid,
+      email: user.email,
+      name: existingUser?.name ?? pendingName,
+      isGetStarted: existingUser?.isGetStarted ?? false,
+    );
 
-      await supabaseDataSource.upsertUser(userModel);
-      await localUserDataSource.upsertUser(userModel);
-    }
-
-    return isVerified;
+    await supabaseDataSource.upsertUser(userModel);
+    await localUserDataSource.upsertUser(userModel);
   }
+
+  return isVerified;
+}
+
 
   // ---------------- IMAGE ----------------
 
@@ -138,8 +127,8 @@ class AuthRepo {
 
     await localUserDataSource.upsertUser(updatedUser);
     }catch(e,stackTrace){
-      print(e);
-       print(stackTrace);
+      debugPrint('AuthRepo updateUser error: $e');
+      debugPrint('StackTrace: $stackTrace');
     }
   }
 

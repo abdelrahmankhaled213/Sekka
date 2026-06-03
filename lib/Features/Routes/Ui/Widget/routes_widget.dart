@@ -2,109 +2,197 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
+import 'package:sekka/Core/Cubit/trip_tracking_cubit.dart';
+import 'package:sekka/Core/DI/service_locator.dart';
 import 'package:sekka/Core/Helper/segment_helper.dart';
+import 'package:sekka/Core/Helper/transport_ui_helper.dart';
+import 'package:sekka/Features/Routes/Ui/Widget/track_trip_button.dart';
+import 'package:sekka/core/theme/app_radius.dart';
+import 'package:sekka/core/theme/app_spacing.dart';
+import 'package:sekka/core/theme/app_text_styles.dart';
 import 'package:sekka/Features/Routes/Logic/routes_cubit.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/segment_header.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/stop_item.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/transfer.dart';
-import 'package:sekka/Features/Auth/Logic/transport_model.dart';
 
 class RouteWidget extends StatelessWidget {
   final SegmentModel segment;
-
-  /// Pass [true] for the last segment — shows "Arrive at …" badge instead of transfer pill.
   final bool isLastSegment;
+  final List<SegmentModel> allSegments; 
 
   const RouteWidget({
     super.key,
     required this.segment,
+    required this.allSegments,
     this.isLastSegment = false,
   });
-
-  Color _accentColor(BuildContext context) {
-    return context
-            .read<RoutesCubit>()
-            .state
-            .selectedTransportSwitching
-            ?.color1 ??
-        _segmentAccent;
-  }
-
-  Color get _segmentAccent {
-    switch (segment.type) {
-      case TransportType.metro:
-        return AppColor.darkBlue;
-      case TransportType.bus:
-        return AppColor.darkGreen;
-      case TransportType.monorail:
-        return AppColor.darkPurple;
-      case TransportType.microbus:
-        return AppColor.orange;
-      default:
-        return AppColor.darkGreen;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final previewStops = segment.previewStops;
-    final accent = _accentColor(context);
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
+        color:        Colors.white,
+        borderRadius: AppRadius.allXL,
         border: Border.all(color: Colors.grey.withOpacity(0.12), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(8),
+            color:      Colors.black.withAlpha(8),
             blurRadius: 8,
-            offset: const Offset(0, 2),
+            offset:     const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header ─────────────────────────────────────────────────
+         
           SegmentHeader(segment: segment),
 
-          // ── Preview stops ──────────────────────────────────────────
-          Padding(
-            padding: EdgeInsets.fromLTRB(14.w, 6.h, 14.w, 4.h),
+           Padding(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.xl.w, AppSpacing.sm.h,
+              AppSpacing.xl.w, AppSpacing.xs.h,
+            ),
             child: ListView.builder(
-              itemCount: previewStops.length,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (_, i) => StopItem(
-                stop: previewStops[i],
+              itemCount:    previewStops.length,
+              shrinkWrap:   true,
+              physics:      const NeverScrollableScrollPhysics(),
+              itemBuilder:  (_, i) => StopItem(
+                stop:    previewStops[i],
                 isFirst: i == 0,
-                isLast: i == previewStops.length - 1 && !segment.hasMoreStops,
+                isLast:  i == previewStops.length - 1 && !segment.hasMoreStops,
               ),
             ),
           ),
+  if (segment.hasMoreStops)
+            _ViewAllStopsButton(
+                segment:     segment,
+                accentColor: AppColor.muted),
 
-          // ── View all stops ──────────────────────────────────────────
-          if (segment.hasMoreStops)
-            _ViewAllStopsButton(segment: segment, accentColor: accent),
+          if (!segment.isEnd && segment.transferAtStop != null)
+            TransferWidget(segment: segment),
 
-          // ── Footer: transfer pill OR arrived badge ─────────────────
-          if (!isLastSegment && segment.transferAtStop != null)
-            TransferWidget(segment: segment)
-          else
-            _TripStatusFooter(
-              isLastSegment: isLastSegment,
-              destinationName: segment.stops.last.stopName,
-              accentColor: accent,
+       
+          if (isLastSegment)
+            _DestinationFooter(
+              destinationName: segment.alightingStop,
+              accentColor:     AppColor.muted, isLastSegment: isLastSegment,
             ),
 
-          SizedBox(height: 6.h),
+       
+          if (isLastSegment) ...[
+            _TripSummaryBar(segments: allSegments),
+            BlocProvider(create: (context) => getIt<TripCubit>(), child: const TrackTripButton()),
+          ],
+
+          SizedBox(height: AppSpacing.sm.h),
+        ],
+      ),
+    );
+  }
+}
+class _SegmentsList extends StatelessWidget {
+  final List<SegmentModel> segments;
+  const _SegmentsList({required this.segments});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      shrinkWrap:       true,
+      physics:          const NeverScrollableScrollPhysics(),
+      itemCount:        segments.length,
+      separatorBuilder: (_, __) => SizedBox(height: 10.h),
+      itemBuilder: (_, i) => RouteWidget(
+        segment:       segments[i],
+        allSegments:   segments,           // ✅
+        isLastSegment: i == segments.length - 1,
+      ),
+    );
+  }
+}
+class _TripSummaryBar extends StatelessWidget {
+  final List<SegmentModel> segments;
+  const _TripSummaryBar({required this.segments});
+
+  @override
+  Widget build(BuildContext context) {
+    final totalPrice   = segments.fold(0.0, (s, e) => s + e.ticketPrice);
+    final totalMinutes = segments.fold(0,   (s, e) => s + e.durationMinutes);
+    final hours        = totalMinutes ~/ 60;
+    final mins         = totalMinutes % 60;
+    final timeLabel    = hours > 0 ? '${hours}h ${mins}min' : '${mins} min';
+
+    return Container(
+      margin:  EdgeInsets.fromLTRB(12.w, 4.h, 12.w, 4.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color:        const Color(0xFFF7F8FC),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.grey.withOpacity(0.15)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _SummaryItem(
+            icon:  Icons.confirmation_num_outlined,
+            label: 'Total Cost',
+            value: 'EGP ${totalPrice.toStringAsFixed(0)}',
+            color: AppColor.main,
+          ),
+          Container(width: 1, height: 30.h, color: Colors.grey.withOpacity(0.2)),
+          _SummaryItem(
+            icon:  Icons.schedule_rounded,
+            label: 'Est. Time',
+            value: timeLabel,
+            color: AppColor.main,
+          ),
         ],
       ),
     );
   }
 }
 
+class _SummaryItem extends StatelessWidget {
+  final IconData icon;
+  final String   label;
+  final String   value;
+  final Color    color;
+
+  const _SummaryItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 18.sp, color: color),
+        SizedBox(width: 8.w),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label,
+                style: TextStyle(
+                    fontSize: 10.sp,
+                    color: Colors.grey.shade500,
+                    fontFamily: 'Roboto')),
+            Text(value,
+                style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                    fontFamily: 'Roboto')),
+          ],
+        ),
+      ],
+    );
+  }
+}
 // ─────────────────────────────────────────────────────────────────────────────
 // View all stops button
 // ─────────────────────────────────────────────────────────────────────────────
@@ -121,27 +209,28 @@ class _ViewAllStopsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _openFullTrip(context),
+      onTap: () => _openFullSheet(context),
       child: Container(
-        margin: EdgeInsets.fromLTRB(14.w, 4.h, 14.w, 0),
-        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+        margin: EdgeInsets.fromLTRB(
+            AppSpacing.xl.w, AppSpacing.xs.h, AppSpacing.xl.w, 0),
+        padding: EdgeInsets.symmetric(
+            vertical: AppSpacing.sm.h, horizontal: AppSpacing.md.w),
         decoration: BoxDecoration(
           color: Colors.grey.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(8.r),
-          border: Border.all(color: Colors.grey.withOpacity(0.12), width: 0.5),
+          borderRadius: AppRadius.allMD,
+          border:
+              Border.all(color: Colors.grey.withOpacity(0.12), width: 0.5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.add_circle_outline_rounded, size: 14, color: accentColor),
-            SizedBox(width: 6.w),
+            Icon(Icons.add_circle_outline_rounded,
+                size: 14.sp, color: accentColor),
+            SizedBox(width: AppSpacing.sm.w),
             Text(
               'View all ${segment.stops.length} stops',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: accentColor,
-              ),
+              style: AppTextStyles.labelSmall(context)
+                  .copyWith(color: accentColor),
             ),
           ],
         ),
@@ -149,7 +238,7 @@ class _ViewAllStopsButton extends StatelessWidget {
     );
   }
 
-  void _openFullTrip(BuildContext context) {
+  void _openFullSheet(BuildContext context) {
     final cubit = context.read<RoutesCubit>();
     showModalBottomSheet(
       context: context,
@@ -164,15 +253,15 @@ class _ViewAllStopsButton extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Trip status footer — only shown on last segment
+// Destination footer — بيظهر بس على آخر segment
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _TripStatusFooter extends StatelessWidget {
+class _DestinationFooter extends StatelessWidget {
   final bool isLastSegment;
   final String destinationName;
   final Color accentColor;
 
-  const _TripStatusFooter({
+  const _DestinationFooter({
     required this.isLastSegment,
     required this.destinationName,
     required this.accentColor,
@@ -183,33 +272,34 @@ class _TripStatusFooter extends StatelessWidget {
     if (!isLastSegment) return const SizedBox.shrink();
 
     return Container(
-      margin: EdgeInsets.fromLTRB(10.w, 4.h, 10.w, 4.h),
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+      margin: EdgeInsets.fromLTRB(
+          AppSpacing.md.w, AppSpacing.xs.h, AppSpacing.md.w, AppSpacing.xs.h),
+      padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.xl.w, vertical: AppSpacing.md.h),
       decoration: BoxDecoration(
         color: accentColor.withOpacity(0.07),
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: AppRadius.allLG,
         border: Border.all(color: accentColor.withOpacity(0.2), width: 1),
       ),
       child: Row(
         children: [
           Container(
             width: 28.w,
-            height: 28.h,
+            height: 28.w,
             decoration: BoxDecoration(
               color: accentColor,
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.flag_rounded, size: 14.sp, color: Colors.white),
           ),
-          SizedBox(width: 10.w),
+          SizedBox(width: AppSpacing.md.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'You have arrived',
-                  style: TextStyle(
-                    fontSize: 12,
+                  'Destination',
+                  style: AppTextStyles.labelSmall(context).copyWith(
                     fontWeight: FontWeight.w700,
                     color: accentColor,
                   ),
@@ -217,15 +307,15 @@ class _TripStatusFooter extends StatelessWidget {
                 SizedBox(height: 1.h),
                 Text(
                   destinationName,
-                  style: TextStyle(
-                    fontSize: 11,
+                  style: AppTextStyles.caption(context).copyWith(
                     color: accentColor.withOpacity(0.75),
                   ),
                 ),
               ],
             ),
           ),
-          Icon(Icons.check_circle_rounded, color: accentColor, size: 18.sp),
+          Icon(Icons.check_circle_rounded,
+              color: accentColor, size: 18.sp),
         ],
       ),
     );
@@ -241,48 +331,6 @@ class FullTripSheet extends StatelessWidget {
 
   const FullTripSheet({super.key, required this.segment});
 
-  Color get _accentColor {
-    switch (segment.type) {
-      case TransportType.metro:
-        return AppColor.darkBlue;
-      case TransportType.bus:
-        return AppColor.darkGreen;
-      case TransportType.microbus:
-        return AppColor.orange;
-      case TransportType.monorail:
-        return AppColor.darkPurple;
-      default:
-        return AppColor.darkGreen;
-    }
-  }
-
-  Color get _bgColor {
-    switch (segment.type) {
-      case TransportType.metro:
-      case TransportType.microbus:
-      case TransportType.monorail:
-        return const Color(0xFFE8F0FB);
-      case TransportType.bus:
-        return const Color(0xFFE8F5EE);
-      default:
-        return const Color(0xFFE8F5EE);
-    }
-  }
-
-  IconData get _icon {
-    switch (segment.type) {
-      case TransportType.metro:
-        return Icons.directions_subway_rounded;
-      case TransportType.monorail:
-        return Icons.directions_railway_rounded;
-      case TransportType.microbus:
-        return Icons.airport_shuttle_rounded;
-      case TransportType.bus:
-      default:
-        return Icons.directions_bus_rounded;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
@@ -293,70 +341,79 @@ class FullTripSheet extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(22.r)),
+            borderRadius: BorderRadius.vertical(
+                top: Radius.circular(AppSpacing.xxxl.r)),
           ),
           child: Column(
             children: [
-              // Handle
+              // handle
               Container(
                 width: 36.w,
                 height: 4.h,
-                margin: EdgeInsets.only(top: 12.h, bottom: 14.h),
+                margin: EdgeInsets.only(
+                    top: AppSpacing.md.h, bottom: AppSpacing.xl.h),
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: AppRadius.allLG,
                 ),
               ),
 
-              // Header
+              // header
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                padding: AppSpacing.horizontalLG,
                 child: Row(
                   children: [
                     Container(
                       padding: EdgeInsets.symmetric(
-                          horizontal: 10.w, vertical: 5.h),
+                          horizontal: AppSpacing.md.w,
+                          vertical: AppSpacing.xs.h),
                       decoration: BoxDecoration(
-                        color: _bgColor,
-                        borderRadius: BorderRadius.circular(8.r),
+                        color: AppColor.muted.withOpacity(0.1),
+                        borderRadius: AppRadius.allMD,
                       ),
                       child: Row(
                         children: [
-                          Icon(_icon, color: _accentColor, size: 14),
-                          SizedBox(width: 5.w),
+                          Icon(TransportUIHelper.icon(segment.type),
+                              color: AppColor.muted, size: 14.sp),
+                          SizedBox(width: AppSpacing.sm.w),
                           Text(
                             segment.lineName ?? '',
-                            style: TextStyle(
-                              fontSize: 13,
+                            style: AppTextStyles.labelSmall(context).copyWith(
                               fontWeight: FontWeight.w600,
-                              color: _accentColor,
+                              color: AppColor.muted,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: AppSpacing.sm.w),
                     Text(
                       '${segment.stops.length} stops',
-                      style: const TextStyle(
-                          fontSize: 13, color: Color(0xFF888888)),
+                      style: AppTextStyles.labelSmall(context)
+                          .copyWith(color: const Color(0xFF888888)),
                     ),
                   ],
                 ),
               ),
 
-              SizedBox(height: 14.h),
+              SizedBox(height: AppSpacing.xl.h),
               Divider(color: Colors.grey.withOpacity(0.1), height: 1),
 
+              // all stops
               Expanded(
                 child: ListView.builder(
                   controller: controller,
-                  padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 24.h),
+                  padding: EdgeInsets.fromLTRB(
+                      AppSpacing.lg.w,
+                      AppSpacing.sm.h,
+                      AppSpacing.lg.w,
+                      AppSpacing.xxl.h),
                   itemCount: segment.stops.length,
                   itemBuilder: (_, i) => StopItem(
-                    stop: segment.stops[i],
-                    isFirst: i == 0,
-                    isLast: i == segment.stops.length - 1,
+                    stop:        segment.stops[i],
+                    isFirst:     i == 0,
+                    isLast:      i == segment.stops.length - 1,
+                    
                   ),
                 ),
               ),

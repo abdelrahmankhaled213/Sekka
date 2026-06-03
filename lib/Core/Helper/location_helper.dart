@@ -1,51 +1,42 @@
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class LocationHelper {
+  
   static Future<Position?> determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+    
+    if (!await Geolocator.isLocationServiceEnabled()) return null;
 
     
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-       return null;
-    }
+    LocationPermission permission = await Geolocator.checkPermission();
 
-    permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return null;
-      }
+      if (permission == LocationPermission.denied) return null;
     }
 
     if (permission == LocationPermission.deniedForever) {
+      await Geolocator.openAppSettings();
       return null;
     }
 
-     return await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
+    return Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ),
     );
   }
 
-  static Future<bool> requestLocationPermission() async {
-    var status = await Permission.location.status;
-    if (status.isGranted) {
-      return true;
-    }
+  
+  static Future<bool> get hasPermission async {
+    final permission = await Geolocator.checkPermission();
+    return permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse;
+  }
 
-    if (status.isDenied) {
-      var result = await Permission.location.request();
-      return result.isGranted;
-    }
-
-    if (status.isPermanentlyDenied) {
-      // You might want to open app settings here
-      await openAppSettings();
-      return false;
-    }
-
-    return false;
+   static double distanceBetween(Position from, Position to) {
+    return Geolocator.distanceBetween(
+      from.latitude, from.longitude,
+      to.latitude, to.longitude,
+    );
   }
 }

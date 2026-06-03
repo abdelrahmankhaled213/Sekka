@@ -3,7 +3,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_route.dart';
-import 'package:sekka/Core/Widget/empty_state_widget.dart';
+import 'package:sekka/core/theme/app_spacing.dart';
+import 'package:sekka/core/widgets/app_empty_state.dart';
+import 'package:sekka/core/widgets/app_loading.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/item.model.dart';
 import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
 import 'package:sekka/Features/LostAndFound/Logic/lost_found_state.dart';
@@ -12,7 +14,6 @@ import 'package:sekka/Features/LostAndFound/Ui/Widgets/home_header_widget.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/home_search_filter_widget.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/home_stats.dart';
 import 'package:sekka/Features/LostAndFound/Ui/Widgets/post_card_widget.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 class HomeFeedScreen extends StatefulWidget {
   const HomeFeedScreen({super.key});
@@ -137,52 +138,46 @@ class _HomeFeedScreenState extends State<HomeFeedScreen>
                 ),
 
                 
-                if (isInitialLoading)
-                  Skeletonizer.sliver(
-                    enabled: true,
-                    child: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) => _buildPostCard(_dummyItem(), index, isSkeleton: true),
-                        childCount: 5,
-                      ),
-                    ),
+  if (isInitialLoading)
+                  const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: AppLoading(variant: AppLoadingVariant.circular),
                   )
                 
                 
-                else if (state.status == LostFoundStatus.getPostFailure && allItems.isEmpty)
+  else if (state.status == LostFoundStatus.getPostFailure && allItems.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
-                    child: EmptyStateWidget(
-                      icon: Icons.error_outline,
+                    child: AppErrorState(
                       title: 'Failure to load posts',
                       description: 'Please try again later',
-                      ctaLabel: 'Try again',
-                      onCta: () => context.read<LostAndFoundCubit>().getPosts(),
+                      actionLabel: 'Try again',
+                      onActionPressed: () => context.read<LostAndFoundCubit>().getPosts(),
                     ),
                   )
 
-                 else if (filteredItems.isEmpty)
+  else if (filteredItems.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
-                    child: EmptyStateWidget(
+                    child: AppEmptyState(
                       icon: Icons.search_off_rounded,
                       title: 'There are no posts',
                       description: 'There are no posts matching your search criteria',
-                      ctaLabel: 'Create a post',
-                      onCta: () => _openCreatePostModal(context),
+                      actionLabel: 'Create a post',
+                      onActionPressed: () => _openCreatePostModal(context),
                     ),
                   )
 
               
                 else
-                  isTablet
+  isTablet
                       ? SliverPadding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                          padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 100),
                           sliver: SliverGrid(
                             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
+                              crossAxisSpacing: AppSpacing.md,
+                              mainAxisSpacing: AppSpacing.md,
                               childAspectRatio: 1.1,
                             ),
                             delegate: SliverChildBuilderDelegate(
@@ -191,8 +186,8 @@ class _HomeFeedScreenState extends State<HomeFeedScreen>
                             ),
                           ),
                         )
-                      : SliverPadding(
-                          padding:  EdgeInsets.only(bottom: 100.h),
+  : SliverPadding(
+                          padding: EdgeInsets.only(bottom: 100.h),
                           sliver: SliverList(
                             delegate: SliverChildBuilderDelegate(
                               (context, index) => _buildPostCard(filteredItems[index], index),
@@ -208,25 +203,11 @@ class _HomeFeedScreenState extends State<HomeFeedScreen>
     );
   }
 
-  ItemModel _dummyItem() {
-    return ItemModel(
-      id: -1, 
-      title: 'Loading Title Header',
-      description: 'This is a long loading description for skeletonizer',
-      type: ItemType.lost,
-      createdAt: DateTime.now().toIso8601String(),
-      category: Category.phone,
-      stationName: 'Loading Station',
-      userId: '0',
-    );
-  }
-
-  Widget _buildPostCard(ItemModel post, int index, {bool isSkeleton = false}) {
+  Widget _buildPostCard(ItemModel post, int index) {
     return TweenAnimationBuilder<double>(
-      
-      key: ValueKey(post.id == -1 ? "skeleton_$index" : post.id),
+      key: ValueKey(post.id),
       tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: isSkeleton ? 200 : 350 + (index * 40).clamp(0, 200)),
+      duration: Duration(milliseconds: 350 + (index * 40).clamp(0, 200)),
       curve: Curves.easeOutCubic,
       builder: (context, value, child) {
         return Opacity(
@@ -239,17 +220,15 @@ class _HomeFeedScreenState extends State<HomeFeedScreen>
       },
       child: PostCardWidget(
         postData: post,
-        onTap: isSkeleton
-            ? null
-            : () => Navigator.pushNamed(
-                  context,
-                  AppRoute.itemDetailAndChatScreen,
-                  arguments: {
-                    'item': post,
-                    'cubit':BlocProvider.of<LostAndFoundCubit>(context),
-                    'id':null
-                  },
-                ),
+        onTap: () => Navigator.pushNamed(
+              context,
+              AppRoute.itemDetailAndChatScreen,
+              arguments: {
+                'item': post,
+                'cubit': BlocProvider.of<LostAndFoundCubit>(context),
+                'id': null
+              },
+            ),
       ),
     );
   }

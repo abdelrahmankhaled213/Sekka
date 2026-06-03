@@ -1,10 +1,10 @@
-import 'package:sekka/Features/Auth/Logic/transport_model.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 
 class UpdateUserRequest {
   final String? name;
   final String? image;
   final bool clearImage;
-  final List<TransportType>? favTrasnportation;
+  final List<TransportType?>? favTrasnportation;
   final bool? isGetStarted;
   final String? phone;
   const UpdateUserRequest({
@@ -30,7 +30,7 @@ class UpdateUserRequest {
     }
     if (favTrasnportation != null) {
       map['Favourite_Transport'] =
-          favTrasnportation!.map((e) => e.name).toList();
+          favTrasnportation!.map((e) => e?.name).toList();
     }
     if (isGetStarted != null) map['flag'] = (isGetStarted??false)?1:0;
 

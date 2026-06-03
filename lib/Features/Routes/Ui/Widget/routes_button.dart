@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
 class RoutesButton extends StatelessWidget {
   
@@ -21,7 +22,7 @@ class RoutesButton extends StatelessWidget {
       width: 290.w,
       height: 56.h,
       decoration: BoxDecoration(
-        gradient: gradient,
+        color: AppColor.main,
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: ElevatedButton.icon(

@@ -41,6 +41,7 @@ class _SignupFormState extends State<SignupForm>
    late final TextEditingController phoneController;
    late final TextEditingController  passwordController;
    late final TextEditingController  confirmPasswordController;
+   late final TextEditingController nameController;
    late final AnimationController animationController;
    late final Animation<Offset>slideAnimationName;
    late final Animation<Offset>slideAnimationEmailOrPhone;
@@ -65,10 +66,15 @@ class _SignupFormState extends State<SignupForm>
     emailController = TextEditingController(
       text: cubit.signUpEmail ?? '',
     );
+  
+    nameController = TextEditingController(
+      text: cubit.signUpName ?? '',
+    );
 
     passwordController = TextEditingController(
       text: cubit.signUpPassword ?? '',
     );
+
 
     confirmPasswordController = TextEditingController(
       text: cubit.signUpConfirmPassword?? '',
@@ -91,9 +97,9 @@ class _SignupFormState extends State<SignupForm>
 
     final languageCode = Localizations.localeOf(context).languageCode;
 
-    choosePhoneOrEmail = AnimationHelper.buildLocalizedSlideAnimation(
-      start: 0.0,
-      end: 0.2,
+slideAnimationName = AnimationHelper.buildLocalizedSlideAnimation(
+      start: 0.1,
+      end: 0.3,
       animationController: animationController,
       languageCode: languageCode,
     );
@@ -178,7 +184,19 @@ class _SignupFormState extends State<SignupForm>
           Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
+                SlideTransition(
+                  position: slideAnimationName,
+                  child: InputField(
+                    onChanged: (value) {
+                      context.read<AuthCubit>().signUpName=value;
+                    },
+                    validator: ValidatorHelper.name,
+                    titleName: 'Name',
+                    hint: AppText.enterYourName,
+                    controller: nameController,
+                    prefixIcon: Icon(Icons.person,size: 20.sp,color: AppColor.grey,),
+                  ),
+                ),
                 SlideTransition(
                     position: slideAnimationEmailOrPhone,
                     child: InputField(
@@ -431,8 +449,11 @@ if(passwordController.text!=confirmPasswordController.text){
   return;
 }
 
-      final request=SignUpRequest(email:emailController.text
-          , password: passwordController.text);
+      final request=SignUpRequest(
+        email:emailController.text
+          , password: passwordController.text,
+          name: nameController.text
+          );
 
       await BlocProvider.of<AuthCubit>(context).signup(request);
 
