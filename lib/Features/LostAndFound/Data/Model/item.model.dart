@@ -19,6 +19,7 @@ class ItemModel {
   final int? commentCount;
   final String? imageUrl;
   final List<String>? images;
+  final bool isSaved;
 
   ItemModel({
     this.id,
@@ -35,6 +36,7 @@ class ItemModel {
     this.commentCount,
     this.imageUrl,
     this.images,
+    this.isSaved = false,
   });
 
 ItemModel copyWith({
@@ -52,6 +54,7 @@ ItemModel copyWith({
   int? commentCount,
   String? imageUrl,
   List<String>? images,
+  bool? isSaved,
 }) {
   return ItemModel(
     id: id ?? this.id,
@@ -68,6 +71,7 @@ ItemModel copyWith({
     commentCount: commentCount ?? this.commentCount,
     imageUrl: imageUrl ?? this.imageUrl,
     images: images ?? this.images,
+    isSaved: isSaved ?? this.isSaved,
   );
 }
 
@@ -101,6 +105,7 @@ ItemModel copyWith({
     isActive: json['is_active'] ?? true,
     commentCount: count,
     imageUrl: json['image_url'],
+    isSaved: json['is_saved'] ?? false,
 
   );
 }
@@ -118,6 +123,7 @@ ItemModel copyWith({
       'station_name': stationName,
       'is_active': isActive,
       'image_url': imageUrl,
+      'is_saved': isSaved,
 
     };
   }

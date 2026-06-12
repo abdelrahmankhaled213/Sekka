@@ -53,7 +53,7 @@ class AuthCubit extends Cubit<AuthState> {
   email: email,
   backToLogin: isBackToLogin
 ));
-
+  
   
 
   void navigateToSignUp()=> emit(AuthSignupState());
@@ -74,12 +74,21 @@ Future<void> loginWithGoogle() async {
 }
 
 Future<void> login(SignInRequest request) async {
-  await _execute(
-    action: () => loginUseCase(request),
-    loading: LoginLoading(),
-    success: LoginSuccess(),
-    failure: (msg) => LoginFailure(msg),
-  );
+  if (isClosed) return;
+  emit(LoginLoading());
+  try {
+    await loginUseCase(request);
+    if (!isClosed) emit(LoginSuccess());
+  } catch (e, s) {
+    if (e is Exception && e.toString().contains('email-not-verified')) {
+      emit(AuthVerificationState(
+        email: request.email!,
+        backToLogin: true,
+      ));
+    } else {
+      _handleError(e, s, (msg) => LoginFailure(msg));
+    }
+  }
 }
 
  Future<void> signup(SignUpRequest request) async {

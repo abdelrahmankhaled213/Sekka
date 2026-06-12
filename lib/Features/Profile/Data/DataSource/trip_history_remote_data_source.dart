@@ -1,23 +1,35 @@
-import 'package:sekka/Core/API/dio_consumer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sekka/Features/Profile/Data/Model/trip_history_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TripHistoryRemoteDataSource {
-  final DioConsumer api;
+  
+  final SupabaseClient supabaseClient;
 
-  TripHistoryRemoteDataSource({required this.api});
+  const TripHistoryRemoteDataSource(this.supabaseClient);
 
-  Future<void> createTrip(TripHistoryModel trip) async {
-    await api.post('/trips', data: trip.toJson());
-  }
+  Future<List<TripHistoryModel>> getTrips() async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final data = await supabaseClient
+        .from('trips_history')
+        .select()
+        .eq('user_id', userId)
+        .order('date_time', ascending: false);
 
-  Future<List<TripHistoryModel>> getTrips(String userId) async {
-    final response = await api.get('/trips?user_id=$userId');
-    return (response as List)
-        .map((json) => TripHistoryModel.fromJson(json))
+    return (data as List)
+        .map((json) => TripHistoryModel.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 
+  Future<void> createTrip(TripHistoryModel trip) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    await supabaseClient.from('trips').insert({
+      ...trip.toJson(),
+      'user_id': userId,
+    });
+  }
+
   Future<void> deleteTrip(String tripId) async {
-    await api.delete('/trips/$tripId');
+    await supabaseClient.from('trips').delete().eq('id', tripId);
   }
 }

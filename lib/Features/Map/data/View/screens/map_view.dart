@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:sekka/Core/Helper/segment_helper.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/core/theme/app_colors.dart';
 import 'package:sekka/core/theme/app_radius.dart';
 import 'package:sekka/core/theme/app_spacing.dart';
@@ -25,13 +27,27 @@ class MapView extends StatefulWidget {
 }
 
 class _MapViewState extends State<MapView> {
- 
+
   static const _defaultCamera = CameraPosition(
     target: LatLng(30.0444, 31.2357), // Cairo
     zoom:   12,
   );
 
-  
+  @override
+  void initState() {
+    super.initState();
+    // Check if route data was passed from navigation
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      if (args != null && args['segments'] != null) {
+        final segments = args['segments'] as List<SegmentModel>;
+        context.read<MapCubit>().loadRoute(segments);
+      } else {
+        // Initialize location if no route data
+        context.read<MapCubit>().initLocation();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +68,7 @@ class _MapViewState extends State<MapView> {
               GoogleMap(
                 initialCameraPosition: _defaultCamera,
                 markers:               state.markers,
+                polylines:             state.polylines,
                 myLocationEnabled:     true,
                 myLocationButtonEnabled: false,
                 zoomControlsEnabled:   false,
@@ -99,7 +116,14 @@ class _MapViewState extends State<MapView> {
   Positioned(
                 right: AppSpacing.lg.w,
                 bottom: _bottomCardsHeight(state) + AppSpacing.lg.h,
-                child: _LocationFab(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _ZoomControls(),
+                    SizedBox(height: AppSpacing.md.h),
+                    _LocationFab(),
+                  ],
+                ),
               ),
 
 
@@ -110,6 +134,14 @@ class _MapViewState extends State<MapView> {
 
               if (state.status == MapStatus.stationsError)
                 _ErrorOverlay(message: state.errorMsg ?? 'Something went wrong'),
+
+              // Route loading skeleton
+              if (state.status == MapStatus.routeLoading)
+                _RouteLoadingSkeleton(),
+
+              // Route legend
+              if (state.status == MapStatus.routeLoaded)
+                _RouteLegend(segments: state.routeSegments ?? []),
             ],
           );
         },
@@ -437,6 +469,223 @@ class _ErrorOverlay extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RouteLegend extends StatelessWidget {
+  final List<SegmentModel> segments;
+
+  const _RouteLegend({required this.segments});
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: AppSpacing.xl.h,
+      left: AppSpacing.lg.w,
+      right: AppSpacing.lg.w,
+      child: Container(
+        padding: EdgeInsets.all(AppSpacing.md.w),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.95),
+          borderRadius: AppRadius.allLG,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 12.w,
+                  height: 12.w,
+                  decoration: const BoxDecoration(
+                    color: Colors.green,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                SizedBox(width: AppSpacing.sm.w),
+                Text(
+                  'Start',
+                  style: AppTextStyles.labelSmall(context),
+                ),
+                SizedBox(width: AppSpacing.lg.w),
+                Container(
+                  width: 12.w,
+                  height: 12.w,
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                SizedBox(width: AppSpacing.sm.w),
+                Text(
+                  'End',
+                  style: AppTextStyles.labelSmall(context),
+                ),
+                SizedBox(width: AppSpacing.lg.w),
+                Container(
+                  width: 12.w,
+                  height: 12.w,
+                  decoration: const BoxDecoration(
+                    color: Colors.orange,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                SizedBox(width: AppSpacing.sm.w),
+                Text(
+                  'Transfer',
+                  style: AppTextStyles.labelSmall(context),
+                ),
+              ],
+            ),
+            if (segments.length > 1) ...[
+              SizedBox(height: AppSpacing.sm.h),
+              Wrap(
+                spacing: AppSpacing.md.w,
+                children: segments.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final segment = entry.value;
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 12.w,
+                        height: 12.w,
+                        decoration: BoxDecoration(
+                          color: _getSegmentColor(segment.type, index),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        'Segment ${index + 1}',
+                        style: AppTextStyles.caption(context),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _getSegmentColor(TransportType type, int index) {
+    final colors = [
+      AppColors.lightBlue,
+      AppColors.lightPurple,
+      AppColors.lightGreen,
+      AppColors.orange,
+    ];
+    return colors[index % colors.length];
+  }
+}
+
+class _RouteLoadingSkeleton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black.withOpacity(0.3),
+        child: Center(
+          child: Container(
+            padding: EdgeInsets.all(AppSpacing.xxl.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: AppRadius.allXXL,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                ),
+                SizedBox(height: AppSpacing.lg.h),
+                Text(
+                  'Loading route...',
+                  style: AppTextStyles.labelSmall(context),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ZoomControls extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: AppRadius.allLG,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _ZoomButton(
+            icon: Icons.add,
+            onTap: () => context.read<MapCubit>().zoomIn(),
+          ),
+          Container(
+            height: 1,
+            width: 32.w,
+            color: Colors.grey.withOpacity(0.2),
+          ),
+          _ZoomButton(
+            icon: Icons.remove,
+            onTap: () => context.read<MapCubit>().zoomOut(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ZoomButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _ZoomButton({
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 40.w,
+        height: 40.h,
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+        ),
+        child: Icon(
+          icon,
+          color: AppColors.textPrimary,
+          size: 20.sp,
         ),
       ),
     );

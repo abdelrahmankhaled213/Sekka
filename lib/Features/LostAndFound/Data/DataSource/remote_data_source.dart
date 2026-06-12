@@ -1,7 +1,5 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:sekka/Core/API/api_constants.dart';
 import 'package:sekka/Core/API/api_service.dart';
 import 'package:sekka/Features/LostAndFound/Data/Model/add_comment_request.dart';
@@ -67,7 +65,7 @@ Future<List<CommentModel>>getComments(int postId)async{
 Future<CommentModel> postComment(AddCommentRequest request)async{
 
 final response =await api.post(endPointCreateComment,data: request.toJson());
-
+print("Comment posted: $response");
 return CommentModel.fromJson(response);
   
 }
@@ -258,6 +256,26 @@ Future<void> markMessageAsRead(String conversationId) async {
     final fileUrl = _supabase.storage.from('post_images').getPublicUrl(filePath);
     return fileUrl;
   }
+
+Future<void> toggleSavePost(String postId) async {
+  // أول بنجيب الـ current state عشان نعكسه
+  final response = await api.get('posts/$postId');
+  final currentlySaved = response['data']['is_saved'] as bool? ?? false;
+ 
+  await api.put(
+    'toggle-post/$postId',
+    data: {'is_saved': !currentlySaved},
+  );
+}
+ 
+
+Future<List<ItemModel>> getSavedPosts() async {
+  final userId = FirebaseAuth.instance.currentUser!.uid;
+  final response = await api.get('get-saved-posts/$userId');
+  return (response['data'] as List<dynamic>)
+      .map((e) => ItemModel.fromJson(e as Map<String, dynamic>))
+      .toList();
+}
 
 }
 

@@ -6,6 +6,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Cubit/pick_image_cubit.dart';
 import 'package:sekka/Core/DI/service_locator.dart';
+import 'package:sekka/Features/NearestStation/Logic/nearest_station_cubit.dart';
+import 'package:sekka/Features/NearestStation/Ui/Widget/View/nearest_station_view.dart';
+import 'package:sekka/Features/Profile/Logic/profile_cubit.dart';
+import 'package:sekka/Features/Profile/Logic/trip_history_cubit.dart';
+import 'package:sekka/Features/Profile/UI/profile_screen.dart';
 import 'package:sekka/Features/WhereToGo/Logic/where_to_go_cubit.dart';
 import 'package:sekka/Features/WhereToGo/Ui/Widgets/Screens/where_to_go.dart';
 import 'package:sekka/core/theme/app_colors.dart';
@@ -13,15 +18,8 @@ import 'package:sekka/core/theme/app_radius.dart';
 import 'package:sekka/core/theme/app_spacing.dart';
 import 'package:sekka/core/theme/app_text_styles.dart';
 import 'package:sekka/Features/ChatBot/Ui/View/chat_bot_view.dart';
-import 'package:sekka/Features/LostAndFound/Logic/chat_cubit.dart';
 import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
-import 'package:sekka/Features/LostAndFound/View/conversation_screen.dart';
 import 'package:sekka/Features/LostAndFound/View/home_feed_screen_view.dart';
-import 'package:sekka/Features/Map/data/view/screens/map_view.dart';
-import 'package:sekka/Features/NearestStation/Logic/nearest_station_cubit.dart';
-import 'package:sekka/Features/NearestStation/Ui/Widget/View/nearest_station_view.dart';
-import 'package:sekka/Features/Profile/Logic/profile_cubit.dart';
-import 'package:sekka/Features/Profile/UI/profile_screen_view.dart';
 import 'package:sekka/Features/Routes/Logic/routes_cubit.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/View/routes_screen_view.dart';
 
@@ -65,8 +63,8 @@ class _MainBottomNavViewState extends State<MainBottomNavView> {
 @override
 initState() {
 super.initState();
- FirebaseMessaging.instance.subscribeToTopic("comments");
-  FirebaseMessaging.instance.subscribeToTopic("posts");  
+FirebaseMessaging.instance.subscribeToTopic("comments");
+FirebaseMessaging.instance.subscribeToTopic("posts");  
 
 }
 
@@ -77,41 +75,41 @@ super.initState();
   static const List<_NavItem> _items = [
     _NavItem(label: 'Home',         icon: Icons.home_outlined,    activeIcon: Icons.home_rounded),
     _NavItem(label: 'Routes',       icon: Icons.route_outlined,   activeIcon: Icons.route_rounded),
-    _NavItem(label: 'Map',          icon: Icons.map_outlined,     activeIcon: Icons.map_rounded),
-    _NavItem(label: 'Lost & Found', icon: Icons.restore_outlined, activeIcon: Icons.restore_rounded, isCenter: true),
-    _NavItem(label: 'Messages',     icon: Icons.message_outlined, activeIcon: Icons.message_rounded),
+    _NavItem(label: 'Map',          icon: Icons.map_outlined,     activeIcon: Icons.map_rounded, isCenter: true),
+    _NavItem(label: 'Lost & Found', icon: Icons.restore_outlined, activeIcon: Icons.restore_rounded),
     _NavItem(label: 'Profile',      icon: Icons.person_outline,   activeIcon: Icons.person_rounded),
   ];
 late final List<Widget> _tabs = [
-  // 0 - Home
+ 
   BlocProvider(
     create: (_) => getIt<WhereToGoCubit>(),
     child: const WhereToGoScreen (),
   ),
-  // 1 - Routes
+ 
   BlocProvider(
     create: (_) => getIt<RoutesCubit>()..fetchTransports(),
     child: const RoutesScreenView(),
   ),
   
-   const MapView(),
-   
+  BlocProvider(
+    create: (_) => getIt<NearestStationCubit>(),
+    child: const NearestStationView(),
+  ),
+  
 BlocProvider(
     create: (_) => getIt<LostAndFoundCubit>()..getPosts(),
     child: const HomeFeedScreen(),
   ),
-  BlocProvider(
-    create: (_) => getIt<ChatCubit>()..getConversations(),
-    child: const ConversationsScreen(),
-  ),
-  
-  
+ 
+
+
   MultiBlocProvider(
     providers: [
       BlocProvider(create: (_) => getIt<ProfileCubit>()..getProfile()),
       BlocProvider(create: (_) => getIt<PickImageCubit>()),
+      BlocProvider(create: (_) => getIt<TripHistoryCubit>()),
     ],
-    child: const ProfileScreenView(),
+    child: const ProfileScreen(),
   ),
 ];
 
@@ -204,7 +202,7 @@ class _NavBar extends StatelessWidget {
                 child: _NavItemWidget(
                   item: item,
                   isSelected: currentIndex == i,
-                  showBadge: i == 3,
+                  showBadge: i == 2,
                   onTap: () => onTap(i),
                 ),
               );
@@ -288,8 +286,8 @@ class _CenterItemState extends State<_CenterItem>
                 ),
                 child: Icon(
                   widget.isSelected
-                      ? Icons.restore_rounded
-                      : Icons.restore_outlined,
+                      ? Icons.map_rounded
+                      : Icons.map_outlined,
                   color: Colors.white,
                   size: 24.sp,
                 ),
@@ -302,9 +300,11 @@ class _CenterItemState extends State<_CenterItem>
                   color: widget.isSelected ? AppColors.primary : AppColors.grey,
                 ),
                 child: const Text(
-                  'Lost & Found',
+                  'Map',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  softWrap: false,
                 ),
               ),
             ],

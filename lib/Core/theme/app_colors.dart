@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../Constants/app_color.dart';
+
 /// App color palette with light and dark mode support
 class AppColors {
   AppColors._();
@@ -18,9 +20,9 @@ class AppColors {
   
   /// Brand gradient
   static const LinearGradient brandGradient = LinearGradient(
-    colors: [primary, secondary, pink],
+        colors: [AppColor.main, Color(0xFF8B5CF6)],
     begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
+    end:   Alignment.bottomRight,
   );
 
   // ==================== Semantic Colors ====================

@@ -10,48 +10,44 @@ import 'package:sekka/Core/Helper/toast_helper.dart';
 import 'package:sekka/Features/Auth/Data/Model/signup_request.dart';
 import '../Model/signInRequest.dart';
 
-class FirebaseDatasource  {
-
+class FirebaseDatasource {
   final FirebaseAuth firebaseAuth;
   final GoogleSignIn googleSignIn;
   late String verificationId;
   int? resendToken;
 
-  FirebaseDatasource(this.firebaseAuth,this.googleSignIn);
+  FirebaseDatasource(this.firebaseAuth, this.googleSignIn);
 
-
-Future<void>getCurrentUser()async{
-
-  await firebaseAuth.currentUser?.reload();
-  
+  // ✅ Removed duplicate getCurrentUser() — reloadUser() covers this
+  Future<void> reloadUser() async {
+    await firebaseAuth.currentUser?.reload();
   }
 
-
-  Future<void> signUp(SignUpRequest request) async {
-
-     await firebaseAuth.createUserWithEmailAndPassword(
+  // ✅ Now returns UserCredential so cubit can extract uid immediately
+  Future<UserCredential> signUp(SignUpRequest request) async {
+    return await firebaseAuth.createUserWithEmailAndPassword(
       email: request.email,
       password: request.password,
-     );
+    );
   }
 
-  Future<void>sendEmailVerification()async{
-    final user=firebaseAuth.currentUser;
-    if(user!=null) {
-     await firebaseAuth.currentUser?.sendEmailVerification();
+  Future<void> sendEmailVerification() async {
+    final user = firebaseAuth.currentUser;
+    if (user != null) {
+      await user.sendEmailVerification();
     }
-    }
-  Future<void>signInWithEmail
-      (SignInRequest signInRequest) async
-  {
-      await firebaseAuth
-          .signInWithEmailAndPassword(email: signInRequest.email!
-          , password: signInRequest.password);
+  }
+
+  // ✅ Now returns UserCredential so cubit can extract uid immediately
+  Future<UserCredential> signInWithEmail(SignInRequest signInRequest) async {
+    return await firebaseAuth.signInWithEmailAndPassword(
+      email: signInRequest.email!,
+      password: signInRequest.password,
+    );
   }
 
   Future<void> signInWithPhone(String phone) async {
-
-await firebaseAuth.verifyPhoneNumber(
+    await firebaseAuth.verifyPhoneNumber(
       phoneNumber: "+2$phone",
       forceResendingToken: resendToken,
       verificationCompleted: _verificationCompleted,
@@ -59,78 +55,80 @@ await firebaseAuth.verifyPhoneNumber(
       codeSent: _codeSentFunc,
       codeAutoRetrievalTimeout: _codeAutoRetrievalTimeOut,
     );
-
   }
 
-
-  Future<UserCredential>submitOtp(String otp)async{
-
-    final PhoneAuthCredential phoneCred=PhoneAuthProvider
-        .credential(verificationId: verificationId, smsCode: otp);
-    final cred= await _signIn(phoneCred);
-
-    return cred;
-
-
-  }
-
-
-  Future<GoogleSignInAccount?> loginWithGoogle() async {
-    
-    await googleSignIn.initialize(
-      clientId: EnvironmentVariable.instance.webClientId
-
+  Future<UserCredential> submitOtp(String otp) async {
+    final PhoneAuthCredential phoneCred = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: otp,
     );
-    if(googleSignIn.supportsAuthenticate()){
-      final account=await googleSignIn.authenticate();
-      return account;
+    return await _signIn(phoneCred);
+  }
+
+  // ✅ Fixed: now signs into Firebase and returns UserCredential
+  Future<UserCredential> loginWithGoogle() async {
+    await googleSignIn.initialize(
+      clientId: EnvironmentVariable.instance.webClientId,
+    );
+
+    if (!googleSignIn.supportsAuthenticate()) {
+      throw FirebaseAuthException(
+        code: 'google-sign-in-unsupported',
+        message: 'Google sign-in is not supported on this platform.',
+      );
     }
-return null;
 
+    final GoogleSignInAccount? account = await googleSignIn.authenticate();
+
+    if (account == null) {
+      throw FirebaseAuthException(
+        code: 'google-sign-in-cancelled',
+        message: 'Google sign-in was cancelled by the user.',
+      );
+    }
+
+
+    final GoogleSignInAuthentication googleAuth = await account.authentication;
+
+
+    final OAuthCredential credential = GoogleAuthProvider.credential(
+      idToken: googleAuth.idToken,
+    );
+
+    return await firebaseAuth.signInWithCredential(credential);
   }
 
-  Future<void>reloadUser()async{
-
-    await firebaseAuth.currentUser?.reload();
-
-  }
-
-  User? get user =>firebaseAuth.currentUser;
+  User? get user => firebaseAuth.currentUser;
 
   bool isAccountVerified() {
-
-    return FirebaseAuth.instance.currentUser?.emailVerified ?? false;
- 
+    return firebaseAuth.currentUser?.emailVerified ?? false;
   }
 
+  Future<void> resetPassword(String email) async {
+    await firebaseAuth.sendPasswordResetEmail(email: email);
+  }
 
-
-
-  Future<void> _verificationCompleted(PhoneAuthCredential authCredential)
-  async {
+  Future<void> _verificationCompleted(PhoneAuthCredential authCredential) async {
     await _signIn(authCredential);
   }
-  void _verificationFailed(FirebaseAuthException error){
 
-FlutterToastHelper.showToast(color: AppColor.error,text: ErrorHandler.handleError(error).message);
-
+  void _verificationFailed(FirebaseAuthException error) {
+    FlutterToastHelper.showToast(
+      color: AppColor.error,
+      text: ErrorHandler.handleError(error).message,
+    );
   }
 
-  void _codeSentFunc(String verificationId,int? forceSendingToken)  {
-    this.verificationId=verificationId;
+  void _codeSentFunc(String verificationId, int? forceSendingToken) {
+    this.verificationId = verificationId;
     debugPrint('Verification ID: $verificationId');
   }
-  void _codeAutoRetrievalTimeOut(String verificationId){
+
+  void _codeAutoRetrievalTimeOut(String verificationId) {
     debugPrint('Code auto retrieval timeout');
   }
 
-  Future<UserCredential> _signIn(PhoneAuthCredential cred)async{
-  final phoneCred=  await firebaseAuth.signInWithCredential(cred);
-return phoneCred;
+  Future<UserCredential> _signIn(AuthCredential cred) async {
+    return await firebaseAuth.signInWithCredential(cred);
   }
-
-Future<void>resetPassword(String email) async {
-  await FirebaseAuth.instance
-      .sendPasswordResetEmail(email: email);
-}
 }

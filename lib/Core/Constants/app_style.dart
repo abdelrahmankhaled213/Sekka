@@ -31,7 +31,7 @@ abstract class AppStyle {
   );
 
  static const LinearGradient brandGradient = LinearGradient(
-    colors: [AppColor.main, AppColor.secondary, AppColor.pink],
+    colors:[ AppColor.main, Color(0xFF8B5CF6)],  
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

@@ -16,9 +16,17 @@ class TripHistoryLocalDataSource {
     await box.put(trip.id, trip);
   }
 
+  Future<void> saveAllTrips(List<TripHistoryModel> trips) async {
+    final box = await _box;
+    final map = {for (final t in trips) t.id: t};
+    await box.putAll(map);
+  }
+
   Future<List<TripHistoryModel>> getTrips() async {
     final box = await _box;
-    return box.values.toList();
+    final list = box.values.toList()
+      ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+    return list;
   }
 
   Future<void> deleteTrip(String tripId) async {
@@ -31,18 +39,13 @@ class TripHistoryLocalDataSource {
     await box.clear();
   }
 
-  Future<int> getTotalTrips() async {
-    final trips = await getTrips();
-    return trips.length;
-  }
+  Future<int> getTotalTrips() async => (await getTrips()).length;
 
-  Future<int> getCompletedTrips() async {
-    final trips = await getTrips();
-    return trips.where((trip) => trip.status == TripStatus.completed).length;
-  }
 
-  Future<int> getCancelledTrips() async {
+  Future<double> getTotalSpent() async {
     final trips = await getTrips();
-    return trips.where((trip) => trip.status == TripStatus.cancelled).length;
+    return trips
+        .where((t) => t.status == TripStatus.completed)
+        .fold<double>(0.0, (double sum, TripHistoryModel t) => sum + (t.fareEGP ?? 0.0));
   }
 }

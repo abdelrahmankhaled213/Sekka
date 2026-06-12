@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sekka/Core/Helper/segment_helper.dart';
-import 'package:sekka/Features/Auth/Logic/transport_model.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/stop_time_line.helper.dart';
 
 class StopItem extends StatelessWidget {

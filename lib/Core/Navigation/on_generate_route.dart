@@ -11,6 +11,9 @@ import 'package:sekka/Features/LostAndFound/Logic/chat_cubit.dart';
 import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
 import 'package:sekka/Features/LostAndFound/View/chat_screen.dart';
 import 'package:sekka/Features/LostAndFound/View/item_detail_and_chat_screen.dart';
+import 'package:sekka/Features/Map/Data/Logic/cubit/map_cubit.dart';
+import 'package:sekka/Features/Map/Data/Logic/cubit/maps_state.dart';
+import 'package:sekka/Features/Map/Data/View/screens/map_view.dart';
 import 'package:sekka/Features/OnBoarding/Ui/Views/OnBoardingView.dart';
 import '../../Features/Auth/Ui/auth_wrapper_view.dart';
 import '../../Features/Splash/View/splash_screen_view.dart';
@@ -54,18 +57,22 @@ case AppRoute.chat:
       ),
     ),
   );
+  
 
+case AppRoute.itemDetailAndChatScreen:
+  final args = settings.arguments as Map<String, dynamic>;
+  final itemModel = args['item'] as ItemModel;
+  final lostAndFoundCubit = args['cubit'] as LostAndFoundCubit;
 
-
-      case AppRoute.itemDetailAndChatScreen:
-      return CustomPageRoute(
-        page: BlocProvider.value(
-          value: settings.arguments as LostAndFoundCubit,
-          child: ItemDetailAndChatScreen(
-                item: settings.arguments as ItemModel,
-          ),
-        )
-      );
+  return CustomPageRoute(
+    page: BlocProvider.value(
+      value: lostAndFoundCubit,
+      child: ItemDetailAndChatScreen(
+        item: itemModel, 
+      ),
+    ),
+  );
+   
     case AppRoute.bottomNavigation:
       return CustomPageRoute(page: MainBottomNavView());
 

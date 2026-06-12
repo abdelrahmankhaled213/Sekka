@@ -45,8 +45,7 @@ return GestureDetector(
             GlobalCupertinoLocalizations.delegate,
           ],
           theme: AppTheme.lightTheme(context),
-          darkTheme: AppTheme.darkTheme(context),
-          themeMode: ThemeMode.system,
+           themeMode: ThemeMode.light,
         debugShowCheckedModeBanner:false,
   
           title: 'Sekka',

@@ -28,6 +28,7 @@ return await remoteDataSource.getComments(postId);
 }
 
 Future<CommentModel> addComment(AddCommentRequest request) async{
+  
 return await remoteDataSource.postComment(request);
 }
 
@@ -112,6 +113,14 @@ return await remoteDataSource.updateMessage(messageId, text);
 
 Future<void>deleteMessage(String messageId)async{  
 return await remoteDataSource.deleteMessage(messageId);
+}
+
+Future<void> toggleSavePost(String postId) async {
+  return await remoteDataSource.toggleSavePost(postId);
+}
+
+Future<List<ItemModel>> getSavedPosts() async {
+  return await remoteDataSource.getSavedPosts();
 }
 
 }

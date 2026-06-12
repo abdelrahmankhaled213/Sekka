@@ -1,10 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sekka/Core/Error/error_handler.dart';
-import 'package:sekka/Features/Profile/Data/Model/trip_history_model.dart';
 import 'package:sekka/Features/Profile/Data/Repo/trip_history_repo.dart';
 import 'package:sekka/Features/Profile/Logic/trip_history_state.dart';
 
+import '../Data/Model/trip_history_model.dart';
+
 class TripHistoryCubit extends Cubit<TripHistoryState> {
+  
   final TripHistoryRepository repository;
 
   TripHistoryCubit(this.repository) : super(const TripHistoryState());
@@ -13,9 +15,15 @@ class TripHistoryCubit extends Cubit<TripHistoryState> {
     emit(state.copyWith(status: TripHistoryStatus.loading));
     try {
       final trips = await repository.getTrips();
-      final total = await repository.getTotalTrips();
-      final completed = await repository.getCompletedTrips();
-      final cancelled = await repository.getCancelledTrips();
+      final total = trips.length;
+      final completed =
+          trips.where((t) => t.status == TripStatus.completed).length;
+      final cancelled =
+          trips.where((t) => t.status == TripStatus.cancelled).length;
+      // Explicit types on BOTH lambda params fix the "+" operator error
+      final spent = trips
+          .where((t) => t.status == TripStatus.completed)
+          .fold<double>(0.0, (double sum, TripHistoryModel t) => sum + (t.fareEGP ?? 0.0));
 
       emit(state.copyWith(
         status: TripHistoryStatus.success,
@@ -23,6 +31,7 @@ class TripHistoryCubit extends Cubit<TripHistoryState> {
         totalTrips: total,
         completedTrips: completed,
         cancelledTrips: cancelled,
+        totalSpentEGP: spent,
       ));
     } catch (e) {
       final failure = ErrorHandler.handleError(e);
@@ -31,6 +40,10 @@ class TripHistoryCubit extends Cubit<TripHistoryState> {
         errorMessage: failure.message,
       ));
     }
+  }
+
+  void setFilter(String filter) {
+    emit(state.copyWith(selectedFilter: filter));
   }
 
   Future<void> createTrip(TripHistoryModel trip) async {

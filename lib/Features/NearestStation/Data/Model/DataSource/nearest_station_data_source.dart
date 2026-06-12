@@ -32,4 +32,5 @@ class NearestStationDataSource {
         .map((json) => NearestStationModel.fromJson(json as Map<String, dynamic>))
         .toList();
   }
+
 }

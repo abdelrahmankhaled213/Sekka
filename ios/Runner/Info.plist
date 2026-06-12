@@ -15,30 +15,27 @@
 				<array>
 					<string>sekka</string>
 				</array>
-<!-- Location usage descriptions - إجباري على iOS -->
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>Sekka needs your location to track your trip and notify you when you arrive.</string>
- 
-<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-<string>Sekka tracks your location in the background to notify you when you arrive at your destination.</string>
- 
-<key>NSLocationAlwaysUsageDescription</key>
-<string>Sekka tracks your location in the background to notify you when you arrive at your destination.</string>
- 
-<!-- Background modes - ده اللي بيخلي iOS يشغل الـ location في البابground -->
-<key>UIBackgroundModes</key>
-<array>
-    <string>location</string>
-    <string>fetch</string>
-    <string>remote-notification</string>
-</array>
+				<!-- Location usage descriptions - إجباري على iOS -->
+				<key>NSLocationWhenInUseUsageDescription</key>
+				<string>Sekka needs your location to track your trip and notify you when you arrive.</string>
+				<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+				<string>Sekka tracks your location in the background to notify you when you arrive at your destination.</string>
+				<key>NSLocationAlwaysUsageDescription</key>
+				<string>Sekka tracks your location in the background to notify you when you arrive at your destination.</string>
+				<!-- Background modes - ده اللي بيخلي iOS يشغل الـ location في البابground -->
+				<key>UIBackgroundModes</key>
+				<array>
+					<string>location</string>
+					<string>fetch</string>
+					<string>remote-notification</string>
+				</array>
 			</dict>
 		</array>
 		<key>UIBackgroundModes</key>
-       <array>
-       <string>fetch</string>
-       <string>remote-notification</string>
-        </array>
+		<array>
+			<string>fetch</string>
+			<string>remote-notification</string>
+		</array>
 		<key>CFBundleIdentifier</key>
 		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 		<key>CFBundleInfoDictionaryVersion</key>

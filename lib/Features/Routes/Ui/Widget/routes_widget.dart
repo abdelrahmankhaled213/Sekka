@@ -16,6 +16,7 @@ import 'package:sekka/Features/Routes/Ui/Widget/stop_item.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/transfer.dart';
 
 class RouteWidget extends StatelessWidget {
+  
   final SegmentModel segment;
   final bool isLastSegment;
   final List<SegmentModel> allSegments; 
@@ -82,10 +83,10 @@ class RouteWidget extends StatelessWidget {
             ),
 
        
-          if (isLastSegment) ...[
-            _TripSummaryBar(segments: allSegments),
-            BlocProvider(create: (context) => getIt<TripCubit>(), child: const TrackTripButton()),
-          ],
+          if (isLastSegment) 
+             _TripSummaryBar(segments: allSegments),
+           
+          
 
           SizedBox(height: AppSpacing.sm.h),
         ],
@@ -196,6 +197,44 @@ class _SummaryItem extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 // View all stops button
 // ─────────────────────────────────────────────────────────────────────────────
+
+class _ViewOnMapButton extends StatelessWidget {
+  
+  final List<SegmentModel> segments;
+
+  const _ViewOnMapButton({required this.segments});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 8.h),
+      child: ElevatedButton.icon(
+        onPressed: () => _navigateToMap(context),
+        icon: Icon(Icons.map_rounded, size: 18.sp),
+        label: Text(
+          'View on Map',
+          style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColor.main,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          elevation: 0,
+        ),
+      ),
+    );
+  }
+
+  void _navigateToMap(BuildContext context) {
+    // Navigate to map with route data
+    Navigator.of(context).pushNamed('/map', arguments: {
+      'segments': segments,
+    });
+  }
+}
 
 class _ViewAllStopsButton extends StatelessWidget {
   final SegmentModel segment;

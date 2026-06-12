@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/theme/app_colors.dart';
 import 'package:sekka/Core/theme/app_radius.dart';
-import 'package:sekka/Core/theme/app_text_styles.dart';
 import 'package:sekka/Features/WhereToGo/Logic/where_to_go_cubit.dart';
 import 'package:sekka/Features/WhereToGo/Logic/where_to_go_state.dart';
 
@@ -13,13 +11,15 @@ class SearchCard extends StatelessWidget {
   final FocusNode focus;
   final bool isFocused;
   final WhereToGoState state;
+  final VoidCallback onClear;
 
   const SearchCard({
-    super.key, 
+    super.key,
     required this.controller,
     required this.focus,
     required this.isFocused,
     required this.state,
+    required this.onClear,
   });
 
   @override
@@ -27,134 +27,122 @@ class SearchCard extends StatelessWidget {
     final cubit = context.read<WhereToGoCubit>();
 
     return Container(
-      margin: EdgeInsets.all(16.w),
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color:        Colors.white,
+        color: AppColors.surface,
         borderRadius: AppRadius.allLG,
-        border: Border.all(
-            color: Colors.grey.withOpacity(0.12), width: 0.5),
+        border: Border.all(color: AppColors.outline, width: 0.8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Where to go?',
-            style: AppTextStyles.headlineMedium(context).copyWith(fontSize: 18.sp),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            'Find your route in Cairo',
-            style: AppTextStyles.caption(context),
-          ),
-          SizedBox(height: 14.h),
-
-
-          _LocationField(
-            icon:       Icons.radio_button_checked_rounded,
-            iconColor:  AppColors.darkGreen,
-            isLoading:  state.status == WhereToGoStatus.locating,
-            label:      state.currentLocationLabel ?? 'Getting your location…',
-            isHint:     state.currentLocationLabel == null,
-            onTap:      cubit.fetchCurrentLocation,
+          // ── From row ───────────────────────────────────────────────────
+          _LocationRow(
+            icon: Icons.radio_button_checked_rounded,
+            iconColor: AppColors.darkGreen,
+            label: state.currentLocationLabel ?? 'Getting your location…',
+            isHint: state.currentLocationLabel == null,
+            isLoading: state.status == WhereToGoStatus.locating,
+            onTap: cubit.fetchCurrentLocation,
           ),
 
-           Padding(
+          // ── Divider with swap ──────────────────────────────────────────
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 8.h),
             child: Row(
               children: [
-                SizedBox(width: 16.w),
+                SizedBox(width: 17.w),
                 Container(
-                    width: 1, height: 18.h, color: Colors.grey.shade200),
+                  width: 1,
+                  height: 16.h,
+                  color: AppColors.outline,
+                ),
                 const Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    // swap — مش محتاجه هنا لأن الـ start دايماً current location
-                  },
-                  child: Container(
-                    width: 28.w,
-                    height: 28.w,
-                    decoration: BoxDecoration(
-                      shape:  BoxShape.circle,
-                      border: Border.all(
-                          color: Colors.grey.withOpacity(0.25), width: 0.5),
-                    ),
-                    child: Icon(Icons.swap_vert_rounded,
-                        size: 16.sp, color: Colors.grey.shade400),
+                Container(
+                  width: 26.w,
+                  height: 26.w,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.offWhite,
+                    border:
+                    Border.all(color: AppColors.outline, width: 0.8),
+                  ),
+                  child: Icon(
+                    Icons.swap_vert_rounded,
+                    size: 14.sp,
+                    color: AppColors.grey,
                   ),
                 ),
               ],
             ),
           ),
 
-          // ── to field (search) ──────────────────────────────────────────────
+          // ── To field (search) ──────────────────────────────────────────
           AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 180),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: AppColors.offWhite,
               borderRadius: AppRadius.allMD,
               border: Border.all(
                 color: isFocused
-                    ? AppColors.darkBlue
-                    : Colors.grey.withOpacity(0.18),
-                width: isFocused ? 1.5 : 0.5,
+                    ? AppColors.primary
+                    : AppColors.outline,
+                width: isFocused ? 1.5 : 0.8,
               ),
+              boxShadow: isFocused
+                  ? [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+                  : [],
             ),
             child: Row(
               children: [
+                // Search icon
                 Padding(
-                  padding: EdgeInsets.only(left: 10.w),
-                  child: Container(
-                    width: 8.w,
-                    height: 8.w,
-                    decoration: BoxDecoration(
-                      color: state.selectedPlace != null
-                          ? AppColors.darkBlue
-                          : Colors.grey.shade300,
-                      shape: BoxShape.circle,
-                    ),
+                  padding: EdgeInsets.only(left: 12.w),
+                  child: Icon(
+                    Icons.search_rounded,
+                    size: 16.sp,
+                    color: isFocused ? AppColors.primary : AppColors.muted,
                   ),
                 ),
+                // Text field
                 Expanded(
                   child: TextField(
-                    controller:  controller,
-                    focusNode:   focus,
-                    style:       TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.black87),
+                    controller: controller,
+                    focusNode: focus,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimary,
+                    ),
                     decoration: InputDecoration(
-                      hintText:        state.selectedPlace?.mainText ??
+                      hintText: state.selectedPlace?.mainText ??
                           'Where do you want to go?',
-                      hintStyle:       TextStyle(
-                          fontSize: 14.sp, color: Colors.grey.shade400),
-                      border:          InputBorder.none,
-                      contentPadding:  EdgeInsets.symmetric(
+                      hintStyle: TextStyle(
+                        fontSize: 14.sp,
+                        color: AppColors.muted,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(
                           horizontal: 10.w, vertical: 11.h),
                     ),
                     onChanged: (v) =>
                         context.read<WhereToGoCubit>().onSearchChanged(v),
                   ),
                 ),
-                if (controller.text.isNotEmpty)
-                  GestureDetector(
-                    onTap: () {
-                      controller.clear();
-                      context.read<WhereToGoCubit>().reset();
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.only(right: 10.w),
-                      child: Container(
-                        width: 18.w,
-                        height: 18.w,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade400,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(Icons.close_rounded,
-                            size: 11.sp, color: Colors.white),
-                      ),
-                    ),
-                  ),
+                // Clear / loading
                 if (state.status == WhereToGoStatus.searching)
                   Padding(
                     padding: EdgeInsets.only(right: 10.w),
@@ -162,8 +150,24 @@ class SearchCard extends StatelessWidget {
                       width: 14.w,
                       height: 14.w,
                       child: CircularProgressIndicator(
-                          strokeWidth: 1.5,
-                          color: AppColors.darkBlue),
+                          strokeWidth: 1.5, color: AppColors.primary),
+                    ),
+                  )
+                else if (controller.text.isNotEmpty)
+                  GestureDetector(
+                    onTap: onClear,
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 10.w),
+                      child: Container(
+                        width: 18.w,
+                        height: 18.w,
+                        decoration: BoxDecoration(
+                          color: AppColors.muted,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.close_rounded,
+                            size: 10.sp, color: Colors.white),
+                      ),
                     ),
                   ),
               ],
@@ -172,28 +176,61 @@ class SearchCard extends StatelessWidget {
 
           SizedBox(height: 12.h),
 
-          // ── find route button ──────────────────────────────────────────────
+          // ── Find Route button ──────────────────────────────────────────
           SizedBox(
-            width:  double.infinity,
+            width: double.infinity,
             height: 44.h,
-            child: ElevatedButton.icon(
-              onPressed: state.canSearch &&
-                      state.status != WhereToGoStatus.loadingRoute
-                  ? cubit.findRoute
-                  : null,
-              icon:  Icon(Icons.route_rounded, size: 18.sp),
-              label: Text(
-                'Find Route',
-                style: TextStyle(
-                    fontSize: 14.sp, fontWeight: FontWeight.w500),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              decoration: BoxDecoration(
+                gradient: state.canSearch &&
+                    state.status != WhereToGoStatus.loadingRoute
+                    ? LinearGradient(
+                  colors: [AppColors.primary, AppColors.darkBlue],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                )
+                    : null,
+                color: state.canSearch &&
+                    state.status != WhereToGoStatus.loadingRoute
+                    ? null
+                    : AppColors.outline,
+                borderRadius: AppRadius.allMD,
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor:         AppColors.darkBlue,
-                disabledBackgroundColor: Colors.grey.shade200,
-                foregroundColor:         Colors.white,
-                elevation:               0,
-                shape: RoundedRectangleBorder(
-                    borderRadius: AppRadius.allMD),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: AppRadius.allMD,
+                  onTap: state.canSearch &&
+                      state.status != WhereToGoStatus.loadingRoute
+                      ? cubit.findRoute
+                      : null,
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.route_rounded,
+                          size: 16.sp,
+                          color: state.canSearch
+                              ? Colors.white
+                              : AppColors.grey,
+                        ),
+                        SizedBox(width: 8.w),
+                        Text(
+                          'Find Route',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            color: state.canSearch
+                                ? Colors.white
+                                : AppColors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -202,20 +239,23 @@ class SearchCard extends StatelessWidget {
     );
   }
 }
-class _LocationField extends StatelessWidget {
+
+// ── Location display row ──────────────────────────────────────────────────────
+
+class _LocationRow extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
-  final bool isLoading;
   final String label;
   final bool isHint;
+  final bool isLoading;
   final VoidCallback onTap;
 
-  const _LocationField({
+  const _LocationRow({
     required this.icon,
     required this.iconColor,
-    required this.isLoading,
     required this.label,
     required this.isHint,
+    required this.isLoading,
     required this.onTap,
   });
 
@@ -224,22 +264,22 @@ class _LocationField extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding:    EdgeInsets.symmetric(horizontal: 10.w, vertical: 11.h),
+        padding:
+        EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
         decoration: BoxDecoration(
-          color:        Colors.grey.shade50,
+          color: AppColors.offWhite,
           borderRadius: AppRadius.allMD,
-          border: Border.all(
-              color: Colors.grey.withOpacity(0.18), width: 0.5),
+          border: Border.all(color: AppColors.outline, width: 0.8),
         ),
         child: Row(
           children: [
             isLoading
                 ? SizedBox(
-                    width: 14.w,
-                    height: 14.w,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 1.5, color: iconColor),
-                  )
+              width: 14.w,
+              height: 14.w,
+              child: CircularProgressIndicator(
+                  strokeWidth: 1.5, color: iconColor),
+            )
                 : Icon(icon, size: 14.sp, color: iconColor),
             SizedBox(width: 10.w),
             Expanded(
@@ -247,14 +287,13 @@ class _LocationField extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color: isHint
-                      ? Colors.grey.shade400
-                      : Colors.black87,
+                  color: isHint ? AppColors.muted : AppColors.textPrimary,
+                  fontWeight: isHint ? FontWeight.w400 : FontWeight.w500,
                 ),
               ),
             ),
             Icon(Icons.my_location_rounded,
-                size: 14.sp, color: iconColor.withOpacity(0.6)),
+                size: 13.sp, color: iconColor.withOpacity(0.5)),
           ],
         ),
       ),

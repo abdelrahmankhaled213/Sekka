@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Widget/custom_text_field.dart';
+import 'package:sekka/Core/theme/app_colors.dart';
 import 'package:sekka/core/constants/app_style.dart';
 
 class HomeSearchFilterWidget extends StatelessWidget {
@@ -130,7 +131,7 @@ Widget _buildAnimatedContainer(bool isActive, String filter) {
            margin: EdgeInsets.symmetric(horizontal: 4.w),
            padding: const EdgeInsets.symmetric(vertical: 10),
            decoration: BoxDecoration(
-           gradient: isActive ?AppStyle.brandGradient : null,
+           gradient: isActive ?AppColors.brandGradient : null,
            color: isActive ? null : AppColor.surface,
            borderRadius: BorderRadius.circular(12),
            boxShadow: isActive
@@ -166,7 +167,7 @@ Widget _buildAnimatedContainer(bool isActive, String filter) {
           margin:  EdgeInsets.only(right: 8.w),
           padding:  EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
           decoration: BoxDecoration(
-            gradient: isActive ? AppStyle.brandGradient : null,
+            gradient: isActive ? AppColors.brandGradient : null,
             color: isActive ? null : AppColor.surface,
             borderRadius: BorderRadius.circular(20),
             border: isActive

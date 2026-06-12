@@ -8,6 +8,7 @@ class ErrorHandler {
   ErrorHandler._();
 
   static Failure handleError(Object error) {
+    
     if (error is DioException) {
       return _handleDio(error);
     }

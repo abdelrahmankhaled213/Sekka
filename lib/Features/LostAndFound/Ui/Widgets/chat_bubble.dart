@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
+import 'package:sekka/Core/Constants/app_image.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Widget/custom_image_widget.dart';
 
@@ -17,7 +19,7 @@ class ChatBubbleWidget extends StatelessWidget {
     final message = messageData['message'] as String;
     final timestamp = messageData['timestamp'] as String;
     final senderName = messageData['senderName'] as String;
-    final senderAvatar = messageData['senderAvatar'] as String;
+    final senderAvatar = messageData['senderAvatar'] as String?;
     final senderAvatarSemanticLabel =
         messageData['senderAvatarSemanticLabel'] as String?;
 
@@ -37,6 +39,7 @@ class ChatBubbleWidget extends StatelessWidget {
 
                 ClipOval(
                   child: CustomImageWidget(
+                    placeHolder: AppImage.profileIcon,
                     imageUrl: senderAvatar,
                     width: 32.w,
                     height: 32.h,
@@ -82,6 +85,7 @@ class ChatBubbleWidget extends StatelessWidget {
                         child: Text(
                           message,
                           style: AppStyle.w60012RobotoGrey.copyWith(
+                           
                             height: 1.5,
                             fontWeight: FontWeight.w400
                           ),
@@ -143,8 +147,13 @@ class ChatBubbleWidget extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 ClipOval(
-                  child: CustomImageWidget(
+                  child: senderAvatar != null ? CachedNetworkImage(
                     imageUrl: senderAvatar,
+                    width: 32,
+                    height: 32,
+                    fit: BoxFit.cover,
+                  ) : CustomImageWidget(
+                    imageUrl: AppImage.profileIcon,
                     width: 32,
                     height: 32,
                     fit: BoxFit.cover,

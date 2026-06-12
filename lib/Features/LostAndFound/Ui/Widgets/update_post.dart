@@ -21,6 +21,7 @@ class EditPostModalWidget extends StatefulWidget {
 }
 
 class _EditPostModalWidgetState extends State<EditPostModalWidget> {
+
   late ItemType _postType;
   late Category _selectedCategory;
   final _formKey = GlobalKey<FormState>();
@@ -28,7 +29,7 @@ class _EditPostModalWidgetState extends State<EditPostModalWidget> {
   late final TextEditingController _descriptionController;
   late final TextEditingController _stationController;
 
-  // If user picks a new image, this is set. Otherwise we keep the existing imageUrl.
+
   XFile? _newImage;
   bool _isUploading = false;
 

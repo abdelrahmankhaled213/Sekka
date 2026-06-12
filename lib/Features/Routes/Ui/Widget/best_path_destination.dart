@@ -27,13 +27,15 @@ class BestPathDestination extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Search card ──────────────────────────────────────────
+
+
             _SearchCard(accentColor: accentColor, cubit: cubit, state: state),
  
             const SizedBox(height: 16),
  
-            // ── Results ──────────────────────────────────────────────
+
             _ResultsSection(state: state, accentColor: accentColor),
+
           ],
         );
       },
@@ -101,7 +103,7 @@ class _InputsRow extends StatelessWidget {
        
         Column(
           children: [
-            _Dot(color: accentColor, filled: true),
+            _Dot(color: AppColor.main, filled: true),
             SizedBox(
               height: 28.h,
               child: VerticalDivider(
@@ -147,15 +149,15 @@ class _InputsRow extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: accentColor.withOpacity(0.3),
+                color: AppColor.grey.withOpacity(0.3),
                 width: 1.5,
               ),
-              color: accentColor.withOpacity(0.05),
+              color: AppColor.main.withOpacity(0.05),
             ),
             child: Icon(
               Icons.swap_vert_rounded,
               size: 18.sp,
-              color: accentColor,
+              color: AppColor.grey,
             ),
           ),
         ),
@@ -241,8 +243,8 @@ class _SearchButton extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: _isLoading ? null : cubit.getRoutePath,
         style: ElevatedButton.styleFrom(
-          backgroundColor: accentColor,
-          disabledBackgroundColor: accentColor.withOpacity(0.6),
+          backgroundColor: AppColor.main,
+          disabledBackgroundColor: AppColor.main.withOpacity(0.6),
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -426,36 +428,43 @@ class _ErrorState extends StatelessWidget {
 }
  
 class _EmptyRouteState extends StatelessWidget {
+
   final Color accentColor;
  
   const _EmptyRouteState({required this.accentColor});
  
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 20.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
-      ),
-      child: Column(
-        children: [
-          Icon(Icons.route_outlined, size: 48.sp, color: Colors.grey.shade400),
-          SizedBox(height: 12.h),
-          Text(
-            'No route found',
-            style: AppStyle.bold14RobotoBlue.copyWith(
-              fontSize: 15.sp,
-              color: const Color(0xFF333333),
+    return Center(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 20.w),
+        
+        decoration: BoxDecoration(
+          
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14.r),
+          
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(Icons.route_outlined, size: 48.sp, color: Colors.grey.shade400),
+            SizedBox(height: 12.h),
+            Text(
+              'No route found',
+              style: AppStyle.bold14RobotoBlue.copyWith(
+                fontSize: 15.sp,
+                color: const Color(0xFF333333),
+              ),
             ),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            'Try selecting different stops',
-            style: AppStyle.w60012RobotoGrey.copyWith(fontSize: 13.sp),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            SizedBox(height: 4.h),
+            Text(
+              'Try selecting different stops',
+              style: AppStyle.w60012RobotoGrey.copyWith(fontSize: 13.sp),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }

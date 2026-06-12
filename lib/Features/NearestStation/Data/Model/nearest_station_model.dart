@@ -10,6 +10,8 @@ class NearestStationModel {
   final double distanceKm;
   final TransportType? type;
   final CrowdingLevel crowding;
+  final double predictionScore;
+  final bool isBestPrediction;
 
   NearestStationModel({
     this.id,
@@ -19,6 +21,8 @@ class NearestStationModel {
     required this.distanceKm,
     required this.crowding,
     required this.type,
+    this.predictionScore = 0.0,
+    this.isBestPrediction = false,
   });
 
   factory NearestStationModel.fromJson(Map<String, dynamic> json) {
@@ -31,7 +35,7 @@ class NearestStationModel {
       name: json['stop_name'] ?? '',
       location: GeoPoint.fromJson(json['location']),
       distanceKm: json['distance_km']?.toDouble() ?? 0.0,
-    
+
       crowding: CrowdingLevelX.fromString(json['crowding_level']),
       type: TransportTypeX.fromString(json['edge_type']),
 
@@ -46,6 +50,8 @@ class NearestStationModel {
     CrowdingLevel? crowding,
     String? routes,
     TransportType? type,
+    double? predictionScore,
+    bool? isBestPrediction,
   }) {
     return NearestStationModel(
 
@@ -56,6 +62,8 @@ class NearestStationModel {
       crowding: crowding ?? this.crowding,
       routes: routes ?? this.routes,
       type: type ?? this.type,
+      predictionScore: predictionScore ?? this.predictionScore,
+      isBestPrediction: isBestPrediction ?? this.isBestPrediction,
     );
   }
 }

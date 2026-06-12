@@ -16,5 +16,5 @@ abstract class AppImage{
    static const String planYourRouteBus='assets/Images/bus.jpg';
    static const String locationIcon='assets/Icons/Icon.png';
    static const String profileBackground="assets/Images/Image (Profile Background).png";
-   static const String profileIcon="assets/Icons/Icon (3).png";
+   static const String profileIcon="assets/Images/person.png";
 }

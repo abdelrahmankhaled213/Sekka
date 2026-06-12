@@ -10,10 +10,15 @@ class RemoteDataSource {
   RemoteDataSource( this.supabaseClient);
   
 Future<UserModel> getUser(String userId)async{
-
+try{
   final data = await supabaseClient.from('users').select().eq('id', userId).single();
+    return UserModel.fromJson(data);
+}catch(e,stackTrace){
+  print('⚠️ Failed to fetch user from remote: $e');
+  print(stackTrace);
+}
 
-  return UserModel.fromJson(data);
+throw Exception('User not found');
 }
 
 
