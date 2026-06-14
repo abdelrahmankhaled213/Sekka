@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_route.dart';
@@ -46,72 +47,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _showAboutUsDialog() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: AppColor.main.withAlpha(30),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.train_rounded,
-                  color: AppColor.main, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Text('About Sekka',
-                style: Theme.of(context).textTheme.titleLarge),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Sekka v2.4.1',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: AppColor.main,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Sekka is your intelligent metro and monorail companion. '
-                  'Using IR sensors, ML-based crowd prediction, and real-time '
-                  'data, we help you navigate urban transit smarter — with less '
-                  'waiting, less stress, and a smaller carbon footprint.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF616161),
-                height: 1.6,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              '© 2026 Sekka Technologies. All rights reserved.',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: const Color(0xFF9E9E9E),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          FilledButton(
-            style: FilledButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-            ),
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Got it'),
-          ),
-        ],
-      ),
+  Future<void> _showAboutUsDialog() async {
+    final uri = Uri.parse(
+      'https://sekka8.netlify.app/?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPOTM2NjE5NzQzMzkyNDU5AAGne8F6RDJPw4V_6jRAEvJI6V1kgPS0FW8o_C8SVjyCYcBKCFg6dg0EUniX-8I_aem_upk-Ye45apqKESP1LQAJ3A',
     );
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open the link')),
+        );
+      }
+    }
   }
 
   // ── Build ───────────────────────────────────────────────────────────────

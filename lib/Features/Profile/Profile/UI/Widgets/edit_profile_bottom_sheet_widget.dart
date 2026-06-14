@@ -1,11 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Cubit/pick_image_cubit.dart';
 import 'package:sekka/Core/Cubit/pick_image_state.dart';
 import 'package:sekka/Core/Helper/toast_helper.dart';
 import 'package:sekka/Core/Helper/transport_type_helper.dart';
-import 'package:sekka/Core/theme/app_theme.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_update.dart';
 import 'package:sekka/Features/Profile/Profile/Logic/profile_cubit.dart';
 import 'package:sekka/Features/Profile/Profile/Logic/profile_state.dart';
@@ -25,6 +27,9 @@ class _EditProfileBottomSheetWidgetState
   late TextEditingController _phoneController;
   late TextEditingController _emailController;
   late List<TransportType> _selectedModes;
+
+  /// Locally-picked file — used only for the preview; the cubit owns the upload.
+  XFile? _localImage;
 
   static final List<Map<String, dynamic>> _transportModes = [
     {
@@ -72,43 +77,129 @@ class _EditProfileBottomSheetWidgetState
     super.dispose();
   }
 
+  // ── Image picking ──────────────────────────────────────────────────────────
+
+  Future<void> _pickImage(ImageSource source) async {
+    Navigator.of(context).pop(); // close source sheet
+    final picked = await ImagePicker().pickImage(
+      source: source,
+      imageQuality: 85,
+      maxWidth: 1024,
+      maxHeight: 1024,
+    );
+    if (picked == null) return;
+
+    setState(() => _localImage = picked);
+
+    // Hand the XFile to the cubit — matches its existing pickImage(XFile) API
+    if (mounted) {
+      context.read<PickImageCubit>().pickImage(picked);
+      context.read<ProfileCubit>().clearRemovedImageFlag();
+    }
+  }
+
+  void _removeImage() {
+    setState(() => _localImage = null);
+    context.read<PickImageCubit>().removeImage(); // existing cubit method
+    context.read<ProfileCubit>().removeNetworkImage();
+  }
+
+  void _showImageSourceSheet() {
+    final profileState = context.read<ProfileCubit>().state;
+    final hasImage = _localImage != null ||
+        (profileState.userModel?.image?.isNotEmpty ?? false);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE0E0E0),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            _SourceOption(
+              icon: Icons.camera_alt_rounded,
+              label: 'Take a photo',
+              color: AppColor.main,
+              onTap: () => _pickImage(ImageSource.camera),
+            ),
+            const SizedBox(height: 12),
+            _SourceOption(
+              icon: Icons.photo_library_rounded,
+              label: 'Choose from gallery',
+              color: AppColor.darkPurple,
+              onTap: () => _pickImage(ImageSource.gallery),
+            ),
+            if (hasImage) ...[
+              const SizedBox(height: 12),
+              _SourceOption(
+                icon: Icons.delete_outline_rounded,
+                label: 'Remove photo',
+                color: AppColor.error,
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _removeImage();
+                },
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Save ───────────────────────────────────────────────────────────────────
+
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 
     final pickImageCubit = context.read<PickImageCubit>();
 
     if (pickImageCubit.state.file != null) {
-      // Upload image; _listenForPickImage will call editProfile when done.
+      // Upload image first; _listenForPickImage calls editProfile when done
       await pickImageCubit.uploadImage();
     } else {
-      final request = UpdateUserRequest(
+      context.read<ProfileCubit>().editProfile(UpdateUserRequest(
         name: _nameController.text.trim(),
         phone: _phoneController.text.trim(),
         favTrasnportation: _selectedModes,
         isGetStarted: true,
         clearImage: context.read<ProfileCubit>().state.isImageRemoved,
-      );
-      context.read<ProfileCubit>().editProfile(request);
+      ));
     }
   }
 
   Future<void> _listenForPickImage(
       BuildContext context, PickImageState state) async {
     if (state.pickImageEnum == PickImageEnum.uploadImageLoaded) {
-      final request = UpdateUserRequest(
+      await context.read<ProfileCubit>().editProfile(UpdateUserRequest(
         image: state.imagePathFromSupa,
         clearImage: false,
         name: _nameController.text.trim(),
         phone: _phoneController.text.trim(),
         favTrasnportation: _selectedModes,
         isGetStarted: true,
-      );
-      await context.read<ProfileCubit>().editProfile(request);
+      ));
     } else if (state.pickImageEnum == PickImageEnum.uploadImageError) {
       FlutterToastHelper.showToast(
           text: state.errorMsg!, color: AppColor.error);
     }
   }
+
+  // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -156,28 +247,34 @@ class _EditProfileBottomSheetWidgetState
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w700),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   Expanded(
                     child: SingleChildScrollView(
                       controller: scrollController,
-                      padding: EdgeInsets.fromLTRB(20, 0, 20, bottomInset + 20),
+                      padding:
+                      EdgeInsets.fromLTRB(20, 0, 20, bottomInset + 20),
                       child: Form(
                         key: _formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // ── Avatar picker ────────────────────────────
+                            _ProfilePictureSection(
+                              localImage: _localImage,
+                              onTap: _showImageSourceSheet,
+                            ),
+                            const SizedBox(height: 24),
+
+                            // ── Text fields ──────────────────────────────
                             _FieldLabel('Full Name'),
                             const SizedBox(height: 6),
                             _buildField(
                               controller: _nameController,
                               hint: 'Your full name',
                               icon: Icons.person_outline,
-                              validator: (v) {
-                                if (v == null || v.trim().isEmpty) {
-                                  return 'Name is required';
-                                }
-                                return null;
-                              },
+                              validator: (v) => (v == null || v.trim().isEmpty)
+                                  ? 'Name is required'
+                                  : null,
                             ),
                             const SizedBox(height: 14),
                             _FieldLabel('Phone Number'),
@@ -187,12 +284,9 @@ class _EditProfileBottomSheetWidgetState
                               hint: '+20 100 000 0000',
                               icon: Icons.phone_outlined,
                               keyboardType: TextInputType.phone,
-                              validator: (v) {
-                                if (v == null || v.trim().isEmpty) {
-                                  return 'Phone number is required';
-                                }
-                                return null;
-                              },
+                              validator: (v) => (v == null || v.trim().isEmpty)
+                                  ? 'Phone number is required'
+                                  : null,
                             ),
                             const SizedBox(height: 14),
                             _FieldLabel('Email Address'),
@@ -221,23 +315,23 @@ class _EditProfileBottomSheetWidgetState
                               runSpacing: 8,
                               children: _transportModes.map((mode) {
                                 final type = mode['type'] as TransportType;
-                                final isSelected = _selectedModes.contains(type);
+                                final isSelected =
+                                _selectedModes.contains(type);
                                 final modeColor = mode['color'] as Color;
 
                                 return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      if (isSelected) {
-                                        if (_selectedModes.length > 1) {
-                                          _selectedModes.remove(type);
-                                        }
-                                      } else {
-                                        _selectedModes.add(type);
+                                  onTap: () => setState(() {
+                                    if (isSelected) {
+                                      if (_selectedModes.length > 1) {
+                                        _selectedModes.remove(type);
                                       }
-                                    });
-                                  },
+                                    } else {
+                                      _selectedModes.add(type);
+                                    }
+                                  }),
                                   child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
+                                    duration:
+                                    const Duration(milliseconds: 200),
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 14, vertical: 9),
                                     decoration: BoxDecoration(
@@ -278,15 +372,24 @@ class _EditProfileBottomSheetWidgetState
                               }).toList(),
                             ),
                             const SizedBox(height: 28),
+
+                            // ── Save button ──────────────────────────────
                             BlocBuilder<ProfileCubit, ProfileState>(
-                              builder: (context, state) {
-                                final isSaving = state.profileStateEnum ==
+                              builder: (context, profileState) {
+                                final isUploading = context
+                                    .watch<PickImageCubit>()
+                                    .state
+                                    .pickImageEnum ==
+                                    PickImageEnum.uploadImageLoading;
+                                final isSaving = profileState.profileStateEnum ==
                                     ProfileStateEnum.editProfileLoading;
+                                final loading = isSaving || isUploading;
+
                                 return SizedBox(
                                   width: double.infinity,
                                   height: 52,
                                   child: FilledButton(
-                                    onPressed: isSaving ? null : _handleSave,
+                                    onPressed: loading ? null : _handleSave,
                                     style: FilledButton.styleFrom(
                                       backgroundColor: AppColor.main,
                                       disabledBackgroundColor:
@@ -295,7 +398,7 @@ class _EditProfileBottomSheetWidgetState
                                           borderRadius:
                                           BorderRadius.circular(16)),
                                     ),
-                                    child: isSaving
+                                    child: loading
                                         ? const SizedBox(
                                       width: 22,
                                       height: 22,
@@ -345,8 +448,7 @@ class _EditProfileBottomSheetWidgetState
         hintText: hint,
         prefixIcon: Icon(icon, size: 20),
         filled: true,
-        fillColor:
-        readOnly ? const Color(0xFFF0F0F0) : const Color(0xFFF5F5F5),
+        fillColor: readOnly ? const Color(0xFFF0F0F0) : const Color(0xFFF5F5F5),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
@@ -365,6 +467,191 @@ class _EditProfileBottomSheetWidgetState
         ),
       ),
       validator: validator,
+    );
+  }
+}
+
+// ── Profile picture section ───────────────────────────────────────────────────
+
+class _ProfilePictureSection extends StatelessWidget {
+  final XFile? localImage;
+  final VoidCallback onTap;
+
+  const _ProfilePictureSection({
+    required this.localImage,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProfileCubit, ProfileState>(
+      builder: (context, state) {
+        final networkUrl = state.userModel?.image;
+        final hasNetwork = networkUrl != null && networkUrl.isNotEmpty;
+
+        return Center(
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: onTap,
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 96,
+                      height: 96,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColor.main, width: 2.5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColor.main.withAlpha(40),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: localImage != null
+                        // Local preview — use File directly (mobile only; fine here)
+                            ? Image.file(
+                          File(localImage!.path),
+                          width: 96,
+                          height: 96,
+                          fit: BoxFit.cover,
+                        )
+                            : hasNetwork
+                            ? Image.network(
+                          networkUrl!,
+                          width: 96,
+                          height: 96,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                              _AvatarFallback(
+                                  name: state.userModel?.name ?? ''),
+                        )
+                            : _AvatarFallback(
+                            name: state.userModel?.name ?? ''),
+                      ),
+                    ),
+                    // Camera badge
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: AppColor.main,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: const Icon(
+                          Icons.camera_alt_rounded,
+                          size: 15,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              GestureDetector(
+                onTap: onTap,
+                child: const Text(
+                  'Change photo',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.main,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ── Source option tile ────────────────────────────────────────────────────────
+
+class _SourceOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _SourceOption({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: color.withAlpha(15),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: color.withAlpha(40), width: 1),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: color.withAlpha(25),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: color == AppColor.error
+                    ? color
+                    : const Color(0xFF212121),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Avatar fallback ───────────────────────────────────────────────────────────
+
+class _AvatarFallback extends StatelessWidget {
+  final String name;
+  const _AvatarFallback({required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 96,
+      height: 96,
+      color: AppColor.main.withOpacity(0.1),
+      child: Center(
+        child: Text(
+          name.isNotEmpty ? name[0].toUpperCase() : '?',
+          style: const TextStyle(
+            fontSize: 36,
+            fontWeight: FontWeight.w700,
+            color: AppColor.main,
+          ),
+        ),
+      ),
     );
   }
 }
