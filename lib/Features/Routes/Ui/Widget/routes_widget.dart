@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
-import 'package:sekka/Core/Cubit/trip_tracking_cubit.dart';
-import 'package:sekka/Core/DI/service_locator.dart';
 import 'package:sekka/Core/Helper/segment_helper.dart';
 import 'package:sekka/Core/Helper/transport_ui_helper.dart';
-import 'package:sekka/Features/Routes/Ui/Widget/track_trip_button.dart';
 import 'package:sekka/core/theme/app_radius.dart';
 import 'package:sekka/core/theme/app_spacing.dart';
 import 'package:sekka/core/theme/app_text_styles.dart';
@@ -84,8 +81,7 @@ class RouteWidget extends StatelessWidget {
        
           if (isLastSegment) ...[
             _TripSummaryBar(segments: allSegments),
-            BlocProvider(create: (context) => getIt<TripCubit>(), child: const TrackTripButton()),
-          ],
+             ],
 
           SizedBox(height: AppSpacing.sm.h),
         ],
@@ -106,12 +102,13 @@ class _SegmentsList extends StatelessWidget {
       separatorBuilder: (_, __) => SizedBox(height: 10.h),
       itemBuilder: (_, i) => RouteWidget(
         segment:       segments[i],
-        allSegments:   segments,           // ✅
+        allSegments:   segments,
         isLastSegment: i == segments.length - 1,
       ),
     );
   }
 }
+
 class _TripSummaryBar extends StatelessWidget {
   final List<SegmentModel> segments;
   const _TripSummaryBar({required this.segments});
@@ -193,9 +190,6 @@ class _SummaryItem extends StatelessWidget {
     );
   }
 }
-// ─────────────────────────────────────────────────────────────────────────────
-// View all stops button
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _ViewAllStopsButton extends StatelessWidget {
   final SegmentModel segment;
@@ -251,10 +245,6 @@ class _ViewAllStopsButton extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Destination footer — بيظهر بس على آخر segment
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _DestinationFooter extends StatelessWidget {
   final bool isLastSegment;
@@ -322,9 +312,6 @@ class _DestinationFooter extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Full trip bottom sheet
-// ─────────────────────────────────────────────────────────────────────────────
 
 class FullTripSheet extends StatelessWidget {
   final SegmentModel segment;

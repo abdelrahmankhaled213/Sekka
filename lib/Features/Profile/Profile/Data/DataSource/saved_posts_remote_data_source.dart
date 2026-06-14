@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sekka/Core/API/dio_consumer.dart';
-import 'package:sekka/Features/Profile/Data/Model/saved_post_model.dart';
+import 'package:sekka/Features/Profile/Profile/Data/Model/saved_post_model.dart';
 
 class SavedPostsRemoteDataSource {
   final DioConsumer api;

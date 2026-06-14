@@ -1,15 +1,16 @@
 import 'package:equatable/equatable.dart';
 import 'package:sekka/Core/Helper/segment_helper.dart';
 import 'package:sekka/Features/NearestStation/Data/Model/place_prediction_model.dart';
+import 'package:sekka/Features/Profile/Profile/Data/Model/trip_history_model.dart';
 
 enum WhereToGoStatus {
   initial,
-  locating,         // جاري تحديد الموقع
-  locationReady,    // الموقع جاهز
-  searching,        // جاري البحث في Google Places
-  searchReady,      // نتائج البحث جاهزة
-  loadingRoute,     // جاري حساب المسار
-  routeReady,       // المسار جاهز
+  locating,       // جاري تحديد الموقع
+  locationReady,  // الموقع جاهز
+  searching,      // جاري البحث في Google Places
+  searchReady,    // نتائج البحث جاهزة
+  loadingRoute,   // جاري حساب المسار
+  routeReady,     // المسار جاهز
   error,
 }
 
@@ -33,8 +34,12 @@ class WhereToGoState extends Equatable {
   // ── route result ──────────────────────────────────────────────────────────
   final List<SegmentModel> segments;
 
+  // ── recent trips ──────────────────────────────────────────────────────────
+  final List<TripHistoryModel> recentTrips;
+  final bool tripsLoading;
+
   const WhereToGoState({
-    this.status             = WhereToGoStatus.initial,
+    this.status              = WhereToGoStatus.initial,
     this.errorMessage,
     this.currentLat,
     this.currentLng,
@@ -42,17 +47,19 @@ class WhereToGoState extends Equatable {
     this.selectedPlace,
     this.destLat,
     this.destLng,
-    this.suggestions        = const [],
-    this.segments           = const [],
+    this.suggestions         = const [],
+    this.segments            = const [],
+    this.recentTrips         = const [],
+    this.tripsLoading        = false,
   });
 
-  bool get hasLocation  => currentLat != null && currentLng != null;
+  bool get hasLocation    => currentLat != null && currentLng != null;
   bool get hasDestination => destLat != null && destLng != null;
-  bool get canSearch    => hasLocation && hasDestination;
-  bool get isLoading    =>
+  bool get canSearch      => hasLocation && hasDestination;
+  bool get isLoading      =>
       status == WhereToGoStatus.locating ||
-      status == WhereToGoStatus.searching ||
-      status == WhereToGoStatus.loadingRoute;
+          status == WhereToGoStatus.searching ||
+          status == WhereToGoStatus.loadingRoute;
 
   WhereToGoState copyWith({
     WhereToGoStatus? status,
@@ -65,22 +72,26 @@ class WhereToGoState extends Equatable {
     double? destLng,
     List<PlacePrediction>? suggestions,
     List<SegmentModel>? segments,
+    List<TripHistoryModel>? recentTrips,
+    bool? tripsLoading,
     bool clearError       = false,
     bool clearSuggestions = false,
     bool clearSegments    = false,
     bool clearDest        = false,
   }) {
     return WhereToGoState(
-      status:               status              ?? this.status,
-      errorMessage:         clearError          ? null : (errorMessage ?? this.errorMessage),
-      currentLat:           currentLat          ?? this.currentLat,
-      currentLng:           currentLng          ?? this.currentLng,
+      status:               status               ?? this.status,
+      errorMessage:         clearError           ? null : (errorMessage ?? this.errorMessage),
+      currentLat:           currentLat           ?? this.currentLat,
+      currentLng:           currentLng           ?? this.currentLng,
       currentLocationLabel: currentLocationLabel ?? this.currentLocationLabel,
-      selectedPlace:        clearDest           ? null : (selectedPlace ?? this.selectedPlace),
-      destLat:              clearDest           ? null : (destLat       ?? this.destLat),
-      destLng:              clearDest           ? null : (destLng       ?? this.destLng),
-      suggestions:          clearSuggestions    ? []   : (suggestions   ?? this.suggestions),
-      segments:             clearSegments       ? []   : (segments      ?? this.segments),
+      selectedPlace:        clearDest            ? null : (selectedPlace ?? this.selectedPlace),
+      destLat:              clearDest            ? null : (destLat       ?? this.destLat),
+      destLng:              clearDest            ? null : (destLng       ?? this.destLng),
+      suggestions:          clearSuggestions     ? []   : (suggestions   ?? this.suggestions),
+      segments:             clearSegments        ? []   : (segments      ?? this.segments),
+      recentTrips:          recentTrips          ?? this.recentTrips,
+      tripsLoading:         tripsLoading         ?? this.tripsLoading,
     );
   }
 
@@ -90,5 +101,6 @@ class WhereToGoState extends Equatable {
     currentLat, currentLng, currentLocationLabel,
     selectedPlace, destLat, destLng,
     suggestions, segments,
+    recentTrips, tripsLoading,
   ];
 }

@@ -1,8 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sekka/Core/Error/error_handler.dart';
-import 'package:sekka/Features/Profile/Data/Model/trip_history_model.dart';
-import 'package:sekka/Features/Profile/Data/Repo/trip_history_repo.dart';
-import 'package:sekka/Features/Profile/Logic/trip_history_state.dart';
+import 'package:sekka/Features/Profile/Profile/Data/Repo/trip_history_repo.dart';
+import 'package:sekka/Features/Profile/Profile/Logic/trip_history_state.dart';
+
+import '../Data/Model/trip_history_model.dart';
 
 class TripHistoryCubit extends Cubit<TripHistoryState> {
   final TripHistoryRepository repository;
@@ -13,17 +14,13 @@ class TripHistoryCubit extends Cubit<TripHistoryState> {
     emit(state.copyWith(status: TripHistoryStatus.loading));
     try {
       final trips = await repository.getTrips();
-      final total = await repository.getTotalTrips();
-      final completed = await repository.getCompletedTrips();
-      final cancelled = await repository.getCancelledTrips();
+      final total = trips.length;
 
       emit(state.copyWith(
         status: TripHistoryStatus.success,
         trips: trips,
         totalTrips: total,
-        completedTrips: completed,
-        cancelledTrips: cancelled,
-      ));
+       ));
     } catch (e) {
       final failure = ErrorHandler.handleError(e);
       emit(state.copyWith(
@@ -31,6 +28,10 @@ class TripHistoryCubit extends Cubit<TripHistoryState> {
         errorMessage: failure.message,
       ));
     }
+  }
+
+  void setFilter(String filter) {
+    emit(state.copyWith(selectedFilter: filter));
   }
 
   Future<void> createTrip(TripHistoryModel trip) async {

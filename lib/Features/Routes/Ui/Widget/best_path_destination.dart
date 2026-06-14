@@ -5,6 +5,8 @@ import 'package:sekka/Core/Constants/app_color.dart';
 import 'package:sekka/Core/Constants/app_style.dart';
 import 'package:sekka/Core/Constants/app_text.dart';
 import 'package:sekka/Core/Helper/segment_helper.dart';
+import 'package:sekka/Features/Profile/Profile/Data/Model/trip_history_model.dart';
+import 'package:sekka/Features/Profile/Profile/Logic/trip_history_cubit.dart';
 import 'package:sekka/Features/Routes/Data/Model/Transport.dart';
 import 'package:sekka/Features/Routes/Logic/routes_cubit.dart';
 import 'package:sekka/Features/Routes/Logic/routes_state.dart';
@@ -22,13 +24,13 @@ class BestPathDestination extends StatelessWidget {
       builder: (context, state) {
         final cubit = context.read<RoutesCubit>();
         final accentColor =
-            state.selectedTransportSwitching?.color1 ?? AppColor.darkBlue;
+            state.selectedTransportSwitching?.color1 ??
+                AppColor.main;
  
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Search card ──────────────────────────────────────────
-            _SearchCard(accentColor: accentColor, cubit: cubit, state: state),
+             _SearchCard(accentColor: accentColor, cubit: cubit, state: state),
  
             const SizedBox(height: 16),
  
@@ -74,8 +76,7 @@ class _SearchCard extends StatelessWidget {
  
           SizedBox(height: 14.h),
  
-          // ── Search button ────────────────────────────────────────
-          _SearchButton(accentColor: accentColor, cubit: cubit, state: state),
+            _SearchButton(accentColor: accentColor, cubit: cubit, state: state),
         ],
       ),
     );
@@ -239,7 +240,16 @@ class _SearchButton extends StatelessWidget {
       width: double.infinity,
       height: 48.h,
       child: ElevatedButton.icon(
-        onPressed: _isLoading ? null : cubit.getRoutePath,
+        onPressed: _isLoading ? null : ()async{
+          await cubit.getRoutePath();
+          final trip=TripHistoryModel(
+
+               fromStation: cubit.state.selectedTransportStart!.name
+              , toStation: cubit.state.selectedTransportEnd!.name,
+               mode: cubit.state.selectedTransportStart?.type.toString(),
+               dateTime: DateTime.now().toIso8601String());
+    await BlocProvider.of<TripHistoryCubit>(context).createTrip(trip);
+          },
         style: ElevatedButton.styleFrom(
           backgroundColor: accentColor,
           disabledBackgroundColor: accentColor.withOpacity(0.6),

@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sekka/Core/Error/error_handler.dart';
-import 'package:sekka/Features/Profile/Data/Repo/saved_posts_repo.dart';
-import 'package:sekka/Features/Profile/Logic/saved_posts_state.dart';
+import 'package:sekka/Features/Profile/Profile/Data/Repo/saved_posts_repo.dart';
+import 'package:sekka/Features/Profile/Profile/Logic/saved_posts_state.dart';
 
 class SavedPostsCubit extends Cubit<SavedPostsState> {
   final SavedPostsRepository repository;

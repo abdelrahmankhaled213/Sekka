@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:sekka/Features/Profile/Data/Model/saved_post_model.dart';
+import 'package:sekka/Features/Profile/Profile/Data/Model/saved_post_model.dart';
 
 class SavedPostsLocalDataSource {
   static const String _boxName = 'savedPosts';

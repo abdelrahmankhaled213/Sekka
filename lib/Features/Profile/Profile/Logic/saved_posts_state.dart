@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:sekka/Features/Profile/Data/Model/saved_post_model.dart';
+import 'package:sekka/Features/Profile/Profile/Data/Model/saved_post_model.dart';
 
 enum SavedPostsStatus {
   initial,

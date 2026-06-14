@@ -6,6 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Cubit/pick_image_cubit.dart';
 import 'package:sekka/Core/DI/service_locator.dart';
+import 'package:sekka/Features/Profile/Profile/Logic/profile_cubit.dart';
+import 'package:sekka/Features/Profile/Profile/Logic/trip_history_cubit.dart';
+import 'package:sekka/Features/Profile/Profile/UI/profile_screen.dart';
 import 'package:sekka/Features/WhereToGo/Logic/where_to_go_cubit.dart';
 import 'package:sekka/Features/WhereToGo/Ui/Widgets/Screens/where_to_go.dart';
 import 'package:sekka/core/theme/app_colors.dart';
@@ -20,8 +23,6 @@ import 'package:sekka/Features/LostAndFound/View/home_feed_screen_view.dart';
 import 'package:sekka/Features/Map/data/view/screens/map_view.dart';
 import 'package:sekka/Features/NearestStation/Logic/nearest_station_cubit.dart';
 import 'package:sekka/Features/NearestStation/Ui/Widget/View/nearest_station_view.dart';
-import 'package:sekka/Features/Profile/Logic/profile_cubit.dart';
-import 'package:sekka/Features/Profile/UI/profile_screen_view.dart';
 import 'package:sekka/Features/Routes/Logic/routes_cubit.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/View/routes_screen_view.dart';
 
@@ -61,14 +62,14 @@ class MainBottomNavView extends StatefulWidget {
 }
 
 class _MainBottomNavViewState extends State<MainBottomNavView> {
-  
-@override
-initState() {
-super.initState();
- FirebaseMessaging.instance.subscribeToTopic("comments");
-  FirebaseMessaging.instance.subscribeToTopic("posts");  
 
-}
+  @override
+  initState() {
+    super.initState();
+    FirebaseMessaging.instance.subscribeToTopic("comments");
+    FirebaseMessaging.instance.subscribeToTopic("posts");
+
+  }
 
 
   int  _currentIndex = 0;
@@ -82,38 +83,40 @@ super.initState();
     _NavItem(label: 'Messages',     icon: Icons.message_outlined, activeIcon: Icons.message_rounded),
     _NavItem(label: 'Profile',      icon: Icons.person_outline,   activeIcon: Icons.person_rounded),
   ];
-late final List<Widget> _tabs = [
-  // 0 - Home
-  BlocProvider(
-    create: (_) => getIt<WhereToGoCubit>(),
-    child: const WhereToGoScreen (),
-  ),
-  // 1 - Routes
-  BlocProvider(
-    create: (_) => getIt<RoutesCubit>()..fetchTransports(),
-    child: const RoutesScreenView(),
-  ),
-  
-   const MapView(),
-   
-BlocProvider(
-    create: (_) => getIt<LostAndFoundCubit>()..getPosts(),
-    child: const HomeFeedScreen(),
-  ),
-  BlocProvider(
-    create: (_) => getIt<ChatCubit>()..getConversations(),
-    child: const ConversationsScreen(),
-  ),
-  
-  
-  MultiBlocProvider(
-    providers: [
-      BlocProvider(create: (_) => getIt<ProfileCubit>()..getProfile()),
-      BlocProvider(create: (_) => getIt<PickImageCubit>()),
-    ],
-    child: const ProfileScreenView(),
-  ),
-];
+  late final List<Widget> _tabs = [
+    // 0 - Home
+    BlocProvider(
+      create: (_) => getIt<WhereToGoCubit>(),
+
+      child: const WhereToGoScreen (),
+    ),
+    // 1 - Routes
+    BlocProvider(
+      create: (_) => getIt<RoutesCubit>()..fetchTransports(),
+      child: const RoutesScreenView(),
+    ),
+
+    const MapView(),
+
+    BlocProvider(
+      create: (_) => getIt<LostAndFoundCubit>()..getPosts(),
+      child: const HomeFeedScreen(),
+    ),
+    BlocProvider(
+      create: (_) => getIt<ChatCubit>()..getConversations(),
+      child: const ConversationsScreen(),
+    ),
+
+
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => getIt<ProfileCubit>()..getProfile()),
+        BlocProvider(create: (_) => getIt<PickImageCubit>()),
+        BlocProvider(create: (_) => getIt<TripHistoryCubit>()),
+      ],
+      child: const ProfileScreen(),
+    ),
+  ];
 
   void _onTabSelected(int index) {
     if (_currentIndex == index) return;
@@ -145,7 +148,7 @@ BlocProvider(
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 300),
           opacity: _isVisible ? 1.0 : 0.0,
-  child: Padding(
+          child: Padding(
             padding: EdgeInsets.fromLTRB(AppSpacing.lg.w, 0, AppSpacing.lg.w, AppSpacing.xl.h),
             child: _NavBar(
               currentIndex: _currentIndex,
@@ -177,7 +180,7 @@ class _NavBar extends StatelessWidget {
       borderRadius: _K.nav,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: _K.blur, sigmaY: _K.blur),
-  child: Container(
+        child: Container(
           padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm.w, vertical: AppSpacing.sm.h),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.72),
@@ -267,17 +270,17 @@ class _CenterItemState extends State<_CenterItem>
                 height: 52.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-  gradient: LinearGradient(
+                  gradient: LinearGradient(
                     colors: widget.isSelected
                         ? [AppColors.primary, AppColors.secondary]
                         : [
-                            AppColors.primary.withOpacity(0.8),
-                            AppColors.secondary.withOpacity(0.8),
-                          ],
+                      AppColors.primary.withOpacity(0.8),
+                      AppColors.secondary.withOpacity(0.8),
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-  boxShadow: [
+                  boxShadow: [
                     BoxShadow(
                       color: AppColors.primary
                           .withOpacity(widget.isSelected ? 0.4 : 0.2),
@@ -294,7 +297,7 @@ class _CenterItemState extends State<_CenterItem>
                   size: 24.sp,
                 ),
               ),
-  SizedBox(height: AppSpacing.xs.h),
+              SizedBox(height: AppSpacing.xs.h),
               AnimatedDefaultTextStyle(
                 duration: _K.icon,
                 style: AppTextStyles.labelSmall(context).copyWith(
@@ -366,7 +369,7 @@ class _NavItemWidgetState extends State<_NavItemWidget>
         child: AnimatedContainer(
           duration: _K.pill,
           curve: Curves.easeOutCubic,
-  padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm.w, vertical: AppSpacing.sm.h),
+          padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm.w, vertical: AppSpacing.sm.h),
           decoration: BoxDecoration(
             color: widget.isSelected
                 ? AppColors.primary.withOpacity(0.1)
@@ -390,7 +393,7 @@ class _NavItemWidgetState extends State<_NavItemWidget>
                           ? widget.item.activeIcon
                           : widget.item.icon,
                       key: ValueKey(widget.isSelected),
-  color: widget.isSelected
+                      color: widget.isSelected
                           ? AppColors.primary
                           : AppColors.grey,
                       size: 22.sp,
@@ -403,11 +406,11 @@ class _NavItemWidgetState extends State<_NavItemWidget>
                       child: Container(
                         width: 14.w,
                         height: 14.w,
-  decoration: BoxDecoration(
+                        decoration: BoxDecoration(
                           color: AppColors.primary,
                           shape: BoxShape.circle,
                           border:
-                              Border.all(color: Colors.white, width: 1.5),
+                          Border.all(color: Colors.white, width: 1.5),
                         ),
                         child: Center(
                           child: Text(
@@ -424,7 +427,7 @@ class _NavItemWidgetState extends State<_NavItemWidget>
                     ),
                 ],
               ),
-  SizedBox(height: AppSpacing.xs.h),
+              SizedBox(height: AppSpacing.xs.h),
               AnimatedDefaultTextStyle(
                 duration: _K.icon,
                 style: AppTextStyles.labelSmall(context).copyWith(
@@ -480,14 +483,14 @@ class _ChatBotFabState extends State<_ChatBotFab>
         initialChildSize: 0.92,
         minChildSize: 0.5,
         maxChildSize: 0.95,
-  builder: (_, __) => Container(
+        builder: (_, __) => Container(
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.xxl)),
           ),
           child: Column(
             children: [
-  Container(
+              Container(
                 width: 36.w,
                 height: 4.h,
                 margin: EdgeInsets.symmetric(vertical: AppSpacing.md.h),
@@ -528,7 +531,7 @@ class _ChatBotFabState extends State<_ChatBotFab>
             child: Container(
               width: 48.w,
               height: 48.w,
-  margin: EdgeInsets.only(bottom: 92.h),
+              margin: EdgeInsets.only(bottom: 92.h),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: const LinearGradient(

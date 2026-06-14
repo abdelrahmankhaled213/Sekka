@@ -11,6 +11,6 @@ abstract class AppRoute{
   static const String itemDetailAndChatScreen='/itemDetailAndChatScreen';
   static const String chat='/chat';
   static const String conversation='/conversation';
-
+  static const String tripHistoryScreen = '/tripHistoryScreen';
 
 }

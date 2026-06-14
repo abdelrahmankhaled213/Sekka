@@ -7,6 +7,8 @@ import 'package:sekka/Core/Error/failure.dart';
 import 'package:sekka/Core/Helper/segment_helper.dart';
 import 'package:sekka/Core/Helper/toast_helper.dart';
 import 'package:sekka/Core/Helper/transport_type_helper.dart';
+import 'package:sekka/Features/Profile/Profile/Data/Model/trip_history_model.dart';
+import 'package:sekka/Features/Profile/Profile/Data/Repo/trip_history_repo.dart';
 import 'package:sekka/Features/Routes/Data/Model/Repo/routes_repo.dart';
 import 'package:sekka/Features/Routes/Data/Model/Transport.dart';
 import 'package:sekka/Features/Routes/Data/Model/fetch_params.dart';
@@ -16,9 +18,10 @@ import 'package:sekka/Features/Routes/Logic/routes_state.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/plan_your_route.dart';
 
 class RoutesCubit extends Cubit<RoutesState> {
-  final RoutesRepo routesRepo;
+  final RoutesRepo            routesRepo;
+  final TripHistoryRepository tripHistoryRepo;
 
-  RoutesCubit(this.routesRepo) : super(RoutesState());
+  RoutesCubit(this.routesRepo, this.tripHistoryRepo) : super(RoutesState());
 
   final TextEditingController selectedStartController = TextEditingController();
   final TextEditingController selectedEndController   = TextEditingController();
@@ -75,9 +78,9 @@ class RoutesCubit extends Cubit<RoutesState> {
       return;
     }
 
-    final temp                    = selectedStartController.text;
-    selectedStartController.text  = selectedEndController.text;
-    selectedEndController.text    = temp;
+    final temp                   = selectedStartController.text;
+    selectedStartController.text = selectedEndController.text;
+    selectedEndController.text   = temp;
 
     emit(state.copyWith(
       selectedTransportStart: state.selectedTransportEnd,
@@ -107,7 +110,6 @@ class RoutesCubit extends Cubit<RoutesState> {
   // ─── Get route path ────────────────────────────────────────────────────────
 
   Future<void> getRoutePath() async {
-
     if (selectedStartController.text.isEmpty ||
         selectedEndController.text.isEmpty) {
       FlutterToastHelper.showToast(
@@ -115,8 +117,8 @@ class RoutesCubit extends Cubit<RoutesState> {
         color: AppColor.error,
       );
       return;
-        }
-   
+    }
+
     if (selectedStartController.text == selectedEndController.text) {
       FlutterToastHelper.showToast(
         text:  "You can't select the same station for both start and end",
@@ -132,7 +134,6 @@ class RoutesCubit extends Cubit<RoutesState> {
     ));
 
     try {
-    
       final rawSegments = await routesRepo.fetchTransportsPath(
         ParamsRoutePath(
           start: state.selectedTransportStart!.id!,
@@ -140,18 +141,23 @@ class RoutesCubit extends Cubit<RoutesState> {
         ),
       );
 
-final segments = parseSegments(rawSegments);
-for (var segment in segments) {
-  print('Segment: ${segment.boardingStop} to ${segment.alightingStop}');
-  print('  Line: ${segment.lineName}, Direction: ${segment.direction}, Type: ${segment.type}');
-  
-}
+      final segments = parseSegments(rawSegments);
+
+      for (var segment in segments) {
+        debugPrint('Segment: ${segment.boardingStop} to ${segment.alightingStop}');
+        debugPrint('  Line: ${segment.lineName}, Direction: ${segment.direction}, Type: ${segment.type}');
+      }
+
       emit(state.copyWith(
         routesStateEnum: RoutesStateEnum.gettingRoutePathLoaded,
         segments:        segments,
         steps:           [],
         path:            [],
       ));
+
+      // ── Save to trips_history ────────────────────────────────────────────
+      _saveTripHistory(segments);
+
     } catch (e, stackTrace) {
       debugPrint('RoutesCubit getRoutePath error: $e');
       debugPrint('StackTrace: $stackTrace');
@@ -160,6 +166,26 @@ for (var segment in segments) {
         errorState: RoutesStateEnum.gettingRoutePathError,
       );
     }
+  }
+
+  void _saveTripHistory(List<SegmentModel> segments) {
+    if (segments.isEmpty) return;
+
+    final fromStation = segments.first.boardingStop;
+    final toStation   = segments.last.alightingStop;
+    final mode        = segments.first.type.name; // metro / bus / monorail
+
+    final trip = TripHistoryModel(
+      fromStation: fromStation,
+      toStation:   toStation,
+      dateTime:    DateTime.now().toIso8601String(),
+      mode:        mode,
+    );
+
+    // Fire-and-forget — don't block the UI
+    tripHistoryRepo.createTrip(trip).catchError(
+          (e) => debugPrint('RoutesCubit _saveTripHistory error: $e'),
+    );
   }
 
   // ─── Change transport type ─────────────────────────────────────────────────
@@ -248,7 +274,7 @@ for (var segment in segments) {
     try {
       final params = ParamsOfFetchRoutesWithSearch(
         selectedTransportType:
-            state.selectedTransportSwitching?.title ?? TransportType.metro,
+        state.selectedTransportSwitching?.title ?? TransportType.metro,
         searchQuery: searchText,
       );
 

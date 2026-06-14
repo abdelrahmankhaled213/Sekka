@@ -1,6 +1,7 @@
-import 'package:sekka/Features/Profile/Data/DataSource/saved_posts_local_data_source.dart';
-import 'package:sekka/Features/Profile/Data/DataSource/saved_posts_remote_data_source.dart';
-import 'package:sekka/Features/Profile/Data/Model/saved_post_model.dart';
+
+import 'package:sekka/Features/Profile/Profile/Data/DataSource/saved_posts_local_data_source.dart';
+import 'package:sekka/Features/Profile/Profile/Data/DataSource/saved_posts_remote_data_source.dart';
+import 'package:sekka/Features/Profile/Profile/Data/Model/saved_post_model.dart';
 
 class SavedPostsRepository {
   final SavedPostsRemoteDataSource remoteDataSource;

@@ -1,4 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// Re-run:  flutter pub run build_runner build --delete-conflicting-outputs
 
 part of 'trip_history_model.dart';
 
@@ -18,10 +19,10 @@ class TripHistoryModelAdapter extends TypeAdapter<TripHistoryModel> {
     };
     return TripHistoryModel(
       id: fields[0] as String,
-      fromTransport: fields[1] as String,
-      toTransport: fields[2] as String,
+      fromStation: fields[1] as String,
+      toStation: fields[2] as String,
       dateTime: fields[3] as String,
-      status: fields[4] as TripStatus,
+
     );
   }
 
@@ -32,13 +33,12 @@ class TripHistoryModelAdapter extends TypeAdapter<TripHistoryModel> {
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.fromTransport)
+      ..write(obj.fromStation)
       ..writeByte(2)
-      ..write(obj.toTransport)
+      ..write(obj.toStation)
       ..writeByte(3)
-      ..write(obj.dateTime)
-      ..writeByte(4)
-      ..write(obj.status);
+      ..write(obj.dateTime);
+
   }
 
   @override
