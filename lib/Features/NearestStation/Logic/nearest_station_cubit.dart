@@ -6,12 +6,13 @@ import 'package:sekka/Core/Helper/location_helper.dart';
 import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Features/Auth/Logic/transport_model.dart';
 import 'package:sekka/Features/NearestStation/Data/Model/DataSource/capacity_prediction_service.dart';
+import 'package:sekka/Features/NearestStation/Data/Model/capacity_prediction_model.dart';
 import 'package:sekka/Features/NearestStation/Data/Model/nearest_station_model.dart';
 import 'package:sekka/Features/NearestStation/Data/Model/Repo/nearest_station_repo.dart';
 import 'package:sekka/Features/NearestStation/Logic/nearest_station_state.dart';
 
 class NearestStationCubit extends Cubit<NearestStationState> {
-  
+
   final NearestStationRepo repo;
   final CapacityPredictionService predictionService;
 
@@ -28,9 +29,19 @@ class NearestStationCubit extends Cubit<NearestStationState> {
 
     return List.generate(stations.length, (i) {
       final prediction = predictions[i];
-      return prediction != null
-          ? stations[i].copyWith(crowding: prediction.crowdingLevel)
-          : stations[i];
+      if (prediction != null) {
+        return stations[i].copyWith(
+          crowding: prediction.crowdingLevel,
+          fakeSeatsAvailable: prediction.fakeSeatsAvailable,
+          fakeCapacityPercent: prediction.fakeCapacityPercent,
+        );
+      }
+      // No real prediction — still generate fake seat data via random().
+      final fake = CapacityPredictionModel.random();
+      return stations[i].copyWith(
+        fakeSeatsAvailable: fake.fakeSeatsAvailable,
+        fakeCapacityPercent: fake.fakeCapacityPercent,
+      );
     });
   }
 
@@ -138,7 +149,7 @@ class NearestStationCubit extends Cubit<NearestStationState> {
   }
 
   Future<void> applyFilter(TransportType? type) async {
-    
+
     if (state.userLat == null || state.userLng == null) return;
 
     final isSame = type == state.selectedFilter;
