@@ -1095,10 +1095,10 @@ class _LoadingOverlay extends StatelessWidget {
       ),
     );
   }
+  
 }
 
 // ── Error Bar ──────────────────────────────────────────────────────────────────
-
 class _ErrorBar extends StatelessWidget {
   final String       message;
   final VoidCallback onRetry;
