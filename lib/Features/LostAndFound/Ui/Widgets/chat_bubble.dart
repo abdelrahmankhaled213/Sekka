@@ -146,20 +146,34 @@ class ChatBubbleWidget extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                ClipOval(
-                  child: senderAvatar != null ? CachedNetworkImage(
-                    imageUrl: senderAvatar,
-                    width: 32,
-                    height: 32,
-                    fit: BoxFit.cover,
-                  ) : CustomImageWidget(
-                    imageUrl: AppImage.profileIcon,
-                    width: 32,
-                    height: 32,
-                    fit: BoxFit.cover,
-                    semanticLabel: senderAvatarSemanticLabel,
-                  ),
-                ),
+           
+ClipOval(
+  child: senderAvatar != null
+      ? CachedNetworkImage(
+          imageUrl: senderAvatar!,
+          width: 32,
+          height: 32,
+          fit: BoxFit.cover,
+          placeholder: (_, __) => Image.asset(
+            AppImage.profileIcon,
+            width: 32,
+            height: 32,
+            fit: BoxFit.cover,
+          ),
+          errorWidget: (_, __, ___) => Image.asset(
+            AppImage.profileIcon,
+            width: 32,
+            height: 32,
+            fit: BoxFit.cover,
+          ),
+        )
+      : Image.asset(
+          AppImage.profileIcon,
+          width: 32,
+          height: 32,
+          fit: BoxFit.cover,
+        ),
+),           
               ],
             ),
             

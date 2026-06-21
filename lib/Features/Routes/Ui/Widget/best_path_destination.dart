@@ -22,7 +22,7 @@ class BestPathDestination extends StatelessWidget {
       builder: (context, state) {
         final cubit = context.read<RoutesCubit>();
         final accentColor =
-            state.selectedTransportSwitching?.color1 ?? AppColor.darkBlue;
+            state.selectedTransportSwitching?.color1 ?? AppColor.main;
  
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,

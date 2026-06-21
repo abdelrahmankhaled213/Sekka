@@ -748,6 +748,9 @@ class _StationMiniCard extends StatelessWidget {
 
 // ── Station Detail Sheet ───────────────────────────────────────────────────────
 
+
+
+
 class _StationDetailSheet extends StatelessWidget {
   final NearestStationModel station;
   final VoidCallback        onClose;
@@ -772,6 +775,16 @@ class _StationDetailSheet extends StatelessWidget {
       case TransportType.microbus: return '🚐';
       default:                     return '🚝';
     }
+  }
+
+  /// لو السيتس متوفرة يبني label زي "30/35 (86%)"
+  /// لو مش متوفرة يرجع label الزحمة العادي
+  String get _seatsLabel {
+    if (station.totalSeats != null && station.availableSeats != null) {
+      final pct = station.occupancyPercentage!.toStringAsFixed(0);
+      return '${station.availableSeats}/${station.totalSeats} Avaliable • $pct%';
+    }
+    return station.crowding.label;
   }
 
   @override
@@ -901,8 +914,8 @@ class _StationDetailSheet extends StatelessWidget {
               ),
               SizedBox(width: 8.w),
               _Chip(
-                icon:  Icons.people_rounded,
-                label: station.crowding.label,
+                icon:  Icons.event_seat_rounded,
+                label: _seatsLabel,
                 color: _crowdingColor(station.crowding),
               ),
               if (station.predictionScore > 0) ...[
@@ -1042,7 +1055,12 @@ class _Chip extends StatelessWidget {
   }
 }
 
-// ── Loading Overlay ────────────────────────────────────────────────────────────
+
+
+
+
+
+
 
 // ✅ شيلنا Positioned.fill من جوا الـ widget وحطيناه بره في الـ Stack
 class _LoadingOverlay extends StatelessWidget {

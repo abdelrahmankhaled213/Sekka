@@ -1,66 +1,87 @@
-import 'package:equatable/equatable.dart';
-import 'package:sekka/Features/Profile/Data/Model/trip_history_model.dart';
 
-enum TripHistoryStatus { initial, loading, success, error }
+import '../Data/Model/trip_history_model.dart';
 
-class TripHistoryState extends Equatable {
-  final TripHistoryStatus status;
+enum TripStateEnum {
+  initial,
+  loading,
+  success,
+  error,
+  loadingDetails,
+  detailsSuccess,
+  detailsError,
+  deleting,
+  deleteError,
+}
+
+class TripHistoryState {
+  final TripStateEnum tripStateEnum;
   final List<TripHistoryModel> trips;
-  final String selectedFilter; // 'all' | 'metro' | 'monorail' | 'bus' | 'microbus'
-  final int totalTrips;
-  final int completedTrips;
-  final int cancelledTrips;
-  final double totalSpentEGP;
-  final String? errorMessage;
+  final List<TripHistoryModel> filteredTrips;
+  final String? errorMsg;
+
+  // ── Statistics ───────────────────────────────────────────────────
+  final int totalTripsCount;
+  final int metroTripsCount;
+  final int monorailTripsCount;
+  final int busTripsCount;
+  final int microbusTripsCount;
+
+  // ── Filtering & Sorting ───────────────────────────────────────────
+  final String? selectedFilter; // 'metro' | 'monorail' | 'bus' | 'microbus' | null
+  final SortBy currentSortBy;
+
+  // ── Trip Details ───────────────────────────────────────────────────
+  final TripHistoryModel? selectedTripDetails;
 
   const TripHistoryState({
-    this.status = TripHistoryStatus.initial,
-    this.trips = const [],
-    this.selectedFilter = 'all',
-    this.totalTrips = 0,
-    this.completedTrips = 0,
-    this.cancelledTrips = 0,
-    this.totalSpentEGP = 0.0,
-    this.errorMessage,
+    required this.tripStateEnum,
+    required this.trips,
+    required this.filteredTrips,
+    this.errorMsg,
+    this.totalTripsCount = 0,
+    this.metroTripsCount = 0,
+    this.monorailTripsCount = 0,
+    this.busTripsCount = 0,
+    this.microbusTripsCount = 0,
+    this.selectedFilter,
+    this.currentSortBy = SortBy.newestFirst,
+    this.selectedTripDetails,
   });
 
-  /// Trips visible after applying [selectedFilter].
-  List<TripHistoryModel> get filteredTrips {
-    if (selectedFilter == 'all') return trips;
-    return trips.where((t) => t.mode == selectedFilter).toList();
-  }
-
   TripHistoryState copyWith({
-    TripHistoryStatus? status,
+    TripStateEnum? tripStateEnum,
     List<TripHistoryModel>? trips,
+    List<TripHistoryModel>? filteredTrips,
+    String? errorMsg,
+    int? totalTripsCount,
+    int? metroTripsCount,
+    int? monorailTripsCount,
+    int? busTripsCount,
+    int? microbusTripsCount,
     String? selectedFilter,
-    int? totalTrips,
-    int? completedTrips,
-    int? cancelledTrips,
-    double? totalSpentEGP,
-    String? errorMessage,
+    SortBy? currentSortBy,
+    TripHistoryModel? selectedTripDetails,
   }) {
     return TripHistoryState(
-      status: status ?? this.status,
+      tripStateEnum: tripStateEnum ?? this.tripStateEnum,
       trips: trips ?? this.trips,
-      selectedFilter: selectedFilter ?? this.selectedFilter,
-      totalTrips: totalTrips ?? this.totalTrips,
-      completedTrips: completedTrips ?? this.completedTrips,
-      cancelledTrips: cancelledTrips ?? this.cancelledTrips,
-      totalSpentEGP: totalSpentEGP ?? this.totalSpentEGP,
-      errorMessage: errorMessage,
+      filteredTrips: filteredTrips ?? this.filteredTrips,
+      errorMsg: errorMsg,
+      totalTripsCount: totalTripsCount ?? this.totalTripsCount,
+      metroTripsCount: metroTripsCount ?? this.metroTripsCount,
+      monorailTripsCount: monorailTripsCount ?? this.monorailTripsCount,
+      busTripsCount: busTripsCount ?? this.busTripsCount,
+      microbusTripsCount: microbusTripsCount ?? this.microbusTripsCount,
+      selectedFilter: selectedFilter,
+      currentSortBy: currentSortBy ?? this.currentSortBy,
+      selectedTripDetails: selectedTripDetails,
     );
   }
+}
 
-  @override
-  List<Object?> get props => [
-        status,
-        trips,
-        selectedFilter,
-        totalTrips,
-        completedTrips,
-        cancelledTrips,
-        totalSpentEGP,
-        errorMessage,
-      ];
+enum SortBy {
+  newestFirst,
+  oldestFirst,
+  longestDuration,
+  shortestDuration,
 }

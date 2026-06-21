@@ -128,7 +128,7 @@ class PostCardWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ── top row ──────────────────────────────────────────────
+
                 Row(
                   children: [
                     ClipOval(
@@ -315,18 +315,11 @@ class PostCardWidget extends StatelessWidget {
 
                     const Spacer(),
 
-                    // status badge
-                    StatusBadgeWidget(
-                      status:   isResolved
-                          ? PostStatus.resolved
-                          : PostStatus.active,
-                      fontSize: 10.sp,
-                    ),
 
-                    SizedBox(width: 8.w),
 
-                    // ── save toggle button ────────────────────────────────
-                    _SaveButton(postData: postData),
+
+                    // // ── save toggle button ────────────────────────────────
+                    // _SaveButton(postData: postData),
                   ],
                 ),
               ],

@@ -22,7 +22,6 @@ class TripHistoryModelAdapter extends TypeAdapter<TripHistoryModel> {
       fromStation: fields[1] as String,
       toStation: fields[2] as String,
       dateTime: fields[3] as String,
-      status: fields[4] as TripStatus,
     );
   }
 
@@ -37,9 +36,7 @@ class TripHistoryModelAdapter extends TypeAdapter<TripHistoryModel> {
       ..writeByte(2)
       ..write(obj.toStation)
       ..writeByte(3)
-      ..write(obj.dateTime)
-      ..writeByte(4)
-      ..write(obj.status);
+      ..write(obj.dateTime);
   }
 
   @override
@@ -53,41 +50,3 @@ class TripHistoryModelAdapter extends TypeAdapter<TripHistoryModel> {
           typeId == other.typeId;
 }
 
-class TripStatusAdapter extends TypeAdapter<TripStatus> {
-  @override
-  final int typeId = 1;
-
-  @override
-  TripStatus read(BinaryReader reader) {
-    switch (reader.readByte()) {
-      case 0:
-        return TripStatus.completed;
-      case 1:
-        return TripStatus.cancelled;
-      default:
-        return TripStatus.completed;
-    }
-  }
-
-  @override
-  void write(BinaryWriter writer, TripStatus obj) {
-    switch (obj) {
-      case TripStatus.completed:
-        writer.writeByte(0);
-        break;
-      case TripStatus.cancelled:
-        writer.writeByte(1);
-        break;
-    }
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TripStatusAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}

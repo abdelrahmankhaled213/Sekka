@@ -10,6 +10,7 @@ import 'package:sekka/Core/Helper/bloc_observer_helper.dart';
 import 'package:sekka/Core/Helper/notification_helper.dart';
 import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Features/Map/data/Logic/cubit/map_cubit.dart';
+import 'package:sekka/Features/Profile/Data/Model/trip_history_model.dart';
 import 'package:sekka/firebase_options.dart';
 import 'package:sekka/sekka.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -38,9 +39,10 @@ void main() async{
   );
   await getIt<NotificationHelper>().init();
   await Hive.initFlutter();
+  
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(TransportTypeAdapter());
-  
+  Hive.registerAdapter(TripHistoryModelAdapter());
   runApp(
   BlocProvider(create: (context) {
     return getIt<MapCubit>()..initLocation();

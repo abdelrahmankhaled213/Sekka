@@ -81,8 +81,6 @@ class ProfileFooterSectionWidget extends StatelessWidget {
 
         BlocBuilder<ProfileCubit, ProfileState>(
           builder: (context, state) {
-            final isLoading = state.profileStateEnum ==
-                ProfileStateEnum.logoutLoading;
 
             return Container(
               decoration: BoxDecoration(
@@ -99,9 +97,7 @@ class ProfileFooterSectionWidget extends StatelessWidget {
                 ],
               ),
               child: InkWell(
-                onTap: isLoading
-                    ? null
-                    : () => _showLogoutDialog(context),
+                onTap: () => _showLogoutDialog(context),
                 borderRadius: BorderRadius.circular(20),
                 splashColor: AppColor .errorContainer,
                 child: Padding(
@@ -116,14 +112,8 @@ class ProfileFooterSectionWidget extends StatelessWidget {
                           color: AppColor.errorContainer,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: isLoading
-                            ? const Padding(
-                          padding: EdgeInsets.all(10),
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColor.error),
-                        )
-                            : const Icon(Icons.logout_rounded,
+                        child: 
+                             const Icon(Icons.logout_rounded,
                             color: AppColor.error, size: 20),
                       ),
                       const SizedBox(width: 14),

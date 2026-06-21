@@ -108,7 +108,7 @@ class SearchCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                // Search icon
+               
                 Padding(
                   padding: EdgeInsets.only(left: 12.w),
                   child: Icon(
@@ -132,9 +132,12 @@ class SearchCard extends StatelessWidget {
                           'Where do you want to go?',
                       hintStyle: TextStyle(
                         fontSize: 14.sp,
+                        fontFamily: 'Roboto',
                         color: AppColors.muted,
                       ),
                       border: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      enabledBorder: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(
                           horizontal: 10.w, vertical: 11.h),
                     ),
@@ -172,6 +175,10 @@ class SearchCard extends StatelessWidget {
                   ),
               ],
             ),
+        
+        
+        
+        
           ),
 
           SizedBox(height: 12.h),
@@ -287,6 +294,7 @@ class _LocationRow extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 14.sp,
+                  fontFamily: 'Roboto',
                   color: isHint ? AppColors.muted : AppColors.textPrimary,
                   fontWeight: isHint ? FontWeight.w400 : FontWeight.w500,
                 ),

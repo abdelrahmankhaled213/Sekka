@@ -14,8 +14,14 @@ if (localPropertiesFile.exists()) {
     localProperties.load(FileInputStream(localPropertiesFile))
 }
 
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 android {
-    namespace = "com.example.abdelrahmankhaled.sekka"
+    namespace = "com.abdelrahmankhaled.sekka"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
@@ -27,6 +33,14 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
+signingConfigs {
+    create("release") {
+        keyAlias = keystoreProperties["keyAlias"] as String
+        keyPassword = keystoreProperties["keyPassword"] as String
+        storeFile = file(keystoreProperties["storeFile"] as String)
+        storePassword = keystoreProperties["storePassword"] as String
+    }
+}
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
@@ -35,7 +49,7 @@ android {
         manifestPlaceholders["MAPS_API_KEY"] =
             localProperties.getProperty("MAPS_API_KEY") ?: ""
 
-        applicationId = "com.example.abdelrahmankhaled.sekka"
+        applicationId = "com.abdelrahmankhaled.sekka"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = flutter.versionCode
@@ -44,7 +58,7 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }

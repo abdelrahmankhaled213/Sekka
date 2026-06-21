@@ -11,11 +11,9 @@ import 'package:sekka/Features/LostAndFound/Logic/chat_cubit.dart';
 import 'package:sekka/Features/LostAndFound/Logic/lost_found.dart';
 import 'package:sekka/Features/LostAndFound/View/chat_screen.dart';
 import 'package:sekka/Features/LostAndFound/View/item_detail_and_chat_screen.dart';
-import 'package:sekka/Features/Map/Data/Logic/cubit/map_cubit.dart';
-import 'package:sekka/Features/Map/Data/Logic/cubit/maps_state.dart';
-import 'package:sekka/Features/Map/Data/View/screens/map_view.dart';
 import 'package:sekka/Features/OnBoarding/Ui/Views/OnBoardingView.dart';
 import '../../Features/Auth/Ui/auth_wrapper_view.dart';
+import '../../Features/Profile/UI/trip_history_screen.dart';
 import '../../Features/Splash/View/splash_screen_view.dart';
 import '../Constants/app_route.dart';
 import '../DI/service_locator.dart';
@@ -43,6 +41,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
           child: SetupProfileView(),
         ),
       );
+
+    case AppRoute.history:
+      return CustomPageRoute(page: TripHistoryScreen());
 
 case AppRoute.chat:
    final args = settings.arguments as Map<String, dynamic>;

@@ -1,33 +1,44 @@
-import 'package:equatable/equatable.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_model.dart';
-import 'package:sekka/Features/Auth/Data/Model/user_update.dart';
 import 'package:sekka/Core/Helper/transport_type_helper.dart';
 
 enum ProfileStateEnum {
   initial,
+  // get profile
   getProfileLoading,
   getProfileSuccess,
   getProfileError,
-  editProfileLoading,
-  editProfileSuccess,
-  editProfileError,
+  // update profile (text)
+  updating,
+  updateSuccess,
+  updateError,
+  // image upload
+  uploadingImage,
+  imageUploadSuccess,
+  imageUploadError,
+  // image delete
+  deletingImage,
+  imageDeleteSuccess,
+  imageDeleteError,
+  // logout
   logoutLoading,
   logoutSuccess,
   logoutError,
 }
 
-class ProfileState extends Equatable {
+class ProfileState {
   final ProfileStateEnum profileStateEnum;
-  final UserModel? userModel;
-  final UpdateUserRequest? updateUserRequest;
+  final UserModel? userModel; // غيرت الاسم من user لـ userModel عشان يطابق الاستخدام
   final String? errorMsg;
-  final List<TransportType> selectedTransports; // non-nullable items
+  
+  // ── Transport Preferences ───────────────────────────────
+  final List<TransportType> selectedTransports;
+  
+  // ── Image Management ───────────────────────────────
   final bool isImageRemoved;
 
   const ProfileState({
     required this.profileStateEnum,
     this.userModel,
-    this.updateUserRequest,
     this.errorMsg,
     this.selectedTransports = const [],
     this.isImageRemoved = false,
@@ -36,28 +47,16 @@ class ProfileState extends Equatable {
   ProfileState copyWith({
     ProfileStateEnum? profileStateEnum,
     UserModel? userModel,
-    UpdateUserRequest? updateUserRequest,
     String? errorMsg,
-    List<TransportType>? selectedTransports, // non-nullable items
+    List<TransportType>? selectedTransports,
     bool? isImageRemoved,
   }) {
     return ProfileState(
       profileStateEnum: profileStateEnum ?? this.profileStateEnum,
       userModel: userModel ?? this.userModel,
-      updateUserRequest: updateUserRequest ?? this.updateUserRequest,
-      errorMsg: errorMsg ?? this.errorMsg,
+      errorMsg: errorMsg,
       selectedTransports: selectedTransports ?? this.selectedTransports,
       isImageRemoved: isImageRemoved ?? this.isImageRemoved,
     );
   }
-
-  @override
-  List<Object?> get props => [
-    profileStateEnum,
-    userModel,
-    updateUserRequest,
-    errorMsg,
-    selectedTransports,
-    isImageRemoved,
-  ];
 }

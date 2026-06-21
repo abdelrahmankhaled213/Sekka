@@ -5,6 +5,7 @@ import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Features/Profile/Logic/profile_cubit.dart';
 import 'package:sekka/Features/Profile/Logic/profile_state.dart';
 
+
 class ProfilePreferencesSectionWidget extends StatefulWidget {
   const ProfilePreferencesSectionWidget({super.key});
 
@@ -15,7 +16,7 @@ class ProfilePreferencesSectionWidget extends StatefulWidget {
 
 class _ProfilePreferencesSectionWidgetState
     extends State<ProfilePreferencesSectionWidget> {
-      
+
   bool _notificationsEnabled = true;
 
   static final List<Map<String, dynamic>> _transportModes = [
@@ -51,10 +52,12 @@ class _ProfilePreferencesSectionWidgetState
 
   @override
   Widget build(BuildContext context) {
+    
     final theme = Theme.of(context);
 
     return BlocBuilder<ProfileCubit, ProfileState>(
       builder: (context, state) {
+
         final selectedModes = state.selectedTransports;
 
         return Container(
@@ -72,87 +75,7 @@ class _ProfilePreferencesSectionWidgetState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Header ──────────────────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: Text(
-                  'PREFERENCES',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: const Color(0xFF9E9E9E),
-                    letterSpacing: 1.2,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
 
-              // ── Notifications toggle ─────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 4),
-                child: Row(
-                  children: [
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: _notificationsEnabled
-                            ? AppColor.successContainer
-                            : const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        _notificationsEnabled
-                            ? Icons.notifications_active_rounded
-                            : Icons.notifications_off_outlined,
-                        color: _notificationsEnabled
-                            ? AppColor.main
-                            : const Color(0xFF9E9E9E),
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Smart Notifications',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              color: const Color(0xFF1A1A1A),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            _notificationsEnabled
-                                ? 'Arrival alerts & crowd predictions on'
-                                : 'Notifications are disabled',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: _notificationsEnabled
-                                  ? AppColor.success
-                                  : const Color(0xFF9E9E9E),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Switch(
-                      value: _notificationsEnabled,
-                      onChanged: (v) =>
-                          setState(() => _notificationsEnabled = v),
-                    ),
-                  ],
-                ),
-              ),
-
-              const Divider(
-                height: 1,
-                indent: 72,
-                endIndent: 16,
-                color: Color(0xFFF0F0F0),
-              ),
-
-              // ── Favourite transport modes ────────────────────────────────
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
                 child: Row(

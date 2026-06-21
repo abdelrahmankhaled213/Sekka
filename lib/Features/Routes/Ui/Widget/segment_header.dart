@@ -15,9 +15,9 @@ class SegmentHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit       = context.read<RoutesCubit>();
     final accentColor = cubit.state.selectedTransportSwitching?.color1 
-                        ?? AppColor.darkBlue;
+                        ?? AppColor.main;
 
-    // ✅ price و time من الـ getters اللي أضفناهم في SegmentModel
+    
     final price    = segment.ticketPrice;
     final duration = segment.durationMinutes;
 

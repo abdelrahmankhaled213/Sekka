@@ -23,7 +23,6 @@ import 'package:sekka/Features/LostAndFound/View/home_feed_screen_view.dart';
 import 'package:sekka/Features/Routes/Logic/routes_cubit.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/View/routes_screen_view.dart';
 
-
 class _K {
   const _K._();
   static const Duration pill   = Duration(milliseconds: 320);
@@ -35,7 +34,6 @@ class _K {
   static const double blur     = 16;
   static const int centerIndex = 2;
 }
-
 
 class _NavItem {
   const _NavItem({
@@ -50,7 +48,6 @@ class _NavItem {
   final bool     isCenter;
 }
 
-
 class MainBottomNavView extends StatefulWidget {
   const MainBottomNavView({super.key});
 
@@ -59,15 +56,12 @@ class MainBottomNavView extends StatefulWidget {
 }
 
 class _MainBottomNavViewState extends State<MainBottomNavView> {
-  
-@override
-initState() {
-super.initState();
-FirebaseMessaging.instance.subscribeToTopic("comments");
-FirebaseMessaging.instance.subscribeToTopic("posts");  
-
-}
-
+  @override
+  void initState() {
+    super.initState();
+    FirebaseMessaging.instance.subscribeToTopic("comments");
+    FirebaseMessaging.instance.subscribeToTopic("posts");  
+  }
 
   int  _currentIndex = 0;
   bool _isVisible    = true;
@@ -79,39 +73,33 @@ FirebaseMessaging.instance.subscribeToTopic("posts");
     _NavItem(label: 'Lost & Found', icon: Icons.restore_outlined, activeIcon: Icons.restore_rounded),
     _NavItem(label: 'Profile',      icon: Icons.person_outline,   activeIcon: Icons.person_rounded),
   ];
-late final List<Widget> _tabs = [
- 
-  BlocProvider(
-    create: (_) => getIt<WhereToGoCubit>(),
-    child: const WhereToGoScreen (),
-  ),
- 
-  BlocProvider(
-    create: (_) => getIt<RoutesCubit>()..fetchTransports(),
-    child: const RoutesScreenView(),
-  ),
-  
-  BlocProvider(
-    create: (_) => getIt<NearestStationCubit>(),
-    child: const NearestStationView(),
-  ),
-  
-BlocProvider(
-    create: (_) => getIt<LostAndFoundCubit>()..getPosts(),
-    child: const HomeFeedScreen(),
-  ),
- 
 
-
-  MultiBlocProvider(
-    providers: [
-      BlocProvider(create: (_) => getIt<ProfileCubit>()..getProfile()),
-      BlocProvider(create: (_) => getIt<PickImageCubit>()),
-      BlocProvider(create: (_) => getIt<TripHistoryCubit>()),
-    ],
-    child: const ProfileScreen(),
-  ),
-];
+  late final List<Widget> _tabs = [
+    BlocProvider(
+      create: (_) => getIt<WhereToGoCubit>(),
+      child: const WhereToGoScreen(),
+    ),
+    BlocProvider(
+      create: (_) => getIt<RoutesCubit>()..fetchTransports(),
+      child: const RoutesScreenView(),
+    ),
+    BlocProvider(
+      create: (_) => getIt<NearestStationCubit>(),
+      child: const NearestStationView(),
+    ),
+    BlocProvider(
+      create: (_) => getIt<LostAndFoundCubit>()..getPosts(),
+      child: const HomeFeedScreen(),
+    ),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => getIt<ProfileCubit>()..getProfile()),
+        BlocProvider(create: (_) => getIt<PickImageCubit>()),
+        BlocProvider(create: (_) => getIt<TripHistoryCubit>()),
+      ],
+      child: const ProfileScreen(),
+    ),
+  ];
 
   void _onTabSelected(int index) {
     if (_currentIndex == index) return;
@@ -122,20 +110,25 @@ BlocProvider(
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      body: NotificationListener<UserScrollNotification>(
-        onNotification: (n) {
-          if (n.direction == ScrollDirection.reverse && _isVisible) {
-            setState(() => _isVisible = false);
-          } else if (n.direction == ScrollDirection.forward && !_isVisible) {
-            setState(() => _isVisible = true);
-          }
-          return true;
-        },
-
-        child: IndexedStack(index: _currentIndex, children: _tabs),
+      // استخدمنا Stack هنا عشان الـ ChatBot يتحرك بحرية فوق الـ Tabs والـ Nav Bar
+      body: Stack(
+        children: [
+          NotificationListener<UserScrollNotification>(
+            onNotification: (n) {
+              if (n.direction == ScrollDirection.reverse && _isVisible) {
+                setState(() => _isVisible = false);
+              } else if (n.direction == ScrollDirection.forward && !_isVisible) {
+                setState(() => _isVisible = true);
+              }
+              return true;
+            },
+            child: IndexedStack(index: _currentIndex, children: _tabs),
+          ),
+          
+          // استدعاء زرار الشات الـ Draggable هنا وتمرير حالة الـ Navigation Bar
+          _ChatBotFab(navVisible: _isVisible),
+        ],
       ),
-      floatingActionButton: _ChatBotFab(navVisible: _isVisible),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: AnimatedSlide(
         duration: _K.slide,
         curve: Curves.easeInOut,
@@ -143,7 +136,7 @@ BlocProvider(
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 300),
           opacity: _isVisible ? 1.0 : 0.0,
-  child: Padding(
+          child: Padding(
             padding: EdgeInsets.fromLTRB(AppSpacing.lg.w, 0, AppSpacing.lg.w, AppSpacing.xl.h),
             child: _NavBar(
               currentIndex: _currentIndex,
@@ -156,7 +149,6 @@ BlocProvider(
     );
   }
 }
-
 
 class _NavBar extends StatelessWidget {
   const _NavBar({
@@ -175,7 +167,7 @@ class _NavBar extends StatelessWidget {
       borderRadius: _K.nav,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: _K.blur, sigmaY: _K.blur),
-  child: Container(
+        child: Container(
           padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm.w, vertical: AppSpacing.sm.h),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.72),
@@ -214,7 +206,6 @@ class _NavBar extends StatelessWidget {
   }
 }
 
-
 class _CenterItem extends StatefulWidget {
   const _CenterItem({required this.isSelected, required this.onTap});
   final bool isSelected;
@@ -224,8 +215,7 @@ class _CenterItem extends StatefulWidget {
   State<_CenterItem> createState() => _CenterItemState();
 }
 
-class _CenterItemState extends State<_CenterItem>
-    with SingleTickerProviderStateMixin {
+class _CenterItemState extends State<_CenterItem> with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl = AnimationController(
     vsync: this,
     duration: _K.tap,
@@ -251,8 +241,7 @@ class _CenterItemState extends State<_CenterItem>
       width: 72.w,
       child: AnimatedBuilder(
         animation: _ctrl,
-        builder: (_, child) =>
-            Transform.scale(scale: 1 - _ctrl.value, child: child),
+        builder: (_, child) => Transform.scale(scale: 1 - _ctrl.value, child: child),
         child: GestureDetector(
           onTap: _onTap,
           behavior: HitTestBehavior.opaque,
@@ -265,7 +254,7 @@ class _CenterItemState extends State<_CenterItem>
                 height: 52.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-  gradient: LinearGradient(
+                  gradient: LinearGradient(
                     colors: widget.isSelected
                         ? [AppColors.primary, AppColors.secondary]
                         : [
@@ -275,24 +264,21 @@ class _CenterItemState extends State<_CenterItem>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-  boxShadow: [
+                  boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary
-                          .withOpacity(widget.isSelected ? 0.4 : 0.2),
+                      color: AppColors.primary.withOpacity(widget.isSelected ? 0.4 : 0.2),
                       blurRadius: widget.isSelected ? 14 : 8,
                       offset: const Offset(0, 4),
                     ),
                   ],
                 ),
                 child: Icon(
-                  widget.isSelected
-                      ? Icons.map_rounded
-                      : Icons.map_outlined,
+                  widget.isSelected ? Icons.map_rounded : Icons.map_outlined,
                   color: Colors.white,
                   size: 24.sp,
                 ),
               ),
-  SizedBox(height: AppSpacing.xs.h),
+              SizedBox(height: AppSpacing.xs.h),
               AnimatedDefaultTextStyle(
                 duration: _K.icon,
                 style: AppTextStyles.labelSmall(context).copyWith(
@@ -315,7 +301,6 @@ class _CenterItemState extends State<_CenterItem>
   }
 }
 
-
 class _NavItemWidget extends StatefulWidget {
   const _NavItemWidget({
     required this.item,
@@ -333,8 +318,7 @@ class _NavItemWidget extends StatefulWidget {
   State<_NavItemWidget> createState() => _NavItemWidgetState();
 }
 
-class _NavItemWidgetState extends State<_NavItemWidget>
-    with SingleTickerProviderStateMixin {
+class _NavItemWidgetState extends State<_NavItemWidget> with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl = AnimationController(
     vsync: this,
     duration: _K.tap,
@@ -358,19 +342,16 @@ class _NavItemWidgetState extends State<_NavItemWidget>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _ctrl,
-      builder: (_, child) =>
-          Transform.scale(scale: 1 - _ctrl.value, child: child),
+      builder: (_, child) => Transform.scale(scale: 1 - _ctrl.value, child: child),
       child: GestureDetector(
         onTap: _onTap,
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
           duration: _K.pill,
           curve: Curves.easeOutCubic,
-  padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm.w, vertical: AppSpacing.sm.h),
+          padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm.w, vertical: AppSpacing.sm.h),
           decoration: BoxDecoration(
-            color: widget.isSelected
-                ? AppColors.primary.withOpacity(0.1)
-                : Colors.transparent,
+            color: widget.isSelected ? AppColors.primary.withOpacity(0.1) : Colors.transparent,
             borderRadius: _K.itm,
           ),
           child: Column(
@@ -386,13 +367,9 @@ class _NavItemWidgetState extends State<_NavItemWidget>
                       child: FadeTransition(opacity: anim, child: child),
                     ),
                     child: Icon(
-                      widget.isSelected
-                          ? widget.item.activeIcon
-                          : widget.item.icon,
+                      widget.isSelected ? widget.item.activeIcon : widget.item.icon,
                       key: ValueKey(widget.isSelected),
-  color: widget.isSelected
-                          ? AppColors.primary
-                          : AppColors.grey,
+                      color: widget.isSelected ? AppColors.primary : AppColors.grey,
                       size: 22.sp,
                     ),
                   ),
@@ -403,11 +380,10 @@ class _NavItemWidgetState extends State<_NavItemWidget>
                       child: Container(
                         width: 14.w,
                         height: 14.w,
-  decoration: BoxDecoration(
+                        decoration: BoxDecoration(
                           color: AppColors.primary,
                           shape: BoxShape.circle,
-                          border:
-                              Border.all(color: Colors.white, width: 1.5),
+                          border: Border.all(color: Colors.white, width: 1.5),
                         ),
                         child: Center(
                           child: Text(
@@ -424,13 +400,11 @@ class _NavItemWidgetState extends State<_NavItemWidget>
                     ),
                 ],
               ),
-  SizedBox(height: AppSpacing.xs.h),
+              SizedBox(height: AppSpacing.xs.h),
               AnimatedDefaultTextStyle(
                 duration: _K.icon,
                 style: AppTextStyles.labelSmall(context).copyWith(
-                  fontWeight: widget.isSelected
-                      ? FontWeight.w700
-                      : FontWeight.w500,
+                  fontWeight: widget.isSelected ? FontWeight.w700 : FontWeight.w500,
                   color: widget.isSelected ? AppColors.primary : AppColors.grey,
                 ),
                 child: Text(
@@ -447,6 +421,7 @@ class _NavItemWidgetState extends State<_NavItemWidget>
   }
 }
 
+// ── التعديل الأساسي هنا للـ ChatBot ليصبح قابل للسحب (Draggable) ──
 class _ChatBotFab extends StatefulWidget {
   const _ChatBotFab({required this.navVisible});
   final bool navVisible;
@@ -455,14 +430,17 @@ class _ChatBotFab extends StatefulWidget {
   State<_ChatBotFab> createState() => _ChatBotFabState();
 }
 
-class _ChatBotFabState extends State<_ChatBotFab>
-    with SingleTickerProviderStateMixin {
+class _ChatBotFabState extends State<_ChatBotFab> with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 180),
     lowerBound: 0,
     upperBound: 0.07,
   );
+
+  // هنا بنخزن الـ Y Position المبدئي للزرار
+  double _yPosition = 500.0;
+  bool _isFirstLayout = true;
 
   Future<void> _onTap() async {
     await _ctrl.forward();
@@ -480,14 +458,14 @@ class _ChatBotFabState extends State<_ChatBotFab>
         initialChildSize: 0.92,
         minChildSize: 0.5,
         maxChildSize: 0.95,
-  builder: (_, __) => Container(
+        builder: (_, __) => Container(
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.xxl)),
           ),
           child: Column(
             children: [
-  Container(
+              Container(
                 width: 36.w,
                 height: 4.h,
                 margin: EdgeInsets.symmetric(vertical: AppSpacing.md.h),
@@ -512,42 +490,69 @@ class _ChatBotFabState extends State<_ChatBotFab>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSlide(
-      duration: _K.slide,
-      curve: Curves.easeInOut,
-      offset: widget.navVisible ? Offset.zero : const Offset(0, 2),
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 300),
-        opacity: widget.navVisible ? 1.0 : 0.0,
-        child: AnimatedBuilder(
-          animation: _ctrl,
-          builder: (_, child) =>
-              Transform.scale(scale: 1 - _ctrl.value, child: child),
-          child: GestureDetector(
-            onTap: _onTap,
-            child: Container(
-              width: 48.w,
-              height: 48.w,
-  margin: EdgeInsets.only(bottom: 92.h),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [AppColors.primary, AppColors.secondary],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.35),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final bottomPadding = mediaQuery.padding.bottom;
+    final topPadding = mediaQuery.padding.top;
+
+    // لتحديد مكانه المبدئي فوق الـ Bottom Nav Bar أول ما الشاشة تفتح
+    if (_isFirstLayout && screenHeight > 0) {
+      _yPosition = screenHeight - bottomPadding - 160.h;
+      _isFirstLayout = false;
+    }
+
+    return Positioned(
+      right: 16.w, // مسافة ثابتة من اليمين
+      top: _yPosition,
+      child: AnimatedSlide(
+        duration: _K.slide,
+        curve: Curves.easeInOut,
+        // بيختفي وينزل لو الـ Nav Bar اختفت أثناء الـ Scroll
+        offset: widget.navVisible ? Offset.zero : const Offset(0, 2),
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 300),
+          opacity: widget.navVisible ? 1.0 : 0.0,
+          child: AnimatedBuilder(
+            animation: _ctrl,
+            builder: (_, child) => Transform.scale(scale: 1 - _ctrl.value, child: child),
+            child: GestureDetector(
+              onTap: _onTap,
+              // تفعيل ميزة السحب فوق وتحت
+              onVerticalDragUpdate: (details) {
+                setState(() {
+                  _yPosition += details.delta.dy;
+
+                  // حماية الزرار عشان ما يخرجش بره الشاشة (بين الـ Status Bar والـ Nav Bar)
+                  double minTop = topPadding + 20.h;
+                  double maxBottom = screenHeight - bottomPadding - 140.h;
+
+                  if (_yPosition < minTop) _yPosition = minTop;
+                  if (_yPosition > maxBottom) _yPosition = maxBottom;
+                });
+              },
+              child: Container(
+                width: 48.w,
+                height: 48.w,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [AppColors.primary, AppColors.secondary],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                ],
-              ),
-              child: Icon(
-                Icons.smart_toy_rounded,
-                color: Colors.white,
-                size: 22.sp,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.35),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.smart_toy_rounded,
+                  color: Colors.white,
+                  size: 22.sp,
+                ),
               ),
             ),
           ),

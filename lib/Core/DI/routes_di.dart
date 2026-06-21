@@ -18,6 +18,6 @@ void initRoutesDI()  {
 getIt.registerLazySingleton(
       () => TripsRepo( getIt()));
   /// Cubit
-  getIt.registerFactory(() => RoutesCubit(getIt()));
+  getIt.registerFactory(() => RoutesCubit(getIt(), getIt()));
   getIt.registerFactory(() => TripCubit(getIt(), getIt()));
 }

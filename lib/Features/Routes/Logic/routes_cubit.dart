@@ -7,6 +7,7 @@ import 'package:sekka/Core/Error/failure.dart';
 import 'package:sekka/Core/Helper/segment_helper.dart';
 import 'package:sekka/Core/Helper/toast_helper.dart';
 import 'package:sekka/Core/Helper/transport_type_helper.dart';
+import 'package:sekka/Features/Profile/Data/Repo/trip_history_repo.dart'; // ← ضيف
 import 'package:sekka/Features/Routes/Data/Model/Repo/routes_repo.dart';
 import 'package:sekka/Features/Routes/Data/Model/Transport.dart';
 import 'package:sekka/Features/Routes/Data/Model/fetch_params.dart';
@@ -17,8 +18,12 @@ import 'package:sekka/Features/Routes/Ui/Widget/plan_your_route.dart';
 
 class RoutesCubit extends Cubit<RoutesState> {
   final RoutesRepo routesRepo;
+  final TripHistoryRepository tripHistoryRepo; // ← ضيف
 
-  RoutesCubit(this.routesRepo) : super(RoutesState());
+  RoutesCubit(
+    this.routesRepo,
+    this.tripHistoryRepo, // ← ضيف
+  ) : super(RoutesState());
 
   final TextEditingController selectedStartController = TextEditingController();
   final TextEditingController selectedEndController   = TextEditingController();
@@ -107,16 +112,15 @@ class RoutesCubit extends Cubit<RoutesState> {
   // ─── Get route path ────────────────────────────────────────────────────────
 
   Future<void> getRoutePath() async {
-
     if (selectedStartController.text.isEmpty ||
         selectedEndController.text.isEmpty) {
       FlutterToastHelper.showToast(
-        text:  AppText.pleaseSelectStation,
+        text:  "Please select both start and end stations to find a route",
         color: AppColor.error,
       );
       return;
-        }
-   
+    }
+
     if (selectedStartController.text == selectedEndController.text) {
       FlutterToastHelper.showToast(
         text:  "You can't select the same station for both start and end",
@@ -132,7 +136,6 @@ class RoutesCubit extends Cubit<RoutesState> {
     ));
 
     try {
-    
       final rawSegments = await routesRepo.fetchTransportsPath(
         ParamsRoutePath(
           start: state.selectedTransportStart!.id!,
@@ -140,11 +143,16 @@ class RoutesCubit extends Cubit<RoutesState> {
         ),
       );
 
-final segments = parseSegments(rawSegments);
-for (var segment in segments) {
-  print('Segment: ${segment.boardingStop} to ${segment.alightingStop}');
-  print('  Line: ${segment.lineName}, Direction: ${segment.direction}, Type: ${segment.type}');
-  
+      final segments = parseSegments(rawSegments);
+
+
+for (var s in segments) {
+  print('=== SEGMENT ===');
+  print('lineName: ${s.lineName}');
+  print('type: ${s.type}');
+  print('stopsCount: ${s.stopsCount}');
+  print('stops.length: ${s.stops.length}');
+  print('ticketPrice: ${s.ticketPrice}');
 }
       emit(state.copyWith(
         routesStateEnum: RoutesStateEnum.gettingRoutePathLoaded,
@@ -152,6 +160,10 @@ for (var segment in segments) {
         steps:           [],
         path:            [],
       ));
+
+      // ← ضيف السطرين دول بعد الـ emit مباشرة
+      _saveToHistory(segments);
+
     } catch (e, stackTrace) {
       debugPrint('RoutesCubit getRoutePath error: $e');
       debugPrint('StackTrace: $stackTrace');
@@ -160,6 +172,19 @@ for (var segment in segments) {
         errorState: RoutesStateEnum.gettingRoutePathError,
       );
     }
+  }
+
+  // ─── Save to history (background) ─────────────────────────────────────────
+
+  void _saveToHistory(List<SegmentModel> segments) {
+    if (segments.isEmpty) return;
+
+    final trip = buildTripFromSegments(segments); // ← من segment_helper.dart
+    
+    // بيشتغل في الـ background — مش بيأثر على الـ UI
+    tripHistoryRepo.createTrip(trip).catchError((e) {
+      debugPrint('Failed to save trip history: $e');
+    });
   }
 
   // ─── Change transport type ─────────────────────────────────────────────────

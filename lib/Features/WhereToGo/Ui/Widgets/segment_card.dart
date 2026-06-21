@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Helper/segment_helper.dart';
 import 'package:sekka/Core/Helper/transport_ui_helper.dart';
+import 'package:sekka/Core/theme/app_colors.dart';
 import 'package:sekka/Core/theme/app_radius.dart';
 import 'package:sekka/Features/Routes/Ui/Widget/stop_item.dart';
 
 class SegmentCard extends StatefulWidget {
-
   final SegmentModel segment;
   final bool isLast;
 
@@ -18,13 +17,11 @@ class SegmentCard extends StatefulWidget {
 }
 
 class _SegmentCardState extends State<SegmentCard> {
-  
   bool _expanded = false;
 
   @override
   Widget build(BuildContext context) {
     final seg     = widget.segment;
-    final accent  = TransportUIHelper.color(seg.type);
     final preview = _expanded
         ? seg.stops
         : (seg.stops.length > 4 ? seg.stops.sublist(0, 4) : seg.stops);
@@ -33,27 +30,26 @@ class _SegmentCardState extends State<SegmentCard> {
       decoration: BoxDecoration(
         color:        Colors.white,
         borderRadius: AppRadius.allLG,
-        border: Border.all(
-            color: Colors.grey.withOpacity(0.12), width: 0.5),
+        border:       Border.all(color: AppColors.outline, width: 0.5),
       ),
       child: Column(
         children: [
-            Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: 12.w, vertical: 10.h),
+          // ── Header ──────────────────────────────────────────────────────
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
             child: Row(
               children: [
                 Container(
-                  width: 32.w,
+                  width:  32.w,
                   height: 32.w,
                   decoration: BoxDecoration(
-                    color: accent.withOpacity(0.1),
+                    color:       AppColors.success.withOpacity(0.2),
                     borderRadius: AppRadius.allMD,
                   ),
                   child: Icon(
                       TransportUIHelper.icon(seg.type),
-                      size: 15.sp,
-                      color: accent),
+                      size:  15.sp,
+                      color: AppColors.success.withOpacity(0.7)),
                 ),
                 SizedBox(width: 8.w),
                 Expanded(
@@ -63,9 +59,10 @@ class _SegmentCardState extends State<SegmentCard> {
                       Text(
                         seg.lineName ?? '',
                         style: TextStyle(
-                          fontSize: 13.sp,
+                          fontSize:   13.sp,
                           fontWeight: FontWeight.w500,
-                          color: accent,
+                          color:      AppColors.textPrimary,
+                          fontFamily: 'Roboto',
                         ),
                       ),
                       if (seg.direction?.isNotEmpty == true)
@@ -73,27 +70,25 @@ class _SegmentCardState extends State<SegmentCard> {
                           seg.direction!,
                           style: TextStyle(
                               fontSize: 11.sp,
-                              color: Colors.grey.shade500),
+                              color:    AppColors.textSecondary,
+                              fontFamily: 'Roboto'),
                         ),
                     ],
                   ),
                 ),
-                _PositionBadge(segment: seg, accent: accent),
+                _PositionBadge(segment: seg, accent: AppColors.warning),
               ],
             ),
           ),
 
-          // ── cost row ──────────────────────────────────────────────────────
+          // ── Cost row ─────────────────────────────────────────────────────
           Container(
-            padding: EdgeInsets.symmetric(
-                horizontal: 12.w, vertical: 6.h),
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: AppColors.offWhite,
               border: Border(
-                top:    BorderSide(
-                    color: Colors.grey.withOpacity(0.08), width: 0.5),
-                bottom: BorderSide(
-                    color: Colors.grey.withOpacity(0.08), width: 0.5),
+                top:    BorderSide(color: AppColors.outline, width: 0.5),
+                bottom: BorderSide(color: AppColors.outline, width: 0.5),
               ),
             ),
             child: Row(
@@ -116,9 +111,9 @@ class _SegmentCardState extends State<SegmentCard> {
             ),
           ),
 
+          // ── Stops list ───────────────────────────────────────────────────
           Padding(
-            padding: EdgeInsets.only(
-                left: 12.w, right: 12.w, top: 4.h),
+            padding: EdgeInsets.only(left: 12.w, right: 12.w, top: 4.h),
             child: ListView.builder(
               shrinkWrap: true,
               physics:    const NeverScrollableScrollPhysics(),
@@ -128,16 +123,15 @@ class _SegmentCardState extends State<SegmentCard> {
                 final isLast  = i == preview.length - 1 &&
                     (seg.stops.length <= 4 || _expanded);
                 return StopItem(
-                  stop:        preview[i],
-                  isFirst:     isFirst,
-                  isLast:      isLast,
-
+                  stop:    preview[i],
+                  isFirst: isFirst,
+                  isLast:  isLast,
                 );
               },
             ),
           ),
 
-          // ── expand ────────────────────────────────────────────────────────
+          // ── Expand button ────────────────────────────────────────────────
           if (seg.stops.length > 4)
             InkWell(
               onTap: () => setState(() => _expanded = !_expanded),
@@ -151,7 +145,7 @@ class _SegmentCardState extends State<SegmentCard> {
                           ? Icons.remove_circle_outline_rounded
                           : Icons.add_circle_outline_rounded,
                       size:  13.sp,
-                      color: Colors.grey.shade400,
+                      color: AppColors.muted,
                     ),
                     SizedBox(width: 6.w),
                     Text(
@@ -160,20 +154,22 @@ class _SegmentCardState extends State<SegmentCard> {
                           : 'View all ${seg.stops.length} stops',
                       style: TextStyle(
                           fontSize: 12.sp,
-                          color: Colors.grey.shade500),
+                          color:    AppColors.textSecondary),
                     ),
                   ],
                 ),
               ),
             ),
 
+          // ── Transfer ─────────────────────────────────────────────────────
           if (seg.transferAtStop != null && seg.nextLineName != null)
             _TransferRow(
-                atStop: seg.transferAtStop!, nextLine: seg.nextLineName!),
+                atStop:   seg.transferAtStop!,
+                nextLine: seg.nextLineName!),
 
-
+          // ── Destination ──────────────────────────────────────────────────
           if (widget.isLast)
-            _DestinationRow(name: seg.alightingStop, accent: accent),
+            _DestinationRow(name: seg.alightingStop, accent: AppColors.grey.withOpacity(0.7)),
 
           SizedBox(height: 6.h),
         ],
@@ -181,34 +177,39 @@ class _SegmentCardState extends State<SegmentCard> {
     );
   }
 }
+
+// ── Cost chip ─────────────────────────────────────────────────────────────────
+
 class _CostChip extends StatelessWidget {
   final IconData icon;
-  final String label;
+  final String   label;
 
   const _CostChip({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) => Row(
         children: [
-          Icon(icon, size: 12.sp, color: Colors.grey.shade400),
+          Icon(icon, size: 12.sp, color: AppColors.muted),
           SizedBox(width: 4.w),
           Text(label,
               style: TextStyle(
-                  fontSize: 11.sp, color: Colors.grey.shade500)),
+                  fontSize: 11.sp, color: AppColors.textSecondary)),
         ],
       );
 }
 
+// ── Position badge ────────────────────────────────────────────────────────────
+
 class _PositionBadge extends StatelessWidget {
   final SegmentModel segment;
-  final Color accent;
+  final Color        accent;
 
   const _PositionBadge({required this.segment, required this.accent});
 
   @override
   Widget build(BuildContext context) {
-    final Color  color;
-    final String label;
+    final Color    color;
+    final String   label;
     final IconData icon;
 
     if (segment.isStart) {
@@ -216,11 +217,11 @@ class _PositionBadge extends StatelessWidget {
       label = 'start';
       icon  = Icons.radio_button_checked_rounded;
     } else if (segment.isTransfer) {
-      color = const Color(0xFFBA7517);
+      color = AppColors.warning;
       label = 'transfer';
       icon  = Icons.swap_horiz_rounded;
     } else {
-      color = const Color(0xFF3B6D11);
+      color = AppColors.darkGreen;
       label = 'end';
       icon  = Icons.location_on_rounded;
     }
@@ -239,17 +240,17 @@ class _PositionBadge extends StatelessWidget {
           SizedBox(width: 3.w),
           Text(label,
               style: TextStyle(
-                  fontSize: 10.sp,
+                  fontFamily: 'Roboto',
+                  fontSize:   10.sp,
                   fontWeight: FontWeight.w500,
-                  color: color)),
+                  color:      color)),
         ],
       ),
     );
   }
 }
 
-
-
+// ── Transfer row ──────────────────────────────────────────────────────────────
 
 class _TransferRow extends StatelessWidget {
   final String atStop;
@@ -260,62 +261,68 @@ class _TransferRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+      margin:  EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
       decoration: BoxDecoration(
-        color:        const Color(0xFFFAEEDA),
+        color:        AppColors.warningContainer,
         borderRadius: AppRadius.allMD,
         border: Border.all(
-            color: const Color(0xFFBA7517).withOpacity(0.3), width: 0.5),
+            color: AppColors.warning.withOpacity(0.3), width: 0.5),
       ),
       child: Row(
         children: [
           Container(
-            width: 24.w,
+            width:  24.w,
             height: 24.w,
-            decoration: const BoxDecoration(
-                color: Color(0xFFF5C97A), shape: BoxShape.circle),
-            child: const Icon(Icons.swap_horiz_rounded,
-                size: 13, color: Color(0xFF7A4F00)),
+            decoration: BoxDecoration(
+                color: AppColors.orange.withOpacity(0.3),
+                shape: BoxShape.circle),
+            child: Icon(Icons.swap_horiz_rounded,
+                size: 13, color: AppColors.warning),
           ),
           SizedBox(width: 8.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Transfer at $atStop',
-                    style: TextStyle(
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w500,
+                Text(
+                  'Transfer at $atStop',
+                  style: TextStyle(
+                      fontSize:   11.sp,
+                      fontWeight: FontWeight.w500,
                       fontFamily: 'Roboto',
-                        color: const Color(0xFF633806))),
-                Text('Take $nextLine',
-                    style: TextStyle(
-                        fontSize: 10.sp,
-                        color: const Color(0xFFBA7517),
-                        fontFamily: 'Roboto',
-                        )),
+                      color:      AppColors.textPrimary),
+                ),
+                Text(
+                  'Take $nextLine',
+                  style: TextStyle(
+                      fontSize:   10.sp,
+                      fontFamily: 'Roboto',
+                      color:      AppColors.warning),
+                ),
               ],
             ),
           ),
           Icon(Icons.arrow_forward_ios_rounded,
-              size: 10.sp, color: const Color(0xFFBA7517)),
+              size: 10.sp, color: AppColors.warning),
         ],
       ),
     );
   }
 }
 
+// ── Destination row ───────────────────────────────────────────────────────────
+
 class _DestinationRow extends StatelessWidget {
   final String name;
-  final Color accent;
+  final Color  accent;
 
   const _DestinationRow({required this.name, required this.accent});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+      margin:  EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
       decoration: BoxDecoration(
         color:        accent.withOpacity(0.06),
@@ -325,7 +332,7 @@ class _DestinationRow extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 24.w,
+            width:  24.w,
             height: 24.w,
             decoration:
                 BoxDecoration(color: accent, shape: BoxShape.circle),
@@ -339,13 +346,13 @@ class _DestinationRow extends StatelessWidget {
               children: [
                 Text('Destination',
                     style: TextStyle(
-                        fontSize: 10.sp,
+                        fontSize:   10.sp,
                         fontWeight: FontWeight.w500,
-                        color: accent)),
+                        color:      accent)),
                 Text(name,
                     style: TextStyle(
                         fontSize: 12.sp,
-                        color: accent.withOpacity(0.8))),
+                        color:    accent.withOpacity(0.8))),
               ],
             ),
           ),

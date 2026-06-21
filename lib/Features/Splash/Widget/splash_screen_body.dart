@@ -65,11 +65,11 @@ class _SplashScreenBodyState extends State<SplashScreenBody>
       );
 
       if (data == true) {
-        // if(FirebaseAuth.instance.currentUser != null) {
-        //   Navigator.pushReplacementNamed(context, AppRoute.bottomNavigation);
-        // } else {
+         if(FirebaseAuth.instance.currentUser != null) {
+           Navigator.pushReplacementNamed(context, AppRoute.bottomNavigation);
+         } else {
           Navigator.pushReplacementNamed(context, AppRoute.authWrapper);
-        // }
+         }
       } else {
         Navigator.pushReplacementNamed(context, AppRoute.onBoarding);
       }

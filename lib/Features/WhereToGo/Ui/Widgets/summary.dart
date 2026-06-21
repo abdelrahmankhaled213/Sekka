@@ -31,11 +31,6 @@ class SummaryBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // _SummaryChip(
-          //     value: '$transfers',
-          //     label: transfers == 1 ? 'transfer' : 'transfers',
-          //     icon: Icons.swap_horiz_rounded),
-          // _SummaryDivider(),
           _SummaryChip(
               value: timeLabel,
               label: 'est. time',
@@ -67,7 +62,7 @@ class _SummaryChip extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          Icon(icon, size: 16.sp, color: AppColors.darkBlue),
+          Icon(icon, size: 16.sp, color: AppColors.muted),
           SizedBox(height: 4.h),
           Text(
             value,

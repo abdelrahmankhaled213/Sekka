@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sekka/Core/Cubit/trip_tracking_state.dart' hide TripStateEnum;
 import 'package:sekka/Features/Profile/Logic/trip_history_cubit.dart';
 import 'package:sekka/Features/Profile/Logic/trip_history_state.dart';
 import 'package:sekka/Features/Profile/UI/Widgets/trip_card_widget.dart';
@@ -36,7 +38,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen>
   }
 
   void _onFilterChanged(String filter) {
-    context.read<TripHistoryCubit>().setFilter(filter);
+    context.read<TripHistoryCubit>().filterByMode(filter);
     _listAnimController.reset();
     _listAnimController.forward();
   }
@@ -52,7 +54,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen>
         child: BlocBuilder<TripHistoryCubit, TripHistoryState>(
           builder: (context, state) {
             // ── Loading ───────────────────────────────────────────────────
-            if (state.status == TripHistoryStatus.loading) {
+            if (state.tripStateEnum == TripStateEnum.loading) {
               return const Center(
                 child: CircularProgressIndicator(
                     color: AppColor.main),
@@ -60,7 +62,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen>
             }
 
             // ── Error ─────────────────────────────────────────────────────
-            if (state.status == TripHistoryStatus.error) {
+            if (state.tripStateEnum == TripStateEnum.error) {
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(32),
@@ -71,14 +73,14 @@ class _TripHistoryScreenState extends State<TripHistoryScreen>
                           size: 56, color: Color(0xFF9E9E9E)),
                       const SizedBox(height: 16),
                       Text(
-                        state.errorMessage ??
+                        state.errorMsg ??
                             'Failed to load trips',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium
                             ?.copyWith(
                             color: const Color(0xFF9E9E9E)),
                       ),
-                      const SizedBox(height: 24),
+                       SizedBox(height: 24.h),
                       FilledButton.icon(
                         onPressed: () => context
                             .read<TripHistoryCubit>()
@@ -180,11 +182,11 @@ class _TripHistoryScreenState extends State<TripHistoryScreen>
                         children: [  
                          TripFilterChipsWidget(
                             selectedFilter:
-                            state.selectedFilter,
+                            state.selectedFilter?? 'all',
                             onFilterChanged: _onFilterChanged,
                             tripCounts: counts,
                           ),
-                          const SizedBox(height: 8),
+                           SizedBox(height: 8.h),
                         ],
                       ),
                     ),

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:sekka/Core/Database/local_data_source.dart';
@@ -35,6 +37,14 @@ class ProfileRepo {
     final updatedRemoteUser = await remoteDataSource.getUser(userId);
 
     await localUserDataSource.upsertUser(updatedRemoteUser);
+  }
+
+
+  Future<void> deleteProfileImage() async {
+    await remoteDataSource.deleteProfileImage();
+  }
+  Future<String> uploadProfileImage(File imageFile) async {
+    return await remoteDataSource.updateProfileImage(imageFile);
   }
 
   Future<void> logout() async {

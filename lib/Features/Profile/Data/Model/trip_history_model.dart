@@ -1,14 +1,9 @@
 import 'package:hive/hive.dart';
+import 'package:sekka/Features/Routes/Data/Model/trip_model.dart';
+import 'package:uuid/uuid.dart';
 
 part 'trip_history_model.g.dart';
 
-@HiveType(typeId: 1)
-enum TripStatus {
-  @HiveField(0)
-  completed,
-  @HiveField(1)
-  cancelled,
-}
 
 @HiveType(typeId: 2)
 class TripHistoryModel {
@@ -24,10 +19,9 @@ class TripHistoryModel {
   @HiveField(3)
   final String dateTime;
 
-  @HiveField(4)
-  final TripStatus status;
 
   // ── Extra fields (not Hive-persisted – fetched from remote) ──
+  final String? userId;
   final String? routeCode;
   final String? mode;       // 'metro' | 'monorail' | 'bus' | 'microbus'
   final int? durationMin;
@@ -36,11 +30,11 @@ class TripHistoryModel {
   final double? co2Saved;
 
   const TripHistoryModel({
+    this.userId,
     required this.id,
     required this.fromStation,
     required this.toStation,
     required this.dateTime,
-    required this.status,
     this.routeCode,
     this.mode,
     this.durationMin,
@@ -59,9 +53,7 @@ class TripHistoryModel {
           json['to_transport'] as String? ??
           '',
       dateTime: json['date_time'] as String? ?? json['dateTime'] as String? ?? '',
-      status: json['status'] == 'completed'
-          ? TripStatus.completed
-          : TripStatus.cancelled,
+
       routeCode: json['route_code'] as String?,
       mode: json['mode'] as String?,
       durationMin: (json['duration_min'] as num?)?.toInt(),
@@ -73,17 +65,16 @@ class TripHistoryModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'id': const Uuid().v4(),
+      'user_id': userId,
       'from_station': fromStation,
       'to_station': toStation,
       'date_time': dateTime,
-      'status': status == TripStatus.completed ? 'completed' : 'cancelled',
       if (routeCode != null) 'route_code': routeCode,
       if (mode != null) 'mode': mode,
       if (durationMin != null) 'duration_min': durationMin,
       if (fareEGP != null) 'fare_egp': fareEGP,
       if (crowdLevel != null) 'crowd_level': crowdLevel,
-      if (co2Saved != null) 'co2_saved': co2Saved,
     };
   }
 
@@ -92,26 +83,24 @@ class TripHistoryModel {
     String? fromStation,
     String? toStation,
     String? dateTime,
-    TripStatus? status,
+
     String? routeCode,
     String? mode,
     int? durationMin,
     double? fareEGP,
     String? crowdLevel,
-    double? co2Saved,
   }) {
     return TripHistoryModel(
       id: id ?? this.id,
       fromStation: fromStation ?? this.fromStation,
       toStation: toStation ?? this.toStation,
       dateTime: dateTime ?? this.dateTime,
-      status: status ?? this.status,
       routeCode: routeCode ?? this.routeCode,
       mode: mode ?? this.mode,
       durationMin: durationMin ?? this.durationMin,
       fareEGP: fareEGP ?? this.fareEGP,
       crowdLevel: crowdLevel ?? this.crowdLevel,
-      co2Saved: co2Saved ?? this.co2Saved,
+
     );
   }
 }

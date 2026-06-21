@@ -3,33 +3,41 @@ import 'package:sekka/Features/Profile/Data/Model/trip_history_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TripHistoryRemoteDataSource {
-  
+
   final SupabaseClient supabaseClient;
 
   const TripHistoryRemoteDataSource(this.supabaseClient);
 
-  Future<List<TripHistoryModel>> getTrips() async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
+Future<List<TripHistoryModel>> getTrips() async {
+  final userId = FirebaseAuth.instance.currentUser!.uid;
+  final data = await supabaseClient
+      .from('trip_history')
+      .select()
+      .eq('user_id', userId); // ← كان 'id' غل
+
+  return (data as List)
+      .map((json) => TripHistoryModel.fromJson(json as Map<String, dynamic>))
+      .toList();
+}
+  // ── Get Single Trip Details ───────────────────────────────────────────────
+  Future<TripHistoryModel> getTripDetails(String tripId) async {
     final data = await supabaseClient
-        .from('trips_history')
+        .from('trip_history')
         .select()
-        .eq('user_id', userId)
-        .order('date_time', ascending: false);
+        .eq('id', tripId)
+        .single();
 
-    return (data as List)
-        .map((json) => TripHistoryModel.fromJson(json as Map<String, dynamic>))
-        .toList();
+    return TripHistoryModel.fromJson(data as Map<String, dynamic>);
   }
 
-  Future<void> createTrip(TripHistoryModel trip) async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
-    await supabaseClient.from('trips').insert({
-      ...trip.toJson(),
-      'user_id': userId,
-    });
-  }
-
+  // ── Create Trip ───────────────────────────────────────────────────────────
+  
+Future<void> createTrip(TripHistoryModel trip) async {
+  await supabaseClient
+      .from('trip_history')
+      .insert(trip.toJson()); // ← من غير user_id
+}
   Future<void> deleteTrip(String tripId) async {
-    await supabaseClient.from('trips').delete().eq('id', tripId);
+    await supabaseClient.from('trip_history').delete().eq('id', tripId);
   }
 }
