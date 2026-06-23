@@ -21,7 +21,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.abdelrahmankhaled.sekka"
+    namespace = "com.example.abdelrahmankhaled.sekka"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
@@ -49,7 +49,7 @@ signingConfigs {
         manifestPlaceholders["MAPS_API_KEY"] =
             localProperties.getProperty("MAPS_API_KEY") ?: ""
 
-        applicationId = "com.abdelrahmankhaled.sekka"
+        applicationId = "com.example.abdelrahmankhaled.sekka"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = flutter.versionCode

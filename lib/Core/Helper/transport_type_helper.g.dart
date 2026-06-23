@@ -22,6 +22,8 @@ class TransportTypeAdapter extends TypeAdapter<TransportType> {
       case 3:
         return TransportType.microbus;
       case 4:
+        return TransportType.BRT;
+        case 5:
         return TransportType.transfer;
       default:
         return TransportType.metro;
@@ -43,9 +45,13 @@ class TransportTypeAdapter extends TypeAdapter<TransportType> {
       case TransportType.microbus:
         writer.writeByte(3);
         break;
+        case TransportType.BRT:
+        writer.writeByte(4);
+        break;
       case TransportType.transfer:
         writer.writeByte(4);
         break;
+
     }
   }
 

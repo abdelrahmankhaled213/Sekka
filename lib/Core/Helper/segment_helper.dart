@@ -120,6 +120,10 @@ class SegmentModel {
         return 80;
       case TransportType.bus:
         return 20;
+      case TransportType.BRT:
+        if(stopsCount <= 4) return 5;
+        if(stopsCount <= 10) return  10;
+        return 15;  
       case TransportType.microbus:
         return 0;
       case TransportType.transfer:
@@ -168,10 +172,12 @@ class SegmentModel {
     if (lower.startsWith('monorail')) return TransportType.monorail;
     if (lower.startsWith('micro'))    return TransportType.microbus;
     if (lower.startsWith('bus'))      return TransportType.bus;
+    if (lower.startsWith('BRT'))      return TransportType.BRT;
 
     if (lower.contains('metro'))      return TransportType.metro;
     if (lower.contains('monorail'))   return TransportType.monorail;
     if (lower.contains('micro'))      return TransportType.microbus;
+    if (lower.contains('BRT'))        return TransportType.BRT;
 
     return TransportType.bus;
   }

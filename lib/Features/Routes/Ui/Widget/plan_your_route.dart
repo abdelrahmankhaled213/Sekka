@@ -57,6 +57,17 @@ class _PlanYourRouteState extends State<PlanYourRoute> {
       color2: AppColor.pink,
       title: TransportType.bus,
     ),
+
+
+    TransportSwitiching(
+      image: AppImage.planYourRouteBRT,
+      icon: Icons.directions_bus_rounded,
+      color1: AppColor.main,
+      color2: AppColor.pink,
+      title: TransportType.BRT,
+    ),
+    
+    
   ];
 
   static LinearGradient _buildGradient(Color c1, Color c2) =>
@@ -162,6 +173,7 @@ class _HeroSection extends StatelessWidget {
 
 
 class _TransportSwitcher extends StatelessWidget {
+
   final List<TransportSwitiching> list;
   final TransportSwitiching selected;
   final LinearGradient Function(Color, Color) gradient;

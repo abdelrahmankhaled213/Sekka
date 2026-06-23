@@ -31,7 +31,7 @@ class ProfileState {
   final String? errorMsg;
   
   // ── Transport Preferences ───────────────────────────────
-  final List<TransportType> selectedTransports;
+  final List<TransportType?> selectedTransports;
   
   // ── Image Management ───────────────────────────────
   final bool isImageRemoved;
@@ -48,7 +48,7 @@ class ProfileState {
     ProfileStateEnum? profileStateEnum,
     UserModel? userModel,
     String? errorMsg,
-    List<TransportType>? selectedTransports,
+    List<TransportType?>? selectedTransports,
     bool? isImageRemoved,
   }) {
     return ProfileState(

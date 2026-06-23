@@ -13,6 +13,8 @@ abstract class AppImage{
    static const String googleIcon="assets/Icons/google_icon.png";
    static const String planYourRouteMetro='assets/Images/CairoMetro3C_02.png';
    static const String planYourRouteMonorail='assets/Images/Monorail.jpg';
+   static const String planYourRouteBRT='assets/Images/BRT.jpg';
+   
    static const String planYourRouteBus='assets/Images/bus.jpg';
    static const String locationIcon='assets/Icons/Icon.png';
    static const String profileBackground="assets/Images/Image (Profile Background).png";

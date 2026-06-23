@@ -77,6 +77,16 @@ class RecentTripsWidget extends StatelessWidget {
       'icon': Icons.subway_rounded,
       'type': 'metro',
     },
+    {
+      'name': 'Nasr City Hub',
+      'icon': Icons.train_rounded,
+      'type': 'monorail',
+    },
+    {
+      'name': 'Cairo Festival City',
+      'icon': Icons.local_mall_rounded,
+      'type': 'microbus',
+    },
   ];
 
   Color _typeColor(String type) {
@@ -95,51 +105,13 @@ class RecentTripsWidget extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 100.h),
       children: [
-        // ── Section header ───────────────────────────────────────────────
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Recent Trips',
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {},
-              child: Text(
-                'See all',
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                ),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 10.h),
-
-        // ── Trip items ───────────────────────────────────────────────────
-        ...List.generate(_recentTrips.length, (index) {
-          return _TripItem(
-            trip: _recentTrips[index],
-            index: index,
-            onTap: () => onDestinationTap(
-                _recentTrips[index]['destination'] as String),
-          );
-        }),
-
-        SizedBox(height: 20.h),
-
         // ── Popular destinations ─────────────────────────────────────────
         Text(
           'Popular Destinations',
           style: TextStyle(
             fontSize: 14.sp,
             fontWeight: FontWeight.w700,
+            fontFamily: 'Roboto',
             color: AppColors.textPrimary,
           ),
         ),

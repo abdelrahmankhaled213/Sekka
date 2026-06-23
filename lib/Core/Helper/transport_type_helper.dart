@@ -12,6 +12,8 @@ enum TransportType {
   @HiveField(3)
   microbus,
   @HiveField(4)
+  BRT,
+  @HiveField(4)
   transfer,
 }
 
@@ -24,7 +26,7 @@ extension TransportTypeX on TransportType {
       case TransportType.monorail: return 'monorail';
       case TransportType.bus:      return 'bus';
       case TransportType.microbus: return 'microbus';
-
+      case TransportType.BRT:      return 'BRT';
       default: return null;
  
     }
@@ -36,19 +38,22 @@ extension TransportTypeX on TransportType {
       case TransportType.monorail: return 'Monorail';
       case TransportType.bus:      return 'Bus';
       case TransportType.microbus: return 'Microbus';
+      case TransportType.BRT:      return 'BRT';
       case TransportType.transfer: return 'Transfer';
     }
   }
 
-  
   static TransportType? fromString(String? val) {
-    if (val == null) return null;
+  if (val == null) return null;
+  try {
     return TransportType.values.firstWhere(
-      (e) => e.toJson() == val.toLowerCase(),
-      orElse: () => TransportType.bus,
+      (e) => e.toJson()?.toLowerCase() == val.toLowerCase(),
     );
+  } catch (_) {
+    return null; // unknown string → drop it, don't default to bus
   }
-
+}
+  
   static TransportType fromJson(String value) {
     return TransportType.values.firstWhere(
       (e) => e.toJson() == value,

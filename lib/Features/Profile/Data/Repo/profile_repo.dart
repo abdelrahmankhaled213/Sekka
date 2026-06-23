@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:sekka/Core/Database/local_data_source.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_model.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_update.dart';
 import 'package:sekka/Features/Profile/Data/DataSource/remote_data_source.dart';
@@ -39,6 +40,9 @@ class ProfileRepo {
     await localUserDataSource.upsertUser(updatedRemoteUser);
   }
 
+  Future<void> updateFavoriteTransports(List<TransportType?> types) async {
+    await remoteDataSource.updateFavoriteTransports(types);
+  }
 
   Future<void> deleteProfileImage() async {
     await remoteDataSource.deleteProfileImage();

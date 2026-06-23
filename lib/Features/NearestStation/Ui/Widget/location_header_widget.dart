@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sekka/Core/Constants/app_color.dart';
 
 class LocationHeaderWidget extends StatelessWidget {
+
   final String locationName;
 
   const LocationHeaderWidget({super.key, required this.locationName});
@@ -77,6 +78,8 @@ class LocationHeaderWidget extends StatelessWidget {
                   Text(
                     locationName,
                     style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Roboto',
                       color: Colors.white.withOpacity(0.85),
                       fontSize: 13.sp,
                     ),

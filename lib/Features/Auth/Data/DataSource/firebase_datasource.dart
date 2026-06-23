@@ -66,37 +66,74 @@ class FirebaseDatasource {
   }
 
   // ✅ Fixed: now signs into Firebase and returns UserCredential
-  Future<UserCredential> loginWithGoogle() async {
-    await googleSignIn.initialize(
-      clientId: EnvironmentVariable.instance.webClientId,
+  // Future<UserCredential> loginWithGoogle() async {
+  //   await googleSignIn.initialize(
+  //     clientId: EnvironmentVariable.instance.webClientId,
+  //   );
+
+  //   if (!googleSignIn.supportsAuthenticate()) {
+  //     throw FirebaseAuthException(
+  //       code: 'google-sign-in-unsupported',
+  //       message: 'Google sign-in is not supported on this platform.',
+  //     );
+  //   }
+
+  //   final GoogleSignInAccount? account = await googleSignIn.authenticate();
+
+  //   if (account == null) {
+  //     throw FirebaseAuthException(
+  //       code: 'google-sign-in-cancelled',
+  //       message: 'Google sign-in was cancelled by the user.',
+  //     );
+  //   }
+
+
+  //   final GoogleSignInAuthentication googleAuth = await account.authentication;
+
+
+  //   final OAuthCredential credential = GoogleAuthProvider.credential(
+  //     idToken: googleAuth.idToken,
+  //   );
+
+  //   return await firebaseAuth.signInWithCredential(credential);
+  // }
+
+
+
+Future<UserCredential> loginWithGoogle() async {
+  await googleSignIn.initialize(
+    serverClientId: EnvironmentVariable.instance.webClientId,   // ✅ correct
+  );
+
+  if (!googleSignIn.supportsAuthenticate()) {
+    throw FirebaseAuthException(
+      code: 'google-sign-in-unsupported',
+      message: 'Google sign-in is not supported on this platform.',
     );
-
-    if (!googleSignIn.supportsAuthenticate()) {
-      throw FirebaseAuthException(
-        code: 'google-sign-in-unsupported',
-        message: 'Google sign-in is not supported on this platform.',
-      );
-    }
-
-    final GoogleSignInAccount? account = await googleSignIn.authenticate();
-
-    if (account == null) {
-      throw FirebaseAuthException(
-        code: 'google-sign-in-cancelled',
-        message: 'Google sign-in was cancelled by the user.',
-      );
-    }
-
-
-    final GoogleSignInAuthentication googleAuth = await account.authentication;
-
-
-    final OAuthCredential credential = GoogleAuthProvider.credential(
-      idToken: googleAuth.idToken,
-    );
-
-    return await firebaseAuth.signInWithCredential(credential);
   }
+
+  final GoogleSignInAccount? account = await googleSignIn.authenticate();
+
+  if (account == null) {
+    throw FirebaseAuthException(
+      code: 'google-sign-in-cancelled',
+      message: 'Google sign-in was cancelled by the user.',
+    );
+  }
+
+  final GoogleSignInAuthentication googleAuth = await account.authentication;
+
+  final OAuthCredential credential = GoogleAuthProvider.credential(
+    idToken: googleAuth.idToken,
+  );
+
+  return await firebaseAuth.signInWithCredential(credential);
+}
+
+
+
+
+
 
   User? get user => firebaseAuth.currentUser;
 

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sekka/Core/Helper/transport_type_helper.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_model.dart';
 import 'package:sekka/Features/Auth/Data/Model/user_update.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -34,7 +35,13 @@ class RemoteDataSource {
         .select();
   }
 
-
+Future<void> updateFavoriteTransports(List<TransportType?> types) async {
+  final userId = FirebaseAuth.instance.currentUser!.uid;
+  await supabaseClient
+      .from('users')
+      .update({'Favourite_Transport': types})
+      .eq('id', userId);
+}
   Future<String> updateProfileImage(File imageFile) async {
     final userId = FirebaseAuth.instance.currentUser!.uid;
     final storagePath = 'avatars/$userId.jpg';

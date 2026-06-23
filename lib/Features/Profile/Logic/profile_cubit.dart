@@ -43,24 +43,61 @@ class ProfileCubit extends Cubit<ProfileState> {
 
 
   // ── Get Profile ───────────────────────────────────────────────────────────
-  Future<void> getProfile() async {
-    emit(state.copyWith(profileStateEnum: ProfileStateEnum.getProfileLoading));
-    try {
-      final userId = FirebaseAuth.instance.currentUser!.uid;
-      final user = await repo.getUser(userId);
-      if (isClosed) return;
-      emit(state.copyWith(
-        profileStateEnum: ProfileStateEnum.getProfileSuccess,
-        userModel: user,
-      ));
-    } catch (e) {
-      final failure = ErrorHandler.handleError(e);
-      emit(state.copyWith(
-        profileStateEnum: ProfileStateEnum.getProfileError,
-        errorMsg: failure.message,
-      ));
-    }
+
+// ── after getProfile() succeeds, init the chips from the loaded user ──────
+
+
+// ── Get Profile ────────────────────────────────────────────────────────────
+Future<void> getProfile() async {
+  emit(state.copyWith(profileStateEnum: ProfileStateEnum.getProfileLoading));
+  try {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final user = await repo.getUser(userId);
+    if (isClosed) return;
+
+    // favTrasnportation is List<String?> from Supabase
+    // TransportTypeX.fromString() knows how to parse each value safely
+    final savedTransports = user.favTrasnportation;
+  
+        
+
+    emit(state.copyWith(
+      profileStateEnum: ProfileStateEnum.getProfileSuccess,
+      userModel: user,
+      selectedTransports: savedTransports,
+    ));
+  } catch (e) {
+    final failure = ErrorHandler.handleError(e);
+    emit(state.copyWith(
+      profileStateEnum: ProfileStateEnum.getProfileError,
+      errorMsg: failure.message,
+    ));
   }
+}
+
+// ── Save Transport Preferences ─────────────────────────────────────────────
+Future<void> saveTransportPreferences() async {
+  emit(state.copyWith(profileStateEnum: ProfileStateEnum.updating));
+  try {
+
+    await repo.updateFavoriteTransports(state.selectedTransports);
+    if (isClosed) return;
+    emit(state.copyWith(profileStateEnum: ProfileStateEnum.updateSuccess));
+  } catch (e) {
+    final failure = ErrorHandler.handleError(e);
+    emit(state.copyWith(
+      profileStateEnum: ProfileStateEnum.updateError,
+      errorMsg: failure.message,
+    ));
+  }
+}
+
+
+
+
+// ── refresh (called by pull-to-refresh) ────────────────────────────────────
+Future<void> refresh() => getProfile();
+
 
   // ── Update Profile (text fields only) ────────────────────────────────────
   Future<void> editProfile(UpdateUserRequest request) async {

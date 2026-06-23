@@ -21,32 +21,32 @@ class CapacityPredictionResult {
 
 class CapacityPredictionService {
 
-  final _random = Random();
+ 
+Future<CapacityPredictionResult?> getPredictionForStation(int stationId) async {
+  await Future.delayed(const Duration(milliseconds: 100));
 
-  Future<CapacityPredictionResult?> getPredictionForStation(int stationId) async {
-    
-    await Future.delayed(const Duration(milliseconds: 100));
+  // seed بالـ stationId → نفس الـ station = نفس الرقم دايمًا
+  final rng = Random(stationId);
 
-    const totalSeats = 35;
+  const totalSeats = 35;
+  final occupiedSeats = 5 + rng.nextInt(totalSeats - 4);
+  final ratio = occupiedSeats / totalSeats;
 
-    
-    final occupiedSeats = 5 + _random.nextInt(totalSeats - 4);
-
-    final ratio = occupiedSeats / totalSeats;
-
-    final CrowdingLevel level;
-    if (ratio < 0.5) {
-      level = CrowdingLevel.low;
-    } else if (ratio < 0.8) {
-      level = CrowdingLevel.medium;
-    } else {
-      level = CrowdingLevel.high;
-    }
-
-    return CapacityPredictionResult(
-      crowdingLevel: level,
-      totalSeats:    totalSeats,
-      occupiedSeats: occupiedSeats,
-    );
+  final CrowdingLevel level;
+  if (ratio < 0.5) {
+    level = CrowdingLevel.low;
+  } else if (ratio < 0.8) {
+    level = CrowdingLevel.medium;
+  } else {
+    level = CrowdingLevel.high;
   }
+
+  return CapacityPredictionResult(
+    crowdingLevel: level,
+    totalSeats:    totalSeats,
+    occupiedSeats: occupiedSeats,
+  );
+}
+
+
 }

@@ -12,12 +12,14 @@ abstract class TransportColorsHelper {
 
   static Color iconBackground(TransportType type) {
     switch (type) {
-      case TransportType.transfer:
+        case TransportType.transfer:
         return AppColor.main;
-      case TransportType.metro:
+        case TransportType.metro:
         return AppColor.main;
-      case TransportType.bus:
+        case TransportType.bus:
         return AppColor.green;
+        case TransportType.BRT:
+        return Colors.teal;
       case TransportType.monorail:
         return AppColor.secondary;
       case TransportType.microbus:
@@ -29,6 +31,9 @@ abstract class TransportColorsHelper {
     switch (type) {
       
       case TransportType.bus:
+        return Icons.directions_bus;
+
+case TransportType.BRT:
         return Icons.directions_bus;
 
       case TransportType.metro:

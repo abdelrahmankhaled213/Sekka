@@ -16,6 +16,7 @@ class TransportFilterWidget extends StatelessWidget {
     _FilterItem(label: 'Monorail', icon: Icons.train,            type: TransportType.monorail),
     _FilterItem(label: 'Bus',      icon: Icons.directions_bus,   type: TransportType.bus),
     _FilterItem(label: 'Microbus', icon: Icons.airport_shuttle,  type: TransportType.microbus),
+    _FilterItem(label: 'BRT',      icon: Icons.directions_bus,            type: TransportType.BRT),
   ];
 
   @override

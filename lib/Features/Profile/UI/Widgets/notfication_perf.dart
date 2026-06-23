@@ -240,16 +240,17 @@ class _NotificationPreferencesWidgetState
             // ── Header ───────────────────────────────────────────────────
             Row(
               children: [
-                const Icon(
+                 Icon(
                   Icons.notifications_rounded,
                   color: AppColor.main,
-                  size: 24,
+                  size: 24.sp,
                 ),
                 const SizedBox(width: 12),
                 Text(
                   'Notifications',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
+                        
                       ),
                 ),
               ],
@@ -266,7 +267,8 @@ class _NotificationPreferencesWidgetState
               value: _notificationsEnabled,
               onChanged: _toggleNotifications,
             ),
-            const SizedBox(height: 12),
+             
+             SizedBox(height: 12.h),
 
             // ── Divider ──────────────────────────────────────────────────
             if (_notificationsEnabled)
@@ -319,25 +321,6 @@ class _NotificationPreferencesWidgetState
                 },
               ),
             ],
-
-            // ── Debug Info (Optional - يمكن حذفها لاحقاً) ──────────────────
-            if (_notificationsEnabled)
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withAlpha(20),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '💾 Settings are saved in SharedPreferences',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Colors.grey[600],
-                        ),
-                  ),
-                ),
-              ),
           ],
         ),
       ),
@@ -385,11 +368,12 @@ class _NotificationTile extends StatelessWidget {
               ),
               child: Icon(
                 icon,
-                size: 20,
+                size: 20.sp,
                 color: value ? AppColor.main : Colors.grey,
               ),
             ),
-            const SizedBox(width: 12),
+            
+             SizedBox(width: 12.w),
 
             // ── Text ────────────────────────────────────────────────────
             Expanded(
@@ -401,6 +385,7 @@ class _NotificationTile extends StatelessWidget {
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
+                      fontFamily: 'Roboto',
                     ),
                   ),
                   const SizedBox(height: 2),

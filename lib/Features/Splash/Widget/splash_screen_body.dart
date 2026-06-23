@@ -155,9 +155,9 @@ class _SplashStaticContent extends StatelessWidget {
       width: double.infinity,
       child: Column(
         children: [
-          Text("Sekka", style: AppTextStyles.headlineLarge(context)),
+          Text("Sekka", style: AppTextStyles.headlineLarge(context).copyWith(color: Colors.white)),
           SizedBox(height: AppSpacing.sm.h),
-          Text("Smart Transportation", style: AppTextStyles.labelLarge(context)),
+          Text("Smart Transportation", style: AppTextStyles.labelLarge(context).copyWith(color: Colors.white)),
         ],
       ),
     );
