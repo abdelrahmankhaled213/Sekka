@@ -277,7 +277,7 @@
 //     _ctrl.clear();
 //     setState(() { _predictions = []; _showList = false; });
 //     _focusNode.unfocus();
-    
+
 //     context.read<NearestStationCubit>().loadNearestStations();
 //   }
 
@@ -923,7 +923,7 @@
 //                 label: '${station.distanceKm.toStringAsFixed(2)} km',
 //                 color: AppColor.main,
 //               ),
-              
+
 //               if (station.predictionScore > 0) ...[
 //                 SizedBox(width: 8.w),
 //                 _Chip(
@@ -1333,14 +1333,14 @@ class _NearestStationViewState extends State<NearestStationView> {
               // ── current location FAB ──────────────────────────────────────
               Positioned(
                 right:  16.w,
-                bottom: 210.h,
+                bottom: kBottomNavigationBarHeight + MediaQuery.of(context).padding.bottom + 16.h,
                 child: _LocationFab(),
               ),
 
               // ── error bar ─────────────────────────────────────────────────
               if (state.status == NearestStationStatus.error)
                 Positioned(
-                  bottom: 220.h,
+                  bottom: kBottomNavigationBarHeight + MediaQuery.of(context).padding.bottom + 16.h,
                   left: 16.w, right: 16.w,
                   child: _ErrorBar(
                     message: state.errorMessage ?? 'Something went wrong',
@@ -1349,12 +1349,15 @@ class _NearestStationViewState extends State<NearestStationView> {
                   ),
                 ),
 
-              // ── bottom stations strip ──────────────────────────────────────
+              // ── bottom stations strip (draggable) ─────────────────────────
               if (state.status == NearestStationStatus.loaded &&
                   state.stations.isNotEmpty)
                 Positioned(
-                  bottom: 0, left: 0, right: 0,
-                  child: _StationsStrip(stations: state.stations),
+                  bottom: 0,
+                  left:   0,
+                  right:  0,
+                  top:    0,
+                  child: _DraggableStationsStrip(stations: state.stations),
                 ),
             ],
           );
@@ -1512,21 +1515,21 @@ class _MapSearchBarState extends State<_MapSearchBar> {
                   ),
                   suffixIcon: _loading
                       ? Padding(
-                          padding: EdgeInsets.all(14.w),
-                          child: SizedBox(
-                            width: 16.w, height: 16.w,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2, color: AppColor.main,
-                            ),
-                          ),
-                        )
+                    padding: EdgeInsets.all(14.w),
+                    child: SizedBox(
+                      width: 16.w, height: 16.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2, color: AppColor.main,
+                      ),
+                    ),
+                  )
                       : _ctrl.text.isNotEmpty
-                          ? IconButton(
-                              icon: Icon(Icons.close_rounded,
-                                  color: AppColor.muted, size: 18.sp),
-                              onPressed: _clearSearch,
-                            )
-                          : null,
+                      ? IconButton(
+                    icon: Icon(Icons.close_rounded,
+                        color: AppColor.muted, size: 18.sp),
+                    onPressed: _clearSearch,
+                  )
+                      : null,
                   border:         InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(
                       horizontal: 16.w, vertical: 14.h),
@@ -1575,13 +1578,13 @@ class _MapSearchBarState extends State<_MapSearchBar> {
                       ),
                       child: isLoading
                           ? Padding(
-                              padding: EdgeInsets.all(8.w),
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2, color: AppColor.main,
-                              ),
-                            )
+                        padding: EdgeInsets.all(8.w),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2, color: AppColor.main,
+                        ),
+                      )
                           : Icon(Icons.location_on_rounded,
-                              color: AppColor.main, size: 16.sp),
+                          color: AppColor.main, size: 16.sp),
                     ),
                     title: Text(
                       p.mainText,
@@ -1594,13 +1597,13 @@ class _MapSearchBarState extends State<_MapSearchBar> {
                     ),
                     subtitle: p.secondaryText.isNotEmpty
                         ? Text(
-                            p.secondaryText,
-                            style: TextStyle(
-                              fontSize:   11.sp,
-                              fontFamily: 'Roboto',
-                              color:      AppColor.textSecondary,
-                            ),
-                          )
+                      p.secondaryText,
+                      style: TextStyle(
+                        fontSize:   11.sp,
+                        fontFamily: 'Roboto',
+                        color:      AppColor.textSecondary,
+                      ),
+                    )
                         : null,
                     onTap: isLoading ? null : () => _onSelect(p),
                   );
@@ -1722,94 +1725,161 @@ class _LocationFab extends StatelessWidget {
   }
 }
 
-// ── Stations Strip ─────────────────────────────────────────────────────────────
+// ── Draggable Stations Strip ───────────────────────────────────────────────────
 
-class _StationsStrip extends StatelessWidget {
+class _DraggableStationsStrip extends StatefulWidget {
   final List<NearestStationModel> stations;
-  const _StationsStrip({required this.stations});
+  const _DraggableStationsStrip({required this.stations});
+
+  @override
+  State<_DraggableStationsStrip> createState() =>
+      _DraggableStationsStripState();
+}
+
+class _DraggableStationsStripState extends State<_DraggableStationsStrip> {
+  final DraggableScrollableController _sheetController =
+  DraggableScrollableController();
+
+  @override
+  void dispose() {
+    _sheetController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: EdgeInsets.fromLTRB(0, 12.h, 0, 20.h),
-          decoration: BoxDecoration(
-            color:        Colors.white.withOpacity(0.92),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-            boxShadow: [
-              BoxShadow(
-                color:      Colors.black.withOpacity(0.07),
-                blurRadius: 16,
-                offset:     const Offset(0, -4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Container(
-                  width:  36.w, height: 4.h,
-                  margin: EdgeInsets.only(bottom: 12.h),
-                  decoration: BoxDecoration(
-                    color:        AppColor.outline,
-                    borderRadius: BorderRadius.circular(2.r),
+    final screenHeight = MediaQuery.of(context).size.height;
+    final navBarHeight = kBottomNavigationBarHeight + MediaQuery.of(context).padding.bottom;
+
+    // The sheet anchors at bottom:0 (behind nav bar).
+    // minSize peek = navBar + drag handle strip (60px) so the handle + "Nearest Stations"
+    // title are clearly visible just above the nav bar and easy to grab.
+    final double peekPx  = navBarHeight + 60;
+    final double minSize = (peekPx / screenHeight).clamp(0.14, 0.25);
+    const double maxSize = 0.85;
+
+    return DraggableScrollableSheet(
+      controller:       _sheetController,
+      initialChildSize: minSize,
+      minChildSize:     minSize,
+      maxChildSize:     maxSize,
+      snap:             true,
+      snapSizes:        [minSize, maxSize],
+      builder: (context, scrollController) {
+        return ClipRRect(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color:        Colors.white.withOpacity(0.92),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+                boxShadow: [
+                  BoxShadow(
+                    color:      Colors.black.withOpacity(0.07),
+                    blurRadius: 16,
+                    offset:     const Offset(0, -4),
                   ),
-                ),
+                ],
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Row(
-                  children: [
-                    Text(
-                      'Nearest Stations',
-                      style: TextStyle(
-                        fontSize:   15.sp,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'Roboto',
-                        color:      AppColor.textPrimary,
+              child: CustomScrollView(
+                controller: scrollController,
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(height: 12.h),
+
+                        // ── drag handle ────────────────────────────────────
+                        GestureDetector(
+                          onTap: () {
+                            final current = _sheetController.size;
+                            _sheetController.animateTo(
+                              current <= minSize + 0.02 ? maxSize : minSize,
+                              duration: const Duration(milliseconds: 300),
+                              curve:    Curves.easeInOut,
+                            );
+                          },
+                          behavior: HitTestBehavior.translucent,
+                          child: Center(
+                            child: Container(
+                              width:  36.w,
+                              height: 4.h,
+                              margin: EdgeInsets.only(bottom: 12.h),
+                              decoration: BoxDecoration(
+                                color:        AppColor.outline,
+                                borderRadius: BorderRadius.circular(2.r),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // ── header row ─────────────────────────────────────
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Nearest Stations',
+                                style: TextStyle(
+                                  fontSize:   15.sp,
+                                  fontWeight: FontWeight.w700,
+                                  fontFamily: 'Roboto',
+                                  color:      AppColor.textPrimary,
+                                ),
+                              ),
+                              const Spacer(),
+                              Text(
+                                '${widget.stations.length} found',
+                                style: TextStyle(
+                                  fontSize:   12.sp,
+                                  fontFamily: 'Roboto',
+                                  color:      AppColor.muted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 10.h),
+                      ],
+                    ),
+                  ),
+
+                  // ── 2-column grid of station cards ─────────────────────
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 20.h),
+                    sliver: SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount:     2,
+                        crossAxisSpacing:   10.w,
+                        mainAxisSpacing:    10.h,
+                        childAspectRatio:   1.1,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                            (_, i) => _StationMiniCard(
+                          station:    widget.stations[i],
+                          isSelected: context
+                              .watch<NearestStationCubit>()
+                              .state
+                              .selectedStation
+                              ?.id ==
+                              widget.stations[i].id,
+                          onTap: () => context
+                              .read<NearestStationCubit>()
+                              .selectStation(widget.stations[i]),
+                        ),
+                        childCount: widget.stations.length,
                       ),
                     ),
-                    const Spacer(),
-                    Text(
-                      '${stations.length} found',
-                      style: TextStyle(
-                        fontSize:   12.sp,
-                        fontFamily: 'Roboto',
-                        color:      AppColor.muted,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 10.h),
-              SizedBox(
-                height: 130.h,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding:         EdgeInsets.symmetric(horizontal: 16.w),
-                  itemCount:       stations.length,
-                  itemBuilder: (_, i) => _StationMiniCard(
-                    station:    stations[i],
-                    isSelected: context
-                            .watch<NearestStationCubit>()
-                            .state
-                            .selectedStation
-                            ?.id ==
-                        stations[i].id,
-                    onTap: () => context
-                        .read<NearestStationCubit>()
-                        .selectStation(stations[i]),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -1839,8 +1909,6 @@ class _StationMiniCard extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
         curve:    Curves.easeOutCubic,
-        width:    150.w,
-        margin:   EdgeInsets.only(right: 10.w),
         padding:  EdgeInsets.all(12.w),
         decoration: BoxDecoration(
           color: isSelected ? _color : Colors.white,
@@ -1941,15 +2009,15 @@ class _StationDetailSheet extends StatefulWidget {
 }
 
 class _StationDetailSheetState extends State<_StationDetailSheet> {
-  
-    late final int _seats; // ← late final = بيتحسب مرة واحدة بس
+
+  late final int _seats; // ← late final = بيتحسب مرة واحدة بس
 
   @override
   void initState() {
     super.initState();
-   
-       _seats = _fakeSeats[Random().nextInt(_fakeSeats.length)];
-  
+
+    _seats = _fakeSeats[Random().nextInt(_fakeSeats.length)];
+
   }
 
   Color  get _color => transportColor(widget.station.type);
@@ -2114,8 +2182,8 @@ class _StationDetailSheetState extends State<_StationDetailSheet> {
                 ],
               ],
             ),
-          
-            
+
+
             if (widget.station.routes != null && widget.station.routes!.isNotEmpty) ...[
               SizedBox(height: 14.h),
               Align(
@@ -2136,23 +2204,23 @@ class _StationDetailSheetState extends State<_StationDetailSheet> {
                 children: widget.station.routes!
                     .split(' | ')
                     .map((r) => Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10.w, vertical: 4.h),
-                          decoration: BoxDecoration(
-                            color:        _color.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(8.r),
-                            border: Border.all(color: _color.withOpacity(0.2)),
-                          ),
-                          child: Text(
-                            r,
-                            style: TextStyle(
-                              fontSize:   11.sp,
-                              fontFamily: 'Roboto',
-                              color:      _color,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ))
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color:        _color.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: _color.withOpacity(0.2)),
+                  ),
+                  child: Text(
+                    r,
+                    style: TextStyle(
+                      fontSize:   11.sp,
+                      fontFamily: 'Roboto',
+                      color:      _color,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ))
                     .toList(),
               ),
             ],

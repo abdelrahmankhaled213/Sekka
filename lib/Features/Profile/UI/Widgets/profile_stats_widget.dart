@@ -13,7 +13,7 @@ class ProfileStatsWidget extends StatelessWidget {
       builder: (context, state) {
         final isLoading =
             state.tripStateEnum == TripStateEnum.loading ||
-            state.tripStateEnum == TripStateEnum.initial;
+                state.tripStateEnum == TripStateEnum.initial;
 
         return Container(
           decoration: BoxDecoration(
@@ -31,37 +31,44 @@ class ProfileStatsWidget extends StatelessWidget {
           child: isLoading
               ? const _LoadingStats()
               : Row(
-                  children: [
-                    _StatItem(
-                      icon: Icons.train_rounded,
-                      label: 'Metro',
-                      count: state.metroTripsCount,
-                      color: const Color(0xFF1565C0),
-                    ),
-                    _Divider(),
-                    _StatItem(
-                      icon: Icons.tram_rounded,
-                      label: 'Monorail',
-                      count: state.monorailTripsCount,
-                      color: const Color(0xFF6A1B9A),
-                    ),
-                    _Divider(),
-                    _StatItem(
-                      icon: Icons.directions_bus_rounded,
-                      label: 'Bus',
-                      count: state.busTripsCount,
-                      color: const Color(0xFF2E7D32),
-                    ),
-                    _Divider(),
-                    _StatItem(
-                      icon: Icons.route_rounded,
-                      label: 'Total',
-                      count: state.totalTripsCount,
-                      color: AppColor.main,
-                      isHighlighted: true,
-                    ),
-                  ],
-                ),
+            children: [
+              _StatItem(
+                icon: Icons.train_rounded,
+                label: 'Metro',
+                count: state.metroTripsCount,
+                color: const Color(0xFF1565C0),
+              ),
+              _Divider(),
+              _StatItem(
+                icon: Icons.tram_rounded,
+                label: 'Monorail',
+                count: state.monorailTripsCount,
+                color: const Color(0xFF6A1B9A),
+              ),
+              _Divider(),
+              _StatItem(
+                icon: Icons.directions_bus_rounded,
+                label: 'Bus',
+                count: state.busTripsCount,
+                color: const Color(0xFF2E7D32),
+              ),
+              _Divider(),
+              _StatItem(
+                icon: Icons.directions_bus_filled_rounded,
+                label: 'BRT',
+                count: state.brtTripsCount,
+                color: const Color(0xFFDC2626),
+              ),
+              _Divider(),
+              _StatItem(
+                icon: Icons.route_rounded,
+                label: 'Total',
+                count: state.totalTripsCount,
+                color: AppColor.main,
+                isHighlighted: true,
+              ),
+            ],
+          ),
         );
       },
     );
@@ -142,8 +149,8 @@ class _LoadingStats extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: List.generate(
-        4,
-        (i) => Expanded(
+        5,
+            (i) => Expanded(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

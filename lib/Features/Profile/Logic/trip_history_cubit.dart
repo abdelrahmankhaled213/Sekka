@@ -6,30 +6,31 @@ import 'package:sekka/Features/Profile/Logic/trip_history_state.dart';
 import '../Data/Model/trip_history_model.dart';
 
 class TripHistoryCubit extends Cubit<TripHistoryState> {
-  
+
   final TripHistoryRepository repo;
 
   TripHistoryCubit(this.repo)
       : super(const TripHistoryState(
-          tripStateEnum: TripStateEnum.initial,
-          trips: [],
-          filteredTrips: [],
-        ));
+    tripStateEnum: TripStateEnum.initial,
+    trips: [],
+    filteredTrips: [],
+  ));
 
-  
+
   Future<void> loadTrips() async {
     emit(state.copyWith(tripStateEnum: TripStateEnum.loading));
     try {
-      
+
       final trips = await repo.getTrips();
       print('Trips: ${trips.length}');
 
       if (isClosed) return;
 
-            final metroCount = trips.where((t) => t.mode == 'metro').length;
+      final metroCount = trips.where((t) => t.mode == 'metro').length;
       final monorailCount = trips.where((t) => t.mode == 'monorail').length;
       final busCount = trips.where((t) => t.mode == 'bus').length;
       final microbusCount = trips.where((t) => t.mode == 'microbus').length;
+      final brtCount = trips.where((t) => t.mode == 'brt').length;
 
       emit(state.copyWith(
         tripStateEnum: TripStateEnum.success,
@@ -39,6 +40,7 @@ class TripHistoryCubit extends Cubit<TripHistoryState> {
         monorailTripsCount: monorailCount,
         busTripsCount: busCount,
         microbusTripsCount: microbusCount,
+        brtTripsCount: brtCount,
         totalTripsCount: trips.length,
       ));
     } catch (e, stackTrace) {
@@ -52,7 +54,7 @@ class TripHistoryCubit extends Cubit<TripHistoryState> {
     }
   }
 
-  
+
   void filterByMode(String? mode) {
     if (mode == null) {
       // إظهار الكل
@@ -63,7 +65,7 @@ class TripHistoryCubit extends Cubit<TripHistoryState> {
     } else {
       // فلترة حسب الـ mode
       final filtered =
-          state.trips.where((trip) => trip.mode == mode).toList();
+      state.trips.where((trip) => trip.mode == mode).toList();
       emit(state.copyWith(
         filteredTrips: filtered,
         selectedFilter: mode,
@@ -110,7 +112,7 @@ class TripHistoryCubit extends Cubit<TripHistoryState> {
     try {
       // البحث عن المشوار من القائمة الموجودة
       final tripDetails =
-          state.trips.firstWhere((trip) => trip.id == tripId);
+      state.trips.firstWhere((trip) => trip.id == tripId);
 
       if (isClosed) return;
 
@@ -136,14 +138,14 @@ class TripHistoryCubit extends Cubit<TripHistoryState> {
 
       // حذف من القائمة المحلية
       final updatedTrips =
-          state.trips.where((trip) => trip.id != tripId).toList();
+      state.trips.where((trip) => trip.id != tripId).toList();
 
       // إعادة تطبيق الفلترة
       final filteredTrips = state.selectedFilter == null
           ? updatedTrips
           : updatedTrips
-              .where((trip) => trip.mode == state.selectedFilter)
-              .toList();
+          .where((trip) => trip.mode == state.selectedFilter)
+          .toList();
 
       // إعادة حساب الإحصائيات
       final metroCount = updatedTrips.where((t) => t.mode == 'metro').length;
@@ -152,6 +154,7 @@ class TripHistoryCubit extends Cubit<TripHistoryState> {
       final busCount = updatedTrips.where((t) => t.mode == 'bus').length;
       final microbusCount =
           updatedTrips.where((t) => t.mode == 'microbus').length;
+      final brtCount = updatedTrips.where((t) => t.mode == 'brt').length;
 
       emit(state.copyWith(
         tripStateEnum: TripStateEnum.success,
@@ -161,6 +164,7 @@ class TripHistoryCubit extends Cubit<TripHistoryState> {
         monorailTripsCount: monorailCount,
         busTripsCount: busCount,
         microbusTripsCount: microbusCount,
+        brtTripsCount: brtCount,
         totalTripsCount: updatedTrips.length,
       ));
     } catch (e) {

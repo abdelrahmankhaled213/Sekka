@@ -127,27 +127,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Text(
               'Sekka v2.4.1',
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: AppColor.main,
-                    fontWeight: FontWeight.w700,
-                  ),
+                color: AppColor.main,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 12),
             Text(
               'Sekka is your intelligent metro and monorail companion. '
-              'Using IR sensors, ML-based crowd prediction, and real-time '
-              'data, we help you navigate urban transit smarter — with less '
-              'waiting, less stress, and a smaller carbon footprint.',
+                  'Using IR sensors, ML-based crowd prediction, and real-time '
+                  'data, we help you navigate urban transit smarter — with less '
+                  'waiting, less stress, and a smaller carbon footprint.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF616161),
-                    height: 1.6,
-                  ),
+                color: const Color(0xFF616161),
+                height: 1.6,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
               '© 2026 Sekka Technologies. All rights reserved.',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: const Color(0xFF9E9E9E),
-                  ),
+                color: const Color(0xFF9E9E9E),
+              ),
             ),
           ],
         ),
@@ -213,7 +213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         body: SafeArea(
           child: BlocBuilder<ProfileCubit, ProfileState>(
             buildWhen: (prev, curr) =>
-                curr.profileStateEnum == ProfileStateEnum.getProfileLoading ||
+            curr.profileStateEnum == ProfileStateEnum.getProfileLoading ||
                 curr.profileStateEnum == ProfileStateEnum.getProfileError ||
                 curr.profileStateEnum == ProfileStateEnum.getProfileSuccess ||
                 curr.profileStateEnum == ProfileStateEnum.imageDeleteSuccess, // بنسمع للنجاح هنا عشان يحدث الـ UI كله
@@ -403,6 +403,12 @@ class _TripHistoryBottomSheet extends StatelessWidget {
                                   count: state.microbusTripsCount,
                                   icon: Icons.directions_bus,
                                   color: Colors.purple,
+                                ),
+                                _StatCard(
+                                  title: 'BRT',
+                                  count: state.brtTripsCount,
+                                  icon: Icons.directions_bus_filled_rounded,
+                                  color: Color(0xFFDC2626),
                                 ),
                               ],
                             ),

@@ -25,9 +25,10 @@ class TripHistoryState {
   final int monorailTripsCount;
   final int busTripsCount;
   final int microbusTripsCount;
+  final int brtTripsCount;
 
   // ── Filtering & Sorting ───────────────────────────────────────────
-  final String? selectedFilter; // 'metro' | 'monorail' | 'bus' | 'microbus' | null
+  final String? selectedFilter; // 'metro' | 'monorail' | 'bus' | 'microbus' | 'brt' | null
   final SortBy currentSortBy;
 
   // ── Trip Details ───────────────────────────────────────────────────
@@ -43,6 +44,7 @@ class TripHistoryState {
     this.monorailTripsCount = 0,
     this.busTripsCount = 0,
     this.microbusTripsCount = 0,
+    this.brtTripsCount = 0,
     this.selectedFilter,
     this.currentSortBy = SortBy.newestFirst,
     this.selectedTripDetails,
@@ -58,6 +60,7 @@ class TripHistoryState {
     int? monorailTripsCount,
     int? busTripsCount,
     int? microbusTripsCount,
+    int? brtTripsCount,
     String? selectedFilter,
     SortBy? currentSortBy,
     TripHistoryModel? selectedTripDetails,
@@ -72,6 +75,7 @@ class TripHistoryState {
       monorailTripsCount: monorailTripsCount ?? this.monorailTripsCount,
       busTripsCount: busTripsCount ?? this.busTripsCount,
       microbusTripsCount: microbusTripsCount ?? this.microbusTripsCount,
+      brtTripsCount: brtTripsCount ?? this.brtTripsCount,
       selectedFilter: selectedFilter,
       currentSortBy: currentSortBy ?? this.currentSortBy,
       selectedTripDetails: selectedTripDetails,

@@ -48,11 +48,18 @@ class _ProfilePreferencesSectionWidgetState
       'color': AppColor.orange,
       'bg': AppColor.orange.withOpacity(0.1),
     },
+    {
+      'type': TransportType.BRT,
+      'label': 'BRT',
+      'icon': Icons.directions_bus_filled_rounded,
+      'color': AppColor.error,
+      'bg': AppColor.error.withOpacity(0.1),
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
-    
+
     final theme = Theme.of(context);
 
     return BlocBuilder<ProfileCubit, ProfileState>(
